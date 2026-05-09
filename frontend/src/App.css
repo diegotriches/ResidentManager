@@ -1,0 +1,22 @@
+.container {
+  display: flex;
+  background-color: #333;
+}
+
+.sidebar {
+  width: 220px;       /* largura fixa da sidebar */
+  min-height: 100vh;
+}
+
+.content {
+  flex: 1;            /* ocupa o restante do espaço */
+  display: flex;      /* permite centralizar o conteúdo interno */
+  justify-content: center; /* centraliza horizontalmente */
+  align-items: flex-start; /* alinha no topo (pode usar center se quiser vertical também) */
+  padding: 20px;
+}
+
+.page-content {
+  max-width: 800px;   /* largura máxima do conteúdo */
+  width: 100%;        /* ocupa toda a largura disponível até o limite */
+}

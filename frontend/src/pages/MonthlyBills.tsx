@@ -1,4 +1,4 @@
-export const Documents = () => {
+export const MonthlyBills = () => {
     return (
         <>
         </>

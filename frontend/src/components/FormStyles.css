@@ -1,0 +1,70 @@
+/* Container principal do formulário */
+.form-wrapper {
+  display: flex;
+  flex-direction: column;
+  gap: 1.5rem;
+  width: 100%;
+}
+
+/* Container que envolve os campos */
+.form-grid {
+  display: flex;
+  flex-direction: column;
+  gap: 1.2rem;
+}
+
+/* Cada grupo de Label + Input */
+.form-field {
+  display: flex;
+  flex-direction: column;
+  text-align: left;
+  gap: 0.5rem;
+}
+
+.form-field label {
+  font-weight: 600;
+  font-size: 0.9rem;
+  color: #444;
+}
+
+.form-field input {
+  padding: 0.75rem;
+  border: 1px solid #ccc;
+  border-radius: 6px;
+  font-size: 1rem;
+  transition: border-color 0.2s, box-shadow 0.2s;
+}
+
+/* Efeito ao clicar no campo */
+.form-field input:focus {
+  outline: none;
+  border-color: #3498db;
+  box-shadow: 0 0 0 3px rgba(52, 152, 219, 0.2);
+}
+
+/* Botão de salvar */
+.btn-submit {
+  margin-top: 1rem;
+  padding: 0.8rem;
+  background-color: #27ae60;
+  color: white;
+  border: none;
+  border-radius: 6px;
+  font-size: 1rem;
+  font-weight: bold;
+  cursor: pointer;
+  transition: background-color 0.2s, transform 0.1s;
+}
+
+.btn-submit:hover {
+  background-color: #219150;
+}
+
+.btn-submit:active {
+  transform: scale(0.98);
+}
+
+/* Ajuste para quando estiver editando (mudar a cor do botão se quiser) */
+.btn-submit.editing {
+  background-color: #3498db;
+}

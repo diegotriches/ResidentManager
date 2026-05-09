@@ -1,0 +1,89 @@
+/* Fundo escurecido que cobre toda a tela */
+.modal-overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background-color: rgba(0, 0, 0, 0.6); /* Preto com 60% de transparência */
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  z-index: 1000; /* Garante que fique acima de tudo */
+  backdrop-filter: blur(3px); /* Leve desfoque no fundo para foco total no modal */
+}
+
+/* Caixa branca do conteúdo */
+.modal-content {
+  background: #eee;
+  padding: 2rem;
+  border-radius: 8px;
+  width: 90%;
+  max-width: 400px;
+  text-align: center;
+  box-shadow: 0 4px 15px rgba(0, 0, 0, 0.2);
+  animation: fadeIn 0.3s ease-out;
+}
+
+.modal-content h3 {
+  margin-top: 0;
+  color: #333;
+  font-size: 1.5rem;
+}
+
+.modal-content p {
+  color: #666;
+  margin: 1.5rem 0;
+  line-height: 1.4;
+}
+
+/* Container dos botões */
+.modal-actions {
+  display: flex;
+  justify-content: center;
+  gap: 1rem; /* Espaço entre os botões */
+  margin-top: 1rem;
+}
+
+/* Estilo geral dos botões do modal */
+.modal-actions button {
+  padding: 0.6rem 1.2rem;
+  border: none;
+  border-radius: 4px;
+  cursor: pointer;
+  font-weight: 600;
+  transition: background-color 0.2s, transform 0.1s;
+}
+
+/* Botão de Fechar/Cancelar (Padrão Cinza) */
+.modal-actions button:not(.btn-confirm) {
+  background-color: #e0e0e0;
+  color: #333;
+}
+
+.modal-actions button:not(.btn-confirm):hover {
+  background-color: #d5d5d5;
+}
+
+/* Botão de Confirmar Exclusão (Vermelho) */
+.btn-confirm {
+  background-color: #d9534f; /* Cor de perigo/alerta */
+  color: white !important;
+}
+
+.btn-confirm:hover {
+  background-color: #c9302c;
+  transform: scale(1.05); /* Pequeno efeito de zoom ao passar o mouse */
+}
+
+/* Animação de entrada */
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+    transform: translateY(-20px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}

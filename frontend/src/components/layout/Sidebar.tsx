@@ -9,6 +9,8 @@ import {
   FaInfoCircle,
 } from "react-icons/fa";
 
+import "./Sidebar.css";
+
 export const Sidebar = () => {
   return (
     <nav className="sidebar">
@@ -21,23 +23,23 @@ export const Sidebar = () => {
           <FaHome className="icon" />
           <span>Home</span>
         </NavLink>
-        <NavLink to="/" className="navlink">
-          <FaFileAlt className="icon" />
-          <span>Documentos</span>
-        </NavLink>
-        <NavLink to="/" className="navlink">
+        <NavLink to="/monthly-bills" className="navlink">
           <FaMoneyCheckAlt className="icon" />
+          <span>Gastos Mensais</span>
+        </NavLink>
+        <NavLink to="/vouchers" className="navlink">
+          <FaFileAlt className="icon" />
           <span>Comprovantes</span>
         </NavLink>
-        <NavLink to="/" className="navlink">
+        <NavLink to="/meters" className="navlink">
           <FaTachometerAlt className="icon" />
           <span>Medidores</span>
         </NavLink>
-        <NavLink to="/" className="navlink">
+        <NavLink to="/warnings" className="navlink">
           <FaInfoCircle className="icon" />
           <span>Avisos</span>
         </NavLink>
-        <NavLink to="/" className="navlink">
+        <NavLink to="/requests" className="navlink">
           <FaUserCog className="icon" />
           <span>Solicitações</span>
         </NavLink>
