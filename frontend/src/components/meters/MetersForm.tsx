@@ -1,11 +1,23 @@
+import type { MetersType } from "../../types/meters";
 import "../FormStyles.css";
 
-export const MetersForm = (
+interface MetersFormProps {
+  formData: Partial<MetersType>;
+  handleSubmit: (event: React.FormEvent<HTMLFormElement>) => void;
+  handleChange: (
+    event: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>,
+  ) => void;
+  editingMeterId?: number | null;
+}
+
+export const MetersForm: React.FC<MetersFormProps> = ({
   formData,
   handleSubmit,
   handleChange,
   editingMeterId,
-) => {
+}) => {
+  const apartmentMeter = Array.from({ length: 21 }, (_, i) => i + 1);
+
   return (
     <div className="form-wrapper">
       <form onSubmit={handleSubmit} className="form-grid">
@@ -16,25 +28,41 @@ export const MetersForm = (
             value={formData.apartment}
             onChange={handleChange}
           >
-            <option value={apartment}>{apartment}</option> // Gerar opções conforme os apartamentos
+            {apartmentMeter.map((option) => (
+              <option key={option} value={option}>
+                {option}
+              </option>
+            ))}
           </select>
         </div>
 
         <div className="form-field">
           <label>Consumo de Água</label>
-          <input name="water" value={formData.water} onChange={handleChange} required />
+          <input
+            type="number"
+            name="water"
+            value={formData.water}
+            onChange={handleChange}
+            required
+          />
         </div>
 
         <div className="form-field">
           <label>Consumo de Gás</label>
-          <input name="text" value={formData.gas} onChange={handleChange} required />
+          <input
+            type="number"
+            name="gas"
+            value={formData.gas}
+            onChange={handleChange}
+            required
+          />
         </div>
 
         <button
           type="submit"
           className={`btn-submit ${editingMeterId ? "editing" : ""}`}
         >
-          {editingMeterId ? "Salvar Alterações" : "Cadastrar Medidor"}
+          {editingMeterId ? "Salvar Medição" : "Cadastrar Medição"}
         </button>
       </form>
     </div>

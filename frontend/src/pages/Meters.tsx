@@ -1,31 +1,42 @@
 import { useState, useEffect } from "react";
-import { MetersForm } from "../components/meters/metersForm";
+import { MetersForm } from "../components/meters/MetersForm";
 import { Modal } from "../components/ui/Modal";
+import { getMeters } from "../services/metersService";
+import { useMeterForm } from "../hooks/useMeterForm";
+import type { MetersType } from "../types/meters";
 import { FaTachometerAlt, FaPencilAlt, FaTrashAlt } from "react-icons/fa";
 import "./PagesStyles.css";
 
+interface ModalConfig {
+  isOpen: boolean;
+  title: string;
+  message: string;
+  type: "confirm" | "alert";
+}
+
 export const Meters = () => {
-  const initialForm = { name: "", tel: "", email: "", adress: "" };
-  const [meters, setMeters] = useState([]);
-  const [modalConfig, setModalConfig] = useState({
+  const initialForm = { apartment: "", water: 0, gas: 0 };
+  const [meters, setMeters] = useState<MetersType[]>([]);
+  const [modalConfig, setModalConfig] = useState<ModalConfig>({
     isOpen: false,
     title: "",
     message: "",
+    type: "alert",
   });
   const [isFormModalOpen, setIsFormModalOpen] = useState(false);
 
   // Função para buscar medidores (pode virar outro hook)
   const fetchMeters = async () => {
     const response = await getMeters();
-    setMeters(response.data);
+    setMeters(response);
   };
 
   useEffect(() => {
     fetchMeters();
   }, []);
 
-  const openModal = (title, message) =>
-    setModalConfig({ isOpen: true, title: message });
+  const openModal = (title: string, message: string) =>
+    setModalConfig({ isOpen: true, title, message, type: "alert" });
 
   // Função para abrir para NOVA medição
   const handleOpenCreate = () => {
@@ -35,13 +46,15 @@ export const Meters = () => {
   };
 
   // Função para abrir para EDIÇÃO
-  const handleOpenEdit = (meter) => {
+  const handleOpenEdit = (meter: MetersType) => {
     handleEdit(meter); // Preenche o formData
     setIsFormModalOpen(true);
   };
 
   // Interceptamos o handleSubmit para fechar o modal após o sucesso
-  const onSubmitWithClose = async (e) => {
+  const onSubmitWithClose = async (
+    e: React.FormEvent<HTMLFormElement>,
+  ) => {
     // O handleSubmit agora retorna true ou false
     const success = await handleSubmit(e);
 
@@ -62,7 +75,7 @@ export const Meters = () => {
     handleSubmit,
     deleteRequest,
     handleDelete,
-  } = useMeterForm(initialForm, fetchMeters, setModalConfig);
+  } = useMeterForm({ initialForm, fetchMeters, setModalConfig });
 
   return (
     <>
@@ -110,23 +123,21 @@ export const Meters = () => {
             <thead>
               <tr>
                 <th>ID</th>
-                <th>Nome</th>
-                <th>Telefone</th>
-                <th>E-mail</th>
-                <th>Endereço</th>
+                <th>Apartamento</th>
+                <th>Cons. Água</th>
+                <th>Cons. Gás</th>
                 <th>Registro</th>
                 <th>Atualizado</th>
                 <th>Editar/Excluir</th>
               </tr>
             </thead>
             <tbody>
-              {meter.map((m) => (
+              {meters.map((m) => (
                 <tr key={m.meter_id}>
                   <td>{m.meter_id}</td>
-                  <td>{m.name}</td>
-                  <td>{m.tel}</td>
-                  <td>{m.email}</td>
-                  <td>{m.adress}</td>
+                  <td>{m.apartment}</td>
+                  <td>{m.water}</td>
+                  <td>{m.gas}</td>
                   <td>{m.createdAt}</td>
                   <td>{m.updatedAt}</td>
                   <td>
