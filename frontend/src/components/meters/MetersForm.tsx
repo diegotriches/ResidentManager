@@ -16,7 +16,10 @@ export const MetersForm: React.FC<MetersFormProps> = ({
   handleChange,
   editingMeterId,
 }) => {
-  const apartmentMeter = Array.from({ length: 21 }, (_, i) => i + 1);
+  const apartmentMeter = Array.from({ length: 7 }, (_, floorIndex) => {
+    const floor = floorIndex + 2; // começa no andar 2
+    return [1, 2, 3].map((apt) => Number(`${floor}0${apt}`));
+  }).flat();
 
   return (
     <div className="form-wrapper">
