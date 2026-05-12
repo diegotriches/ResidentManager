@@ -12,12 +12,18 @@ router.get("/", async (req, res) => {
 
 // POST - criar novo
 router.post("/", async (req, res) => {
-  const { apartment, water, gas } = req.body;
-  const db = await initDB();
-  const result = await db.run(
-    "INSERT INTO meters (apartment, water, gas) VALUES (?, ?, ?)",
-    [apartment, water, gas],
-  );
+  try {
+    const { apartment, water, gas } = req.body;
+    const db = await initDB();
+    const result = await db.run(
+      "INSERT INTO meters (apartment, water, gas) VALUES (?, ?, ?)",
+      [apartment, water, gas],
+    );
+    res.status(201).json({ meter_id: result.lastID, apartment, water, gas });
+  } catch (error) {
+    console.error(error);
+    res.status(500).json({ error: "Erro ao inserir medição" });
+  }
 });
 
 // PUT - atualizar
@@ -29,7 +35,7 @@ router.put("/:id", async (req, res) => {
   try {
     const result = await db.run(
       "UPDATE meters SET apartment = ?, water = ?, gas = ?, updatedAt = CURRENT_TIMESTAMP WHERE meter_id = ?",
-      [apartment, water, gas],
+      [apartment, water, gas, id],
     );
 
     if (result.changes === 0) {
@@ -48,7 +54,9 @@ router.delete("/:id", async (req, res) => {
 
   try {
     const db = await initDB();
-    const result = await db.run("DELETE FROM meters WHERE meter_id = ?", [id]) as { changes: number };
+    const result = (await db.run("DELETE FROM meters WHERE meter_id = ?", [
+      id,
+    ])) as { changes: number };
 
     if (result.changes > 0) {
       res.status(200).json({ message: "Medição removida com sucesso." });

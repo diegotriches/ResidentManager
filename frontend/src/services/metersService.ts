@@ -14,7 +14,7 @@ export async function createMeters(
 
 export async function updateMeters(
   id: number,
-  data: Partial<Omit<MetersType, "id">>,
+  data: Partial<MetersType>,
 ): Promise<MetersType> {
   const response = await api.put<MetersType>(`/meters/${id}`, data);
   return response.data;

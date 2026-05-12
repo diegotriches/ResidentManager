@@ -28,6 +28,7 @@ export const useMeterForm = ({
   };
 
   const handleEdit = (meter: MetersType) => {
+    console.log("Objeto recebido para edição:", meter);
     setEditingMeterId(meter.meter_id);
     setFormData({
       apartment: meter.apartment,

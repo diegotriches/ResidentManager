@@ -15,7 +15,7 @@ interface ModalConfig {
 }
 
 export const Meters = () => {
-  const initialForm = { apartment: "", water: 0, gas: 0 };
+  const initialForm = { apartment: "201", water: 0, gas: 0 };
   const [meters, setMeters] = useState<MetersType[]>([]);
   const [modalConfig, setModalConfig] = useState<ModalConfig>({
     isOpen: false,
@@ -35,8 +35,8 @@ export const Meters = () => {
     fetchMeters();
   }, []);
 
-  const openModal = (title: string, message: string) =>
-    setModalConfig({ isOpen: true, title, message, type: "alert" });
+  /*const openModal = (title: string, message: string) =>
+    setModalConfig({ isOpen: true, title, message, type: "alert" });*/
 
   // Função para abrir para NOVA medição
   const handleOpenCreate = () => {
@@ -51,14 +51,11 @@ export const Meters = () => {
     setIsFormModalOpen(true);
   };
 
-  // Interceptamos o handleSubmit para fechar o modal após o sucesso
   const onSubmitWithClose = async (
     e: React.FormEvent<HTMLFormElement>,
   ) => {
-    // O handleSubmit agora retorna true ou false
     const success = await handleSubmit(e);
 
-    // Só fecha o modal do formulário se a operação no banco deu certo
     if (success) {
       setIsFormModalOpen(false);
     }
