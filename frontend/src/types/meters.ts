@@ -1,6 +1,6 @@
 export type MetersType = {
   meter_id: number;
-  apartment: string;
+  apartment: number;
   water: number;
   gas: number;
   createdAt?: string;
@@ -8,7 +8,7 @@ export type MetersType = {
 };
 
 export type MeterFormData = {
-  apartment: string;
+  apartment: number;
   water: number;
   gas: number;
 };

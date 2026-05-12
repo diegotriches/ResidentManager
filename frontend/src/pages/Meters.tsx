@@ -15,7 +15,7 @@ interface ModalConfig {
 }
 
 export const Meters = () => {
-  const initialForm = { apartment: "201", water: 0, gas: 0 };
+  const initialForm = { apartment: 201, water: 0, gas: 0 };
   const [meters, setMeters] = useState<MetersType[]>([]);
   const [modalConfig, setModalConfig] = useState<ModalConfig>({
     isOpen: false,
@@ -34,9 +34,6 @@ export const Meters = () => {
   useEffect(() => {
     fetchMeters();
   }, []);
-
-  /*const openModal = (title: string, message: string) =>
-    setModalConfig({ isOpen: true, title, message, type: "alert" });*/
 
   // Função para abrir para NOVA medição
   const handleOpenCreate = () => {

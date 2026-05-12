@@ -1,10 +1,10 @@
 import { useState } from "react";
-import { createMeters, deleteMeters, updateMeters } from "../services/metersService";
-import type { MetersType, MeterFormData } from "../types/meters";
+import { createBills, deleteBills, updateBills } from "../services/billsService";
+import type { BillsType, BillsFormData } from "../types/bills";
 
-interface useMetersFormProps {
-  initialForm: MeterFormData;
-  fetchMeters: () => Promise<void>;
+interface useBillFormProps {
+  initialForm: BillsFormData;
+  fetchBills: () => Promise<void>;
   setModalConfig: (config: {
     isOpen: boolean;
     message: string;
@@ -13,13 +13,13 @@ interface useMetersFormProps {
   }) => void;
 }
 
-export const useMeterForm = ({
+export const useBillForm = ({
   initialForm,
-  fetchMeters,
+  fetchBills,
   setModalConfig,
-}: useMetersFormProps) => {
-  const [formData, setFormData] = useState<MeterFormData>(initialForm);
-  const [editingMeterId, setEditingMeterId] = useState<number | null>(null);
+}: useBillFormProps) => {
+  const [formData, setFormData] = useState<BillsFormData>(initialForm);
+  const [editingBillId, setEditingBillId] = useState<number | null>(null);
   const [idToDelete, setIdToDelete] = useState<number | null>(null);
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>) => {
@@ -27,12 +27,12 @@ export const useMeterForm = ({
     setFormData((prev) => ({ ...prev, [name]: value }));
   };
 
-  const handleEdit = (meter: MetersType) => {
-    setEditingMeterId(meter.meter_id);
+  const handleEdit = (bill: BillsType) => {
+    setEditingBillId(bill.bill_id);
     setFormData({
-      apartment: meter.apartment,
-      water: meter.water,
-      gas: meter.gas,
+      bill: bill.bill,
+      totalValue: bill.totalValue,
+      unitValue: bill.unitValue,
     });
   };
 
@@ -40,27 +40,27 @@ export const useMeterForm = ({
     e.preventDefault();
 
     try {
-      if (editingMeterId) {
-        await updateMeters(editingMeterId, formData);
+      if (editingBillId) {
+        await updateBills(editingBillId, formData);
         setModalConfig({
           isOpen: true,
           title: "Atualização",
-          message: "Medição atualizada com sucesso!",
+          message: "Conta atualizada com sucesso!",
           type: "alert",
         });
       } else {
-        await createMeters(formData);
+        await createBills(formData);
         setModalConfig({
           isOpen: true,
           title: "Cadastro",
-          message: "Medição cadastrada com sucesso!",
+          message: "Conta cadastrada com sucesso!",
           type: "alert",
         });
       }
 
       setFormData(initialForm);
-      setEditingMeterId(null);
-      await fetchMeters();
+      setEditingBillId(null);
+      await fetchBills();
 
       return true;
     } catch (error) {
@@ -80,7 +80,7 @@ export const useMeterForm = ({
     setModalConfig({
       isOpen: true,
       title: "Confirmação",
-      message: "Tem certeza que deseja excluir esta medição?",
+      message: "Tem certeza que deseja excluir esta conta?",
       type: "confirm",
     });
   };
@@ -88,21 +88,21 @@ export const useMeterForm = ({
   const handleDelete = async () => {
     try {
       if (idToDelete !== null) {
-        await deleteMeters(idToDelete);
+        await deleteBills(idToDelete);
       }
       setModalConfig({
         isOpen: true,
         title: "Sucesso",
-        message: "Medição removida com sucesso!",
+        message: "Conta removida com sucesso!",
         type: "alert",
       });
-      fetchMeters();
+      fetchBills();
     } catch (error) {
       console.error("Erro ao deletar:", error);
       setModalConfig({
         isOpen: true,
         title: "Erro",
-        message: "Ocorreu um problema ao tentar excluir a medição.",
+        message: "Ocorreu um problema ao tentar excluir a conta.",
         type: "alert",
       });
     }
@@ -111,8 +111,8 @@ export const useMeterForm = ({
   return {
     formData,
     setFormData,
-    editingMeterId,
-    setEditingMeterId,
+    editingBillId,
+    setEditingBillId,
     handleChange,
     handleEdit,
     handleSubmit,
