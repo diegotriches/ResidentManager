@@ -1,0 +1,53 @@
+import { FaPencilAlt, FaTrashAlt } from "react-icons/fa";
+import type { BillsType } from "../../types/bills";
+
+interface BillsRecordsTableProps {
+  bills: BillsType[];
+  handleOpenEdit: (bills: BillsType) => void;
+  deleteRequest: (id: number) => void;
+}
+
+export const BillsRecordsTable: React.FC<BillsRecordsTableProps> = ({
+  bills,
+  handleOpenEdit,
+  deleteRequest,
+}) => {
+  return (
+    <div className="records-container">
+      <table className="records-table">
+        <thead>
+          <tr>
+            <th>Despesa</th>
+            <th>Valor Total</th>
+            <th>Valor Unitário</th>
+            <th>Registro</th>
+            <th>Atualizado</th>
+            <th>Editar/Excluir</th>
+          </tr>
+        </thead>
+        <tbody>
+          {bills.map((b) => (
+            <tr key={b.bill_id}>
+              <td>{b.bill}</td>
+              <td>{b.totalValue}</td>
+              <td>{b.unitValue}</td>
+              <td>{b.createdAt}</td>
+              <td>{b.updatedAt}</td>
+              <td>
+                <button className="btn-edit" onClick={() => handleOpenEdit(b)}>
+                  <FaPencilAlt />
+                </button>
+                <button
+                  className="btn-delete"
+                  onClick={() => deleteRequest(b.bill_id)}
+                >
+                  <FaTrashAlt />
+                </button>
+              </td>
+            </tr>
+          ))}
+        </tbody>
+      </table>
+    </div>
+  );
+};

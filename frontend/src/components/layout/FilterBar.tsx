@@ -29,7 +29,6 @@ export const FilterBar: React.FC<FilterBarProps> = ({ month, year, setMonth, set
           <option value="2026">2026</option>
         </select>
       </div>
-      <button className="btn-print" onClick={() => window.print()}>Imprimir Vouchers</button>
     </div>
   );
 };

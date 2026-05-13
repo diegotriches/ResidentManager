@@ -4,7 +4,8 @@ import { Modal } from "../components/ui/Modal";
 import { getBills } from "../services/billsService";
 import { useBillForm } from "../hooks/useBillForm";
 import type { BillsType } from "../types/bills";
-import { FaMoneyCheckAlt, FaPencilAlt, FaTrashAlt } from "react-icons/fa";
+import { FaMoneyCheckAlt } from "react-icons/fa";
+import { BillsRecordsTable } from "../components/monthly-bills/BillsRecordTable";
 
 interface ModalConfig {
   isOpen: boolean;
@@ -25,49 +26,47 @@ export const MonthlyBills = () => {
   const [isFormModalOpen, setIsFormModalOpen] = useState(false);
 
   const fetchBills = async () => {
-      const response = await getBills();
-      setBills(response);
-    };
-  
-    useEffect(() => {
-      fetchBills();
-    }, []);
-  
-    // Função para abrir para NOVA medição
-    const handleOpenCreate = () => {
-      setEditingBillId(null);
-      setFormData(initialForm);
-      setIsFormModalOpen(true);
-    };
-  
-    // Função para abrir para EDIÇÃO
-    const handleOpenEdit = (bill: BillsType) => {
-      handleEdit(bill);
-      setIsFormModalOpen(true);
-    };
-  
-    const onSubmitWithClose = async (
-      e: React.FormEvent<HTMLFormElement>,
-    ) => {
-      const success = await handleSubmit(e);
-  
-      if (success) {
-        setIsFormModalOpen(false);
-      }
-    };
-  
-    // INSTANCIANDO O HOOK
-    const {
-      formData,
-      setFormData,
-      editingBillId,
-      setEditingBillId,
-      handleChange,
-      handleEdit,
-      handleSubmit,
-      deleteRequest,
-      handleDelete,
-    } = useBillForm({ initialForm, fetchBills, setModalConfig });
+    const response = await getBills();
+    setBills(response);
+  };
+
+  useEffect(() => {
+    fetchBills();
+  }, []);
+
+  // Função para abrir para NOVA medição
+  const handleOpenCreate = () => {
+    setEditingBillId(null);
+    setFormData(initialForm);
+    setIsFormModalOpen(true);
+  };
+
+  // Função para abrir para EDIÇÃO
+  const handleOpenEdit = (bill: BillsType) => {
+    handleEdit(bill);
+    setIsFormModalOpen(true);
+  };
+
+  const onSubmitWithClose = async (e: React.FormEvent<HTMLFormElement>) => {
+    const success = await handleSubmit(e);
+
+    if (success) {
+      setIsFormModalOpen(false);
+    }
+  };
+
+  // INSTANCIANDO O HOOK
+  const {
+    formData,
+    setFormData,
+    editingBillId,
+    setEditingBillId,
+    handleChange,
+    handleEdit,
+    handleSubmit,
+    deleteRequest,
+    handleDelete,
+  } = useBillForm({ initialForm, fetchBills, setModalConfig });
 
   return (
     <>
@@ -110,47 +109,11 @@ export const MonthlyBills = () => {
           </div>
         )}
 
-        <div className="records-container">
-          <table className="records-table">
-            <thead>
-              <tr>
-                <th>ID</th>
-                <th>Despesa</th>
-                <th>Valor Total</th>
-                <th>Valor Unitário</th>
-                <th>Registro</th>
-                <th>Atualizado</th>
-                <th>Editar/Excluir</th>
-              </tr>
-            </thead>
-            <tbody>
-              {bills.map((b) => (
-                <tr key={b.bill_id}>
-                  <td>{b.bill_id}</td>
-                  <td>{b.bill}</td>
-                  <td>{b.totalValue}</td>
-                  <td>{b.unitValue}</td>
-                  <td>{b.createdAt}</td>
-                  <td>{b.updatedAt}</td>
-                  <td>
-                    <button
-                      className="btn-edit"
-                      onClick={() => handleOpenEdit(b)}
-                    >
-                      <FaPencilAlt />
-                    </button>
-                    <button
-                      className="btn-delete"
-                      onClick={() => deleteRequest(b.bill_id)}
-                    >
-                      <FaTrashAlt />
-                    </button>
-                  </td>
-                </tr>
-              ))}
-            </tbody>
-          </table>
-        </div>
+        <BillsRecordsTable
+          bills={bills}
+          handleOpenEdit={handleOpenEdit}
+          deleteRequest={deleteRequest}
+        />
       </div>
     </>
   );

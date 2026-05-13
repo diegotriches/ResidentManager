@@ -17,7 +17,6 @@ export const MeterRecordsTable: React.FC<MeterRecordsTableProps> = ({
       <table className="records-table">
         <thead>
           <tr>
-            <th>ID</th>
             <th>Apartamento</th>
             <th>Cons. Água</th>
             <th>Cons. Gás</th>
@@ -29,7 +28,6 @@ export const MeterRecordsTable: React.FC<MeterRecordsTableProps> = ({
         <tbody>
           {meters.map((m) => (
             <tr key={m.meter_id}>
-              <td>{m.meter_id}</td>
               <td><strong>Apto {m.apartment}</strong></td>
               <td>{m.water}</td>
               <td>{m.gas}</td>
