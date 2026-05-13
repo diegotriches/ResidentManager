@@ -10,6 +10,40 @@ router.get("/", async (req, res) => {
   res.json(meters);
 });
 
+// GET - Esta query busca a medição do mês escolhido e tenta achar a medição do mês imediatamente anterior para o mesmo apartamento.
+router.get("/consumption/:month/:year", async (req, res) => {
+  const { month, year } = req.params;
+  const db = await initDB();
+
+  try {
+    const query = `
+      SELECT 
+        m1.apartment,
+        m1.water AS water_current,
+        m2.water AS water_previous,
+        (m1.water - IFNULL(m2.water, 0)) AS water_consumption,
+        m1.gas AS gas_current,
+        m2.gas AS gas_previous,
+        (m1.gas - IFNULL(m2.gas, 0)) AS gas_consumption
+      FROM meters m1
+      LEFT JOIN meters m2 ON m1.apartment = m2.apartment 
+        AND m2.createdAt = (
+          SELECT MAX(createdAt) 
+          FROM meters 
+          WHERE apartment = m1.apartment AND createdAt < m1.createdAt
+        )
+      WHERE strftime('%m', m1.createdAt) = ? 
+        AND strftime('%Y', m1.createdAt) = ?
+      ORDER BY m1.apartment ASC
+    `;
+
+    const results = await db.all(query, [month, year]);
+    res.json(results);
+  } catch (error) {
+    res.status(500).json({ error: "Erro ao calcular consumo." });
+  }
+});
+
 // POST - criar novo
 router.post("/", async (req, res) => {
   try {

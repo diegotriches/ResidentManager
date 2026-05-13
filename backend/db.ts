@@ -7,5 +7,7 @@ export async function initDB() {
     driver: sqlite3.Database,
   });
 
+  await db.get("PRAGMA foreign_keys = ON");
+
   return db;
 }

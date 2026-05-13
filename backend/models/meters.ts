@@ -10,6 +10,7 @@ export async function createMetersTable() {
         water DECIMAL(4,3),
         gas DECIMAL(4,3),
         createdAt DATETIME DEFAULT CURRENT_TIMESTAMP,
-        updatedAt DATETIME DEFAULT CURRENT_TIMESTAMP
+        updatedAt DATETIME DEFAULT CURRENT_TIMESTAMP,
+        FOREIGN KEY (apartment) REFERENCES apartments(number)
         )`);
 }

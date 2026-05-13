@@ -4,6 +4,7 @@ import meterRoutes from "./routes/meters.ts";
 import billRoutes from "./routes/bills.ts";
 import { createMetersTable } from "./models/meters.ts";
 import { createBillsTable } from "./models/bills.ts";
+import { createApartmentsTable } from "./models/apartments.ts";
 
 const app = express();
 const PORT = 3000;
@@ -11,6 +12,7 @@ const PORT = 3000;
 app.use(cors());
 app.use(express.json());
 
+await createApartmentsTable();
 await createMetersTable();
 await createBillsTable();
 
