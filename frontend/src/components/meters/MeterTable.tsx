@@ -1,17 +1,16 @@
-import React from "react";
-import type { VoucherReportType } from "../../types/vouchers";
+import type { MeterReportType } from "../../types/meters";
 
-interface VoucherTableProps {
-  data: VoucherReportType[];
+interface MeterTableProps {
+  data: MeterReportType[];
   loading: boolean;
 }
 
-export const VoucherTable: React.FC<VoucherTableProps> = ({ data, loading }) => {
+export const MeterTable: React.FC<MeterTableProps> = ({ data, loading }) => {
   if (loading) return <div className="loading">Carregando consumos...</div>;
 
   return (
     <div className="table-container">
-      <table className="vouchers-table">
+      <table className="meters-table">
         <thead>
           <tr>
             <th>Apartamento</th>

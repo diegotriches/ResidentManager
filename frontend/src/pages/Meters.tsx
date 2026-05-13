@@ -1,11 +1,14 @@
 import { useState, useEffect } from "react";
 import { MetersForm } from "../components/meters/MetersForm";
+import { FilterBar } from "../components/layout/FilterBar";
+import { MeterTable } from "../components/meters/MeterTable";
 import { Modal } from "../components/ui/Modal";
-import { getMeters } from "../services/metersService";
+import { getMeters, getConsumptionReport } from "../services/metersService";
 import { useMeterForm } from "../hooks/useMeterForm";
-import type { MetersType } from "../types/meters";
-import { FaTachometerAlt, FaPencilAlt, FaTrashAlt } from "react-icons/fa";
+import type { MetersType, MeterReportType } from "../types/meters";
+import { FaTachometerAlt } from "react-icons/fa";
 import "./PagesStyles.css";
+import { MeterRecordsTable } from "../components/meters/MeterRecordsTable";
 
 interface ModalConfig {
   isOpen: boolean;
@@ -16,24 +19,46 @@ interface ModalConfig {
 
 export const Meters = () => {
   const initialForm = { apartment: 201, water: 0, gas: 0 };
+
+  const [activeTab, setActiveTab] = useState<"register" | "history">(
+    "register",
+  );
   const [meters, setMeters] = useState<MetersType[]>([]);
+  const [reportData, setReportData] = useState<MeterReportType[]>([]);
+  const [loading, setLoading] = useState(false);
+  const [month, setMonth] = useState("05");
+  const [year, setYear] = useState("2026");
+  const [isFormModalOpen, setIsFormModalOpen] = useState(false);
   const [modalConfig, setModalConfig] = useState<ModalConfig>({
     isOpen: false,
     title: "",
     message: "",
     type: "alert",
   });
-  const [isFormModalOpen, setIsFormModalOpen] = useState(false);
 
-  // Função para buscar medidores (pode virar outro hook)
   const fetchMeters = async () => {
     const response = await getMeters();
     setMeters(response);
   };
 
+  const fetchReport = async () => {
+    setLoading(true);
+    try {
+      const data = await getConsumptionReport(month, year);
+      setReportData(data);
+    } catch (error) {
+      console.error("Erro ao carregar relatório", error);
+    } finally {
+      setLoading(false);
+    }
+  };
+
   useEffect(() => {
     fetchMeters();
   }, []);
+  useEffect(() => {
+    fetchReport();
+  }, [month, year]);
 
   // Função para abrir para NOVA medição
   const handleOpenCreate = () => {
@@ -48,9 +73,8 @@ export const Meters = () => {
     setIsFormModalOpen(true);
   };
 
-  const onSubmitWithClose = async (
-    e: React.FormEvent<HTMLFormElement>,
-  ) => {
+  // Handler de submissão que fecha o modal
+  const onSubmitWithClose = async (e: React.FormEvent<HTMLFormElement>) => {
     const success = await handleSubmit(e);
 
     if (success) {
@@ -58,7 +82,6 @@ export const Meters = () => {
     }
   };
 
-  // INSTANCIANDO O HOOK
   const {
     formData,
     setFormData,
@@ -69,10 +92,15 @@ export const Meters = () => {
     handleSubmit,
     deleteRequest,
     handleDelete,
-  } = useMeterForm({ initialForm, fetchMeters, setModalConfig });
+  } = useMeterForm({
+    initialForm,
+    fetchMeters,
+    setModalConfig,
+  });
 
   return (
     <>
+      {/* Modal de Alerta/Confirmação (Exclusão) */}
       <Modal
         isOpen={modalConfig.isOpen}
         title={modalConfig.title}
@@ -81,77 +109,81 @@ export const Meters = () => {
         onClose={() => setModalConfig({ ...modalConfig, isOpen: false })}
         onConfirm={handleDelete}
       />
-      <div className="main-container">
-        <header>
-          <h1>Gestão de Medidores</h1>
-          <button onClick={handleOpenCreate} className="btn-new">
-            <FaTachometerAlt /> Nova Medição
-          </button>
-        </header>
 
-        {isFormModalOpen && (
-          <div className="modal-overlay">
-            <div className="modal-content form-modal">
-              <button
-                className="close-x"
-                onClick={() => setIsFormModalOpen(false)}
-              >
-                X
-              </button>
-              <h2 className="modal-title">
-                {editingMeterId ? "Editar Medição" : "Nova Medição"}
-              </h2>
+      {/* MODAL DO FORMULÁRIO (Acionado por Nova Medição ou Editar) */}
+      {isFormModalOpen && (
+        <div className="modal-overlay">
+          <div className="modal-content form-modal">
+            <h2 className="modal-title">
+              {editingMeterId ? "Editar Medição" : "Nova Medição"}
+            </h2>
+            <button
+              className="close-x"
+              onClick={() => setIsFormModalOpen(false)}
+            >
+              &times;
+            </button>
 
-              <MetersForm
-                formData={formData}
-                handleChange={handleChange}
-                handleSubmit={onSubmitWithClose}
-                editingMeterId={editingMeterId}
-              />
-            </div>
+            <MetersForm
+              formData={formData}
+              handleChange={handleChange}
+              handleSubmit={onSubmitWithClose}
+              editingMeterId={editingMeterId}
+            />
           </div>
-        )}
+        </div>
+      )}
 
-        <div className="records-container">
-          <table className="records-table">
-            <thead>
-              <tr>
-                <th>ID</th>
-                <th>Apartamento</th>
-                <th>Cons. Água</th>
-                <th>Cons. Gás</th>
-                <th>Registro</th>
-                <th>Atualizado</th>
-                <th>Editar/Excluir</th>
-              </tr>
-            </thead>
-            <tbody>
-              {meters.map((m) => (
-                <tr key={m.meter_id}>
-                  <td>{m.meter_id}</td>
-                  <td>{m.apartment}</td>
-                  <td>{m.water}</td>
-                  <td>{m.gas}</td>
-                  <td>{m.createdAt}</td>
-                  <td>{m.updatedAt}</td>
-                  <td>
-                    <button
-                      className="btn-edit"
-                      onClick={() => handleOpenEdit(m)}
-                    >
-                      <FaPencilAlt />
-                    </button>
-                    <button
-                      className="btn-delete"
-                      onClick={() => deleteRequest(m.meter_id)}
-                    >
-                      <FaTrashAlt />
-                    </button>
-                  </td>
-                </tr>
-              ))}
-            </tbody>
-          </table>
+      <div className="main-container">
+        <div className="tabs-header">
+          <header className="pages-header">
+            <h1>Gestão de Medidores</h1>
+            <button onClick={handleOpenCreate} className="btn-new">
+              <FaTachometerAlt /> Nova Medição
+            </button>
+          </header>
+
+          <nav className="tabs-nav">
+            <button
+              className={activeTab === "register" ? "active" : ""}
+              onClick={() => setActiveTab("register")}
+            >
+              Registro de Medições
+            </button>
+            <button
+              className={activeTab === "history" ? "active" : ""}
+              onClick={() => setActiveTab("history")}
+            >
+              Visualizar Medições
+            </button>
+          </nav>
+        </div>
+
+        <div className="tab-content">
+          {activeTab === "register" ? (
+            <section className="animate-in">
+              <MeterRecordsTable
+                meters={meters}
+                onEdit={handleOpenEdit}
+                onDelete={deleteRequest}
+              />
+            </section>
+          ) : (
+            <section className="animate-in">
+              <div className="meters-page">
+                <div className="report-header">
+                  <h2>Métricas de Consumo</h2>
+                  <FilterBar
+                    month={month}
+                    setMonth={setMonth}
+                    year={year}
+                    setYear={setYear}
+                  />
+                </div>
+                <MeterTable data={reportData} loading={loading} />
+              </div>
+            </section>
+          )}
         </div>
       </div>
     </>
