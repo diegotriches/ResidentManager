@@ -1,5 +1,9 @@
 import { useState } from "react";
-import { createBills, deleteBills, updateBills } from "../services/billsService";
+import {
+  createBills,
+  deleteBills,
+  updateBills,
+} from "../services/billsService";
 import type { BillsType, BillsFormData } from "../types/bills";
 
 interface useBillFormProps {
@@ -22,9 +26,25 @@ export const useBillForm = ({
   const [editingBillId, setEditingBillId] = useState<number | null>(null);
   const [idToDelete, setIdToDelete] = useState<number | null>(null);
 
-  const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>) => {
+  const handleChange = (
+    e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>,
+  ) => {
     const { name, value } = e.target;
-    setFormData((prev) => ({ ...prev, [name]: value }));
+
+    setFormData((prev) => {
+      const newData = { ...prev, [name]: value };
+      const numValue = parseFloat(value);
+
+      if (!isNaN(numValue)) {
+        if (name === "totalValue") {
+          newData.unitValue = parseFloat((numValue / 21).toFixed(2));
+        } else if (name === "unitValue") {
+          newData.totalValue = parseFloat((numValue * 21).toFixed(2));
+        }
+      }
+
+      return newData;
+    });
   };
 
   const handleEdit = (bill: BillsType) => {
@@ -36,7 +56,9 @@ export const useBillForm = ({
     });
   };
 
-  const handleSubmit = async (e: React.FormEvent<HTMLFormElement>): Promise<boolean> => {
+  const handleSubmit = async (
+    e: React.FormEvent<HTMLFormElement>,
+  ): Promise<boolean> => {
     e.preventDefault();
 
     try {

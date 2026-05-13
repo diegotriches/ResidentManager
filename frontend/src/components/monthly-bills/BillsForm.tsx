@@ -33,8 +33,9 @@ export const BillsForm: React.FC<BillsFormProps> = ({
           <label>Valor Total</label>
           <input
             type="number"
+            step="0.01"
             name="totalValue"
-            value={formData.totalValue}
+            value={formData.totalValue || ""}
             onChange={handleChange}
             required
           />
@@ -44,8 +45,9 @@ export const BillsForm: React.FC<BillsFormProps> = ({
           <label>Valor unitário</label>
           <input
             type="number"
+            step="0.01"
             name="unitValue"
-            value={formData.unitValue}
+            value={formData.unitValue || ""}
             onChange={handleChange}
             required
           />
