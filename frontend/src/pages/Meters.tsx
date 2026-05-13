@@ -56,6 +56,7 @@ export const Meters = () => {
   useEffect(() => {
     fetchMeters();
   }, []);
+
   useEffect(() => {
     fetchReport();
   }, [month, year]);
@@ -94,7 +95,10 @@ export const Meters = () => {
     handleDelete,
   } = useMeterForm({
     initialForm,
-    fetchMeters,
+    fetchMeters: () => {
+      fetchMeters();
+      fetchReport();
+    },
     setModalConfig,
   });
 

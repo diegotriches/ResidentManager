@@ -4,7 +4,7 @@ import type { MetersType, MeterFormData } from "../types/meters";
 
 interface useMetersFormProps {
   initialForm: MeterFormData;
-  fetchMeters: () => Promise<void>;
+  fetchMeters: () => void;
   setModalConfig: (config: {
     isOpen: boolean;
     message: string;
