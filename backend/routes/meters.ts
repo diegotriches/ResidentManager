@@ -10,37 +10,40 @@ router.get("/", async (req, res) => {
   res.json(meters);
 });
 
-// GET - Esta query busca a medição do mês escolhido e tenta achar a medição do mês imediatamente anterior para o mesmo apartamento.
-router.get("/consumption/:month/:year", async (req, res) => {
-  const { month, year } = req.params;
+// GET - para filtrar os consumos e passar para vouchers
+router.get("/report/consumption", async (req, res) => {
+  const { month, year } = req.query; 
   const db = await initDB();
 
   try {
+    // Esta query é o "coração" do sistema de vouchers
     const query = `
       SELECT 
-        m1.apartment,
-        m1.water AS water_current,
-        m2.water AS water_previous,
-        (m1.water - IFNULL(m2.water, 0)) AS water_consumption,
-        m1.gas AS gas_current,
-        m2.gas AS gas_previous,
-        (m1.gas - IFNULL(m2.gas, 0)) AS gas_consumption
-      FROM meters m1
-      LEFT JOIN meters m2 ON m1.apartment = m2.apartment 
-        AND m2.createdAt = (
-          SELECT MAX(createdAt) 
-          FROM meters 
-          WHERE apartment = m1.apartment AND createdAt < m1.createdAt
+        a.number AS apartment,
+        m_atual.water AS water_current,
+        m_atual.gas AS gas_current,
+        IFNULL(m_ant.water, 0) AS water_previous,
+        IFNULL(m_ant.gas, 0) AS gas_previous,
+        (IFNULL(m_atual.water, 0) - IFNULL(m_ant.water, 0)) AS water_consumption,
+        (IFNULL(m_atual.gas, 0) - IFNULL(m_ant.gas, 0)) AS gas_consumption
+      FROM apartments a
+      LEFT JOIN meters m_atual ON a.number = m_atual.apartment 
+        AND strftime('%m', m_atual.createdAt) = ? 
+        AND strftime('%Y', m_atual.createdAt) = ?
+      LEFT JOIN meters m_ant ON a.number = m_ant.apartment 
+        AND m_ant.createdAt < m_atual.createdAt
+        AND m_ant.meter_id = (
+          SELECT MAX(meter_id) FROM meters 
+          WHERE apartment = a.number AND (createdAt < m_atual.createdAt OR m_atual.createdAt IS NULL)
         )
-      WHERE strftime('%m', m1.createdAt) = ? 
-        AND strftime('%Y', m1.createdAt) = ?
-      ORDER BY m1.apartment ASC
+      ORDER BY a.number ASC
     `;
 
-    const results = await db.all(query, [month, year]);
-    res.json(results);
+    const report = await db.all(query, [month, year]);
+    res.json(report);
   } catch (error) {
-    res.status(500).json({ error: "Erro ao calcular consumo." });
+    console.error("Erro no relatório:", error);
+    res.status(500).json({ error: "Erro interno ao gerar consumos." });
   }
 });
 
