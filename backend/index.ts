@@ -4,6 +4,7 @@ import meterRoutes from "./routes/meters.ts";
 import billRoutes from "./routes/bills.ts";
 import { createMetersTable } from "./models/meters.ts";
 import { createBillsTable } from "./models/bills.ts";
+import { createUtilityBillsTable } from "./models/utilityBills.ts";
 import { createApartmentsTable } from "./models/apartments.ts";
 
 const app = express();
@@ -15,6 +16,7 @@ app.use(express.json());
 await createApartmentsTable();
 await createMetersTable();
 await createBillsTable();
+await createUtilityBillsTable();
 
 app.use("/meters", meterRoutes);
 app.use("/bills", billRoutes);

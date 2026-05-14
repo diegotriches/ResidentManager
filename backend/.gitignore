@@ -23,3 +23,6 @@ dist-ssr
 *.sln
 *.sw?
 *.db
+
+# Ignorar a pasta de backups do backend
+backend/backups/
