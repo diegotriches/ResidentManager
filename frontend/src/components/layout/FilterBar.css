@@ -1,0 +1,19 @@
+.global-filter-container {
+  width: 100%;
+  display: flex;
+  justify-content: flex-end;
+  padding: 15px 40px;
+  background-color: #fff;
+  border-bottom: 1px solid #e0e0e0;
+  box-sizing: border-box; /* Garante que o padding não estoure a largura */
+}
+
+.filter-select {
+  padding: 0.5rem;
+  border-radius: 4px;
+  border: 1px solid #ddd;
+  background-color: #fff;
+  color: #333;
+  font-weight: 500;
+  cursor: pointer;
+}

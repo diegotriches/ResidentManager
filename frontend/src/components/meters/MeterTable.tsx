@@ -9,8 +9,8 @@ export const MeterTable: React.FC<MeterTableProps> = ({ data, loading }) => {
   if (loading) return <div className="loading">Carregando consumos...</div>;
 
   return (
-    <div className="table-container">
-      <table className="meters-table">
+    <div className="records-container">
+      <table className="records-table">
         <thead>
           <tr>
             <th>Apartamento</th>

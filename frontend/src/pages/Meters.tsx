@@ -1,6 +1,6 @@
 import { useState, useEffect } from "react";
 import { MetersForm } from "../components/meters/MetersForm";
-import { FilterBar } from "../components/layout/FilterBar";
+import { useFilter } from "../components/context/FilterContext";
 import { MeterTable } from "../components/meters/MeterTable";
 import { Modal } from "../components/ui/Modal";
 import { getMeters, getConsumptionReport } from "../services/metersService";
@@ -19,6 +19,7 @@ interface ModalConfig {
 
 export const Meters = () => {
   const initialForm = { apartment: 201, water: 0, gas: 0 };
+  const { month, year } = useFilter();
 
   const [activeTab, setActiveTab] = useState<"register" | "history">(
     "register",
@@ -26,8 +27,6 @@ export const Meters = () => {
   const [meters, setMeters] = useState<MetersType[]>([]);
   const [reportData, setReportData] = useState<MeterReportType[]>([]);
   const [loading, setLoading] = useState(false);
-  const [month, setMonth] = useState("05");
-  const [year, setYear] = useState("2026");
   const [isFormModalOpen, setIsFormModalOpen] = useState(false);
   const [modalConfig, setModalConfig] = useState<ModalConfig>({
     isOpen: false,
@@ -177,12 +176,6 @@ export const Meters = () => {
               <div className="meters-page">
                 <div className="report-header">
                   <h2>Métricas de Consumo</h2>
-                  <FilterBar
-                    month={month}
-                    setMonth={setMonth}
-                    year={year}
-                    setYear={setYear}
-                  />
                 </div>
                 <MeterTable data={reportData} loading={loading} />
               </div>

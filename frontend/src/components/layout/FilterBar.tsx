@@ -1,13 +1,7 @@
-import React from "react";
+import { useFilter } from "../context/FilterContext";
+import "./FilterBar.css"
 
-interface FilterBarProps {
-  month: string;
-  year: string;
-  setMonth: (m: string) => void;
-  setYear: (y: string) => void;
-}
-
-export const FilterBar: React.FC<FilterBarProps> = ({ month, year, setMonth, setYear }) => {
+export const FilterBar = () => {
   const months = [
     { val: "01", name: "Janeiro" }, { val: "02", name: "Fevereiro" },
     { val: "03", name: "Março" }, { val: "04", name: "Abril" },
@@ -16,10 +10,11 @@ export const FilterBar: React.FC<FilterBarProps> = ({ month, year, setMonth, set
     { val: "09", name: "Setembro" }, { val: "10", name: "Outubro" },
     { val: "11", name: "Novembro" }, { val: "12", name: "Dezembro" }
   ];
+  const { month, setMonth, year, setYear } = useFilter();
 
   return (
-    <div className="filter-bar">
-      <div className="filter-group">
+    <div className="global-filter-container">
+      <div className="filter-select">
         <label>Período:</label>
         <select value={month} onChange={(e) => setMonth(e.target.value)}>
           {months.map(m => <option key={m.val} value={m.val}>{m.name}</option>)}
@@ -27,6 +22,7 @@ export const FilterBar: React.FC<FilterBarProps> = ({ month, year, setMonth, set
         <select value={year} onChange={(e) => setYear(e.target.value)}>
           <option value="2025">2025</option>
           <option value="2026">2026</option>
+          <option value="2026">2027</option>
         </select>
       </div>
     </div>

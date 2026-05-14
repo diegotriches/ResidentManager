@@ -6,25 +6,32 @@ import { Vouchers } from "./pages/Vouchers";
 import { Meters } from "./pages/Meters";
 import { Warnings } from "./pages/Warnings";
 import { Requests } from "./pages/Requests";
+import { FilterProvider } from "./components/context/FilterContext";
+import { FilterBar } from "./components/layout/FilterBar";
 import "./App.css";
 
 function App() {
   return (
-    <div className="container">
-      <Sidebar />
-      <main className="content">
-        <div className="page-content">
-          <Routes>
-            <Route path="/" element={<Home />} />
-            <Route path="/monthly-bills" element={<MonthlyBills />} />
-            <Route path="/vouchers" element={<Vouchers />} />
-            <Route path="/meters" element={<Meters />} />
-            <Route path="/warnings" element={<Warnings />} />
-            <Route path="/requests" element={<Requests />} />
-          </Routes>
+    <FilterProvider>
+      <div className="container">
+        <Sidebar />
+        <div className="main-wrapper">
+          <FilterBar />
+          <main className="content">
+            <div className="page-content">
+              <Routes>
+                <Route path="/" element={<Home />} />
+                <Route path="/monthly-bills" element={<MonthlyBills />} />
+                <Route path="/vouchers" element={<Vouchers />} />
+                <Route path="/meters" element={<Meters />} />
+                <Route path="/warnings" element={<Warnings />} />
+                <Route path="/requests" element={<Requests />} />
+              </Routes>
+            </div>
+          </main>
         </div>
-      </main>
-    </div>
+      </div>
+    </FilterProvider>
   );
 }
 

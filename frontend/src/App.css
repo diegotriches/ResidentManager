@@ -1,22 +1,37 @@
+/* App.css */
 .container {
   display: flex;
-  background-color: #333;
+  min-height: 100vh;
+  background-color: #f4f7f6; /* Cor de fundo mais suave */
 }
 
-.sidebar {
-  width: 220px;       /* largura fixa da sidebar */
-  min-height: 100vh;
+.main-wrapper {
+  flex: 1; /* Ocupa todo o espaço à direita da Sidebar */
+  display: flex;
+  flex-direction: column; /* Coloca a FilterBar no topo e o conteúdo abaixo */
+  height: 100vh;
+  overflow: hidden; /* Evita scroll duplo no wrapper pai */
 }
 
 .content {
-  flex: 1;            /* ocupa o restante do espaço */
-  display: flex;      /* permite centralizar o conteúdo interno */
-  justify-content: center; /* centraliza horizontalmente */
-  align-items: flex-start; /* alinha no topo (pode usar center se quiser vertical também) */
+  flex: 1;
+  overflow-y: auto; /* Permite o scroll apenas no conteúdo da página */
+  padding: 40px; /* Espaçamento para o conteúdo não grudar no topo/lados */
+  display: flex;
+  justify-content: center; /* Centraliza horizontalmente o page-content */
+  align-items: flex-start; /* Mantém o início no topo */
+}
+
+.page-body {
+  flex: 1;
+  overflow-y: auto; /* Permite scroll apenas no conteúdo, mantendo o filtro fixo */
   padding: 20px;
+  display: flex;
+  justify-content: center;
 }
 
 .page-content {
-  max-width: 800px;   /* largura máxima do conteúdo */
-  width: 100%;        /* ocupa toda a largura disponível até o limite */
+  width: 100%;
+  max-width: 1200px; /* Define um limite de largura para a tabela não esticar demais */
+  margin: 0 auto;
 }
