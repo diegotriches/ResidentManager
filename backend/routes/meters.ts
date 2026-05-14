@@ -4,15 +4,35 @@ import { initDB } from "../db.ts";
 const router = express.Router();
 
 // GET - listas dados
+// GET - lista dados filtrados por mês e ano
 router.get("/", async (req, res) => {
+  const { month, year } = req.query; // Pega os parâmetros da URL
   const db = await initDB();
-  const meters = await db.all("SELECT * FROM meters");
-  res.json(meters);
+
+  try {
+    let query = "SELECT * FROM meters";
+    const params = [];
+
+    // Se mês e ano forem enviados, filtramos a busca
+    if (month && year) {
+      query +=
+        " WHERE strftime('%m', createdAt) = ? AND strftime('%Y', createdAt) = ?";
+      params.push(month, year);
+    }
+
+    query += " ORDER BY createdAt DESC"; // Opcional: registros mais novos primeiro
+
+    const meters = await db.all(query, params);
+    res.json(meters);
+  } catch (error) {
+    console.error("Erro ao listar medições:", error);
+    res.status(500).json({ error: "Erro ao buscar dados no banco." });
+  }
 });
 
 // GET - para filtrar os consumos e passar para vouchers
 router.get("/report/consumption", async (req, res) => {
-  const { month, year } = req.query; 
+  const { month, year } = req.query;
   const db = await initDB();
 
   try {

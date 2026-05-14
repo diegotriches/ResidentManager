@@ -36,7 +36,7 @@ export const Meters = () => {
   });
 
   const fetchMeters = async () => {
-    const response = await getMeters();
+    const response = await getMeters(month, year);
     setMeters(response);
   };
 
@@ -54,7 +54,7 @@ export const Meters = () => {
 
   useEffect(() => {
     fetchMeters();
-  }, []);
+  }, [month, year]);
 
   useEffect(() => {
     fetchReport();
