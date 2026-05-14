@@ -3,7 +3,6 @@ import { initDB } from "../db.ts";
 
 const router = express.Router();
 
-// GET - listas dados
 // GET - lista dados filtrados por mês e ano
 router.get("/", async (req, res) => {
   const { month, year } = req.query; // Pega os parâmetros da URL
@@ -30,13 +29,13 @@ router.get("/", async (req, res) => {
   }
 });
 
-// GET - para filtrar os consumos e passar para vouchers
+// GET - para filtrar os consumos e passar para medição
 router.get("/report/consumption", async (req, res) => {
   const { month, year } = req.query;
   const db = await initDB();
 
   try {
-    // Esta query é o "coração" do sistema de vouchers
+    // Esta query é o "coração" do sistema de medição
     const query = `
       SELECT 
         a.number AS apartment,

@@ -5,7 +5,10 @@ import type {
   MeterReportType,
 } from "../types/meters";
 
-export async function getMeters(month?: string, year?: string): Promise<MetersType[]> {
+export async function getMeters(
+  month?: string,
+  year?: string,
+): Promise<MetersType[]> {
   const response = await api.get<MetersType[]>("/meters", {
     params: { month, year },
   });

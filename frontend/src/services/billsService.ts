@@ -1,13 +1,17 @@
 import api from "./axiosInstance";
 import type { BillsType, BillsFormData } from "../types/bills";
 
-export async function getBills(): Promise<BillsType[]> {
-  const response = await api.get<BillsType[]>("/bills");
+export async function getBills(
+  month?: string,
+  year?: string,
+): Promise<BillsType[]> {
+  const response = await api.get<BillsType[]>("/bills", {
+    params: { month, year },
+  });
   return response.data;
 }
 
-export async function createBills(
-  data: BillsFormData): Promise<BillsType> {
+export async function createBills(data: BillsFormData): Promise<BillsType> {
   const response = await api.post<BillsType>("/bills", data);
   return response.data;
 }

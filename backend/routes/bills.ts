@@ -3,11 +3,30 @@ import { initDB } from "../db.ts";
 
 const router = express.Router();
 
-// GET - listas dados
+// GET - listar dados filtrados por mês e ano
 router.get("/", async (req, res) => {
+  const { month, year } = req.query;
   const db = await initDB();
-  const bills = await db.all("SELECT * FROM bills");
-  res.json(bills);
+
+  try {
+    let query = "SELECT * FROM bills";
+    const params = [];
+
+    // Se mês e ano forem enviados, filtramos a busca
+    if (month && year) {
+      query +=
+        " WHERE strftime('%m', createdAt) = ? AND strftime('%Y', createdAt) = ?";
+      params.push(month, year);
+    }
+
+    query += " ORDER BY createdAt DESC";
+
+    const bills = await db.all(query, params);
+    res.json(bills);
+  } catch (error) {
+    console.error("Erro ao listar contas:", error);
+    res.status(500).json({ error: "Erro ao buscar dados no banco." });
+  }
 });
 
 // POST - criar novo
@@ -19,7 +38,9 @@ router.post("/", async (req, res) => {
       "INSERT INTO bills (bill, totalValue, unitValue) VALUES (?, ?, ?)",
       [bill, totalValue, unitValue],
     );
-    res.status(201).json({ meter_id: result.lastID, bill, totalValue, unitValue });
+    res
+      .status(201)
+      .json({ meter_id: result.lastID, bill, totalValue, unitValue });
   } catch (error) {
     console.error(error);
     res.status(500).json({ error: "Erro ao inserir conta" });

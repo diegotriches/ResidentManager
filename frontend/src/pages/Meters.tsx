@@ -7,8 +7,8 @@ import { getMeters, getConsumptionReport } from "../services/metersService";
 import { useMeterForm } from "../hooks/useMeterForm";
 import type { MetersType, MeterReportType } from "../types/meters";
 import { FaTachometerAlt } from "react-icons/fa";
-import "./PagesStyles.css";
 import { MeterRecordsTable } from "../components/meters/MeterRecordsTable";
+import "./PagesStyles.css";
 
 interface ModalConfig {
   isOpen: boolean;

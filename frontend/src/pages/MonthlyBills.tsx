@@ -3,6 +3,7 @@ import { BillsForm } from "../components/monthly-bills/BillsForm";
 import { Modal } from "../components/ui/Modal";
 import { getBills } from "../services/billsService";
 import { useBillForm } from "../hooks/useBillForm";
+import { useFilter } from "../components/context/FilterContext";
 import type { BillsType } from "../types/bills";
 import { FaMoneyCheckAlt } from "react-icons/fa";
 import { BillsRecordsTable } from "../components/monthly-bills/BillsRecordTable";
@@ -16,6 +17,8 @@ interface ModalConfig {
 
 export const MonthlyBills = () => {
   const initialForm = { bill: "", totalValue: 0, unitValue: 0 };
+  const { month, year } = useFilter();
+
   const [bills, setBills] = useState<BillsType[]>([]);
   const [modalConfig, setModalConfig] = useState<ModalConfig>({
     isOpen: false,
@@ -26,13 +29,13 @@ export const MonthlyBills = () => {
   const [isFormModalOpen, setIsFormModalOpen] = useState(false);
 
   const fetchBills = async () => {
-    const response = await getBills();
+    const response = await getBills(month, year);
     setBills(response);
   };
 
   useEffect(() => {
     fetchBills();
-  }, []);
+  }, [month, year]);
 
   // Função para abrir para NOVA medição
   const handleOpenCreate = () => {
