@@ -12,6 +12,13 @@ export const BillsRecordsTable: React.FC<BillsRecordsTableProps> = ({
   handleOpenEdit,
   deleteRequest,
 }) => {
+  const formatCurrency = (value: number) => {
+    return value.toLocaleString("pt-BR", {
+      style: "currency",
+      currency: "BRL",
+    });
+  };
+
   return (
     <div className="records-container">
       <table className="records-table">
@@ -29,8 +36,8 @@ export const BillsRecordsTable: React.FC<BillsRecordsTableProps> = ({
           {bills.map((b) => (
             <tr key={b.bill_id}>
               <td>{b.bill}</td>
-              <td>{b.totalValue}</td>
-              <td>{b.unitValue}</td>
+              <td>{formatCurrency(b.totalValue || 0)}</td>
+              <td>{formatCurrency(b.unitValue || 0)}</td>
               <td>{b.createdAt}</td>
               <td>{b.updatedAt}</td>
               <td>

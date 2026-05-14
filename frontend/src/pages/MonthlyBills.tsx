@@ -16,9 +16,6 @@ interface ModalConfig {
 }
 
 export const MonthlyBills = () => {
-  const initialForm = { bill: "", totalValue: 0, unitValue: 0 };
-  const { month, year } = useFilter();
-
   const [bills, setBills] = useState<BillsType[]>([]);
   const [modalConfig, setModalConfig] = useState<ModalConfig>({
     isOpen: false,
@@ -27,6 +24,23 @@ export const MonthlyBills = () => {
     type: "alert",
   });
   const [isFormModalOpen, setIsFormModalOpen] = useState(false);
+
+  const { month, year } = useFilter();
+  const initialForm = { bill: "", totalValue: 0, unitValue: 0 };
+  const totalTotalValue = bills.reduce(
+    (acc, bill) => acc + (bill.totalValue || 0),
+    0,
+  );
+  const totalUnitValue = bills.reduce(
+    (acc, bill) => acc + (bill.unitValue || 0),
+    0,
+  );
+  const formatCurrency = (value: number) => {
+    return value.toLocaleString("pt-BR", {
+      style: "currency",
+      currency: "BRL",
+    });
+  };
 
   const fetchBills = async () => {
     const response = await getBills(month, year);
@@ -89,6 +103,17 @@ export const MonthlyBills = () => {
           </button>
         </header>
 
+        <div className="summary-cards">
+          <div className="card">
+            <span>Total das Contas</span>
+            <strong>{formatCurrency(totalTotalValue)}</strong>
+          </div>
+          <div className="card">
+            <span>Soma das Unidades (Taxas/Unitários)</span>
+            <strong>{formatCurrency(totalUnitValue)}</strong>
+          </div>
+        </div>
+
         {isFormModalOpen && (
           <div className="modal-overlay">
             <div className="modal-content form-modal">
@@ -112,11 +137,13 @@ export const MonthlyBills = () => {
           </div>
         )}
 
-        <BillsRecordsTable
-          bills={bills}
-          handleOpenEdit={handleOpenEdit}
-          deleteRequest={deleteRequest}
-        />
+        <div className="tab-content">
+          <BillsRecordsTable
+            bills={bills}
+            handleOpenEdit={handleOpenEdit}
+            deleteRequest={deleteRequest}
+          />
+        </div>
       </div>
     </>
   );

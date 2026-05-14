@@ -213,3 +213,31 @@ header h1 {
   background: #fff3cd;
   color: #856404;
 }
+
+.summary-cards {
+  display: flex;
+  gap: 20px;
+  margin-bottom: 20px;
+}
+
+.summary-cards .card {
+  background: #fff;
+  padding: 1.5rem;
+  border-radius: 8px;
+  flex: 1;
+  box-shadow: 0 4px 6px rgba(0,0,0,0.05);
+  display: flex;
+  flex-direction: column;
+  gap: 5px;
+}
+
+.summary-cards .card span {
+  font-size: 0.9rem;
+  color: #7f8c8d;
+  font-weight: 600;
+}
+
+.summary-cards .card strong {
+  font-size: 1.5rem;
+  color: #2c3e50;
+}
