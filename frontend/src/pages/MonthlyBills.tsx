@@ -5,6 +5,7 @@ import { getBills } from "../services/billsService";
 import { useBillForm } from "../hooks/useBillForm";
 import { useFilter } from "../components/context/FilterContext";
 import type { BillsType } from "../types/bills";
+import { formatCurrency } from "../utils/format";
 import { FaMoneyCheckAlt } from "react-icons/fa";
 import { BillsRecordsTable } from "../components/monthly-bills/BillsRecordTable";
 
@@ -35,12 +36,6 @@ export const MonthlyBills = () => {
     (acc, bill) => acc + (bill.unitValue || 0),
     0,
   );
-  const formatCurrency = (value: number) => {
-    return value.toLocaleString("pt-BR", {
-      style: "currency",
-      currency: "BRL",
-    });
-  };
 
   const fetchBills = async () => {
     const response = await getBills(month, year);

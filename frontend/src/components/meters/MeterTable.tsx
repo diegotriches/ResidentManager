@@ -1,4 +1,5 @@
 import { useState } from "react";
+import { formatCurrency } from "../../utils/format";
 import type { MeterReportType } from "../../types/meters";
 
 interface MeterTableProps {
@@ -9,8 +10,6 @@ interface MeterTableProps {
 export const MeterTable: React.FC<MeterTableProps> = ({ data, loading }) => {
   const [unitWaterPrice, setUnitWaterPrice] = useState<number>(0);
   const [unitGasPrice, setUnitGasPrice] = useState<number>(0);
-  const formatCurrency = (value: number) =>
-    value.toLocaleString("pt-BR", { style: "currency", currency: "BRL" });
 
   if (loading) return <div className="loading">Carregando consumos...</div>;
 
@@ -105,7 +104,7 @@ export const MeterTable: React.FC<MeterTableProps> = ({ data, loading }) => {
                 <td className="consumption-value">
                   {hasMeasurement ? item.water_consumption.toFixed(3) : "0.000"}
                 </td>
-                <td style={{ color: '#27ae60', fontWeight: 'bold' }}>
+                <td style={{ color: '#27ae60'}}>
                   {formatCurrency(waterTotal)}
                 </td>
                 <td>{item.gas_previous.toFixed(3)}</td>
@@ -113,7 +112,7 @@ export const MeterTable: React.FC<MeterTableProps> = ({ data, loading }) => {
                 <td className="consumption-value">
                   {hasMeasurement ? item.gas_consumption.toFixed(3) : "0.000"}
                 </td>
-                <td style={{ color: '#27ae60', fontWeight: 'bold' }}>
+                <td style={{ color: '#27ae60'}}>
                   {formatCurrency(gasTotal)}
                 </td>
                 <td>
