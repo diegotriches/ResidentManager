@@ -1,45 +1,21 @@
-import { useState, useEffect } from "react";
 import { useFilter } from "../../components/context/FilterContext";
+import type { UtilityBillType } from "../../types/utilityBills";
 import { formatCurrency, formatDecimal } from "../../utils/format";
 import { FaDroplet, FaFireFlameCurved } from "react-icons/fa6";
+import { FaPencilAlt, FaTrashAlt } from "react-icons/fa";
 
-interface UtilityBill {
-  id: number;
-  type: "water" | "gas";
-  total_consumption_m3?: number;
-  consumption_value?: number;
-  taxes_value?: number;
-  cylinder_type?: string;
-  unit_price?: number;
-  multiplier_factor?: number;
+interface UtilityBillsViewProps {
+  bills: UtilityBillType[];
+  handleOpenEdit: (bills: UtilityBillType) => void;
+  deleteRequest: (id: number) => void;
 }
 
-export const UtilityBillsView = () => {
+export const UtilityBillsView = ({
+  bills,
+  handleOpenEdit,
+  deleteRequest,
+}: UtilityBillsViewProps) => {
   const { month, year } = useFilter();
-  const [bills, setBills] = useState<UtilityBill[]>([]);
-  const [loading, setLoading] = useState(true);
-
-  // Função para buscar os dados do backend
-  const fetchUtilityBills = async () => {
-    setLoading(true);
-    try {
-      const response = await fetch(
-        `/api/utility-bills?month=${month}&year=${year}`,
-      );
-      const data = await response.json();
-      setBills(data);
-    } catch (error) {
-      console.error("Erro ao buscar faturas de concessionária:", error);
-    } finally {
-      setLoading(false);
-    }
-  };
-
-  useEffect(() => {
-    fetchUtilityBills();
-  }, [month, year]);
-
-  if (loading) return <p>Carregando faturas...</p>;
 
   return (
     <div className="utility-view-container">
@@ -87,8 +63,15 @@ export const UtilityBillsView = () => {
                 <h3 style={{ margin: 0 }}>
                   {bill.type === "water"
                     ? "Conta de Água"
-                    : `Gás (${bill.cylinder_type})`}
+                    : `Gás (${bill.cylinderType})`}
                 </h3>
+                <button onClick={() => handleOpenEdit(bill)}>
+                  <FaPencilAlt />
+                </button>
+                <button onClick={() => deleteRequest(bill.id)}>
+                  <FaTrashAlt />
+                </button>
+                <p>Atualizado: {bill.updatedAt}</p>
               </div>
 
               <div
@@ -100,22 +83,22 @@ export const UtilityBillsView = () => {
                     <p>
                       Consumo Total:{" "}
                       <strong>
-                        {formatDecimal(bill.total_consumption_m3)} m³
+                        {formatDecimal(bill.totalConsumptionM3)} m³
                       </strong>
                     </p>
                     <p>
                       Valor Consumo:{" "}
-                      <strong>{formatCurrency(bill.consumption_value)}</strong>
+                      <strong>{formatCurrency(bill.consumptionValue)}</strong>
                     </p>
                     <p>
                       Taxas/Esgoto:{" "}
-                      <strong>{formatCurrency(bill.taxes_value)}</strong>
+                      <strong>{formatCurrency(bill.taxesValue)}</strong>
                     </p>
                     <hr />
                     <p style={{ color: "#27ae60", fontWeight: "bold" }}>
                       Valor do m³:{" "}
                       {formatCurrency(
-                        bill.consumption_value! / bill.total_consumption_m3!,
+                        bill.consumptionValue! / bill.totalConsumptionM3!,
                       )}
                     </p>
                   </>
@@ -123,24 +106,19 @@ export const UtilityBillsView = () => {
                   <>
                     <p>
                       Preço do Botijão:{" "}
-                      <strong>{formatCurrency(bill.unit_price)}</strong>
+                      <strong>{formatCurrency(bill.unitPrice)}</strong>
                     </p>
                     <p>
                       Fator de Correção:{" "}
-                      <strong>{bill.multiplier_factor}x</strong>
+                      <strong>{bill.multiplierFactor}x</strong>
                     </p>
                     <hr />
                     <p style={{ color: "#27ae60", fontWeight: "bold" }}>
-                      {/* Cálculo: (Preço / KG) * Fator */}
                       Valor do kg:{" "}
                       {formatCurrency(
-                        (bill.unit_price! /
-                          (bill.cylinder_type === "P20"
-                            ? 20
-                            : bill.cylinder_type === "P45"
-                              ? 45
-                              : 90)) *
-                          bill.multiplier_factor!,
+                        (bill.unitPrice! /
+                          (bill.cylinderType === "P45" ? 45 : 90)) *
+                          bill.multiplierFactor!,
                       )}
                     </p>
                   </>
