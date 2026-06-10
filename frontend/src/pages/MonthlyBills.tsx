@@ -1,15 +1,20 @@
-import { useState, useEffect } from "react";
+// Components
 import { BillsForm } from "../components/monthly-bills/BillsForm";
 import { UtilityBillsView } from "../components/monthly-bills/UtilityBillsView";
 import { UtilityBillModal } from "../components/monthly-bills/UtilityBillModal";
-import { Modal } from "../components/ui/Modal";
-import { getBills } from "../services/billsService";
-import { useBillForm } from "../hooks/useBillForm";
-import { useFilter } from "../components/context/FilterContext";
-import type { BillsType } from "../types/bills";
-import { formatCurrency } from "../utils/format";
-import { FaMoneyCheckAlt } from "react-icons/fa";
 import { BillsRecordsTable } from "../components/monthly-bills/BillsRecordTable";
+import { Modal } from "../components/ui/Modal";
+// Hooks
+import { useState } from "react";
+import { useBillForm } from "../hooks/useBillForm";
+import { useUtilityBills } from "../hooks/useUtilityBills";
+// Types
+import type { BillsType } from "../types/bills";
+import type { UtilityBillType } from "../types/utilityBills";
+// Utils
+import { formatCurrency } from "../utils/format";
+// Icons
+import { FaMoneyCheckAlt } from "react-icons/fa";
 
 interface ModalConfig {
   isOpen: boolean;
@@ -19,7 +24,6 @@ interface ModalConfig {
 }
 
 export const MonthlyBills = () => {
-  const [bills, setBills] = useState<BillsType[]>([]);
   const [modalConfig, setModalConfig] = useState<ModalConfig>({
     isOpen: false,
     title: "",
@@ -30,8 +34,30 @@ export const MonthlyBills = () => {
   const [isUtilityModalOpen, setIsUtilityModalOpen] = useState(false);
   const [activeTab, setActiveTab] = useState<"condo" | "utilities">("condo");
 
-  const { month, year } = useFilter();
-  const initialForm = { bill: "", totalValue: 0, unitValue: 0 };
+  const {
+    initialForm,
+    bills,
+    formData,
+    setFormData,
+    editingBillId,
+    setEditingBillId,
+    handleChange,
+    handleEdit,
+    handleSubmit,
+    handleDelete,
+    deleteRequest,
+  } = useBillForm({ setModalConfig });
+
+  const {
+    bills: utilityBills,
+    formData: utilityFormData,
+    handleSubmit: handleUtilitySubmit,
+    handleChange: handleChangeUtility,
+    handleEdit: handleEditUtility,
+    handleDelete: handleDeleteUtility,
+    deleteRequest: deleteUtilityRequest,
+  } = useUtilityBills({ setModalConfig });
+
   const totalTotalValue = bills.reduce(
     (acc, bill) => acc + (bill.totalValue || 0),
     0,
@@ -41,14 +67,14 @@ export const MonthlyBills = () => {
     0,
   );
 
-  const fetchBills = async () => {
-    const response = await getBills(month, year);
-    setBills(response);
+  // Função para confirmar qual página esta para excluir
+  const handleConfirmAction = () => {
+    if (activeTab === "condo") {
+      handleDelete();
+    } else {
+      handleDeleteUtility();
+    }
   };
-
-  useEffect(() => {
-    fetchBills();
-  }, [month, year]);
 
   // Função para abrir para NOVA medição
   const handleOpenCreate = () => {
@@ -57,10 +83,16 @@ export const MonthlyBills = () => {
     setIsFormModalOpen(true);
   };
 
-  // Função para abrir para EDIÇÃO
+  // Função para abrir para EDIÇÃO de contas do condomínio
   const handleOpenEdit = (bill: BillsType) => {
-    handleEdit(bill);
-    setIsFormModalOpen(true);
+    handleEdit(bill); // Carrega os dados antigos no formulário do hook
+    setIsFormModalOpen(true); // Força o modal visual a aparecer na tela
+  };
+
+  // Função para abrir para EDIÇÃO de contas de água/gás
+  const openEditUtility = (bill: UtilityBillType) => {
+    handleEditUtility(bill); // Carrega os dados antigos no formulário do hook
+    setIsUtilityModalOpen(true); // Força o modal visual a aparecer na tela
   };
 
   const onSubmitWithClose = async (e: React.FormEvent<HTMLFormElement>) => {
@@ -71,35 +103,6 @@ export const MonthlyBills = () => {
     }
   };
 
-  const handleSaveUtilityBill = async (newBill: any) => {
-    try {
-      await fetch("/api/utility-bills", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ ...newBill, month, year }),
-      });
-      // Como a lista está dentro do UtilityBillsView,
-      // você precisará de uma forma de avisar o componente para atualizar
-      // ou mover a lógica de busca para cá.
-      setIsUtilityModalOpen(false);
-    } catch (error) {
-      console.error("Erro ao salvar fatura:", error);
-    }
-  };
-
-  // INSTANCIANDO O HOOK
-  const {
-    formData,
-    setFormData,
-    editingBillId,
-    setEditingBillId,
-    handleChange,
-    handleEdit,
-    handleSubmit,
-    deleteRequest,
-    handleDelete,
-  } = useBillForm({ initialForm, fetchBills, setModalConfig });
-
   return (
     <>
       <Modal
@@ -108,13 +111,20 @@ export const MonthlyBills = () => {
         message={modalConfig.message}
         type={modalConfig.type}
         onClose={() => setModalConfig({ ...modalConfig, isOpen: false })}
-        onConfirm={handleDelete}
+        onConfirm={handleConfirmAction}
       />
 
       {isUtilityModalOpen && (
         <UtilityBillModal
+          formData={utilityFormData}
+          handleChange={handleChangeUtility}
           onClose={() => setIsUtilityModalOpen(false)}
-          onSave={handleSaveUtilityBill}
+          onSave={async () => {
+            const success = await handleUtilitySubmit(); // Executa o submit e aguarda o banco
+            if (success) {
+              setIsUtilityModalOpen(false); // Só fecha o modal se a operação deu certo
+            }
+          }}
         />
       )}
 
@@ -183,7 +193,11 @@ export const MonthlyBills = () => {
               />
             </>
           ) : (
-            <UtilityBillsView />
+            <UtilityBillsView
+              bills={utilityBills}
+              handleOpenEdit={openEditUtility}
+              deleteRequest={deleteUtilityRequest}
+            />
           )}
         </div>
 
