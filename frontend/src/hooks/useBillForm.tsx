@@ -1,5 +1,7 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
+import { useFilter } from "../context/FilterContext";
 import {
+  getBills,
   createBills,
   deleteBills,
   updateBills,
@@ -7,8 +9,6 @@ import {
 import type { BillsType, BillsFormData } from "../types/bills";
 
 interface useBillFormProps {
-  initialForm: BillsFormData;
-  fetchBills: () => Promise<void>;
   setModalConfig: (config: {
     isOpen: boolean;
     message: string;
@@ -17,14 +17,28 @@ interface useBillFormProps {
   }) => void;
 }
 
-export const useBillForm = ({
-  initialForm,
-  fetchBills,
-  setModalConfig,
-}: useBillFormProps) => {
+export const useBillForm = ({ setModalConfig }: useBillFormProps) => {
+  const { month, year } = useFilter();
+  const initialForm = {
+    month: String(new Date().getMonth() + 1).padStart(2, '0'),
+    year: new Date().getFullYear(),
+    bill: "",
+    totalValue: 0,
+    unitValue: 0,
+  };
+  const [bills, setBills] = useState<BillsType[]>([]);
   const [formData, setFormData] = useState<BillsFormData>(initialForm);
   const [editingBillId, setEditingBillId] = useState<number | null>(null);
   const [idToDelete, setIdToDelete] = useState<number | null>(null);
+
+  const fetchBills = async () => {
+    const response = await getBills(month, year);
+    setBills(response);
+  };
+
+  useEffect(() => {
+    fetchBills();
+  }, [month, year]);
 
   const handleChange = (
     e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>,
@@ -131,6 +145,8 @@ export const useBillForm = ({
   };
 
   return {
+    initialForm,
+    bills,
     formData,
     setFormData,
     editingBillId,

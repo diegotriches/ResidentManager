@@ -1,11 +1,9 @@
-import { useState, useEffect } from "react";
+import { useState } from "react";
 import { MetersForm } from "../components/meters/MetersForm";
-import { useFilter } from "../components/context/FilterContext";
 import { MeterTable } from "../components/meters/MeterTable";
 import { Modal } from "../components/ui/Modal";
-import { getMeters, getConsumptionReport } from "../services/metersService";
 import { useMeterForm } from "../hooks/useMeterForm";
-import type { MetersType, MeterReportType } from "../types/meters";
+import type { MetersType } from "../types/meters";
 import { FaTachometerAlt } from "react-icons/fa";
 import { MeterRecordsTable } from "../components/meters/MeterRecordsTable";
 import "./PagesStyles.css";
@@ -18,15 +16,9 @@ interface ModalConfig {
 }
 
 export const Meters = () => {
-  const initialForm = { apartment: 201, water: 0, gas: 0 };
-  const { month, year } = useFilter();
-
   const [activeTab, setActiveTab] = useState<"register" | "history">(
     "register",
   );
-  const [meters, setMeters] = useState<MetersType[]>([]);
-  const [reportData, setReportData] = useState<MeterReportType[]>([]);
-  const [loading, setLoading] = useState(false);
   const [isFormModalOpen, setIsFormModalOpen] = useState(false);
   const [modalConfig, setModalConfig] = useState<ModalConfig>({
     isOpen: false,
@@ -35,30 +27,21 @@ export const Meters = () => {
     type: "alert",
   });
 
-  const fetchMeters = async () => {
-    const response = await getMeters(month, year);
-    setMeters(response);
-  };
-
-  const fetchReport = async () => {
-    setLoading(true);
-    try {
-      const data = await getConsumptionReport(month, year);
-      setReportData(data);
-    } catch (error) {
-      console.error("Erro ao carregar relatório", error);
-    } finally {
-      setLoading(false);
-    }
-  };
-
-  useEffect(() => {
-    fetchMeters();
-  }, [month, year]);
-
-  useEffect(() => {
-    fetchReport();
-  }, [month, year]);
+  const {
+    initialForm,
+    meters,
+    reportData,
+    loading,
+    formData,
+    setFormData,
+    editingMeterId,
+    setEditingMeterId,
+    handleChange,
+    handleEdit,
+    handleSubmit,
+    deleteRequest,
+    handleDelete,
+  } = useMeterForm({ setModalConfig });
 
   // Função para abrir para NOVA medição
   const handleOpenCreate = () => {
@@ -81,25 +64,6 @@ export const Meters = () => {
       setIsFormModalOpen(false);
     }
   };
-
-  const {
-    formData,
-    setFormData,
-    editingMeterId,
-    setEditingMeterId,
-    handleChange,
-    handleEdit,
-    handleSubmit,
-    deleteRequest,
-    handleDelete,
-  } = useMeterForm({
-    initialForm,
-    fetchMeters: () => {
-      fetchMeters();
-      fetchReport();
-    },
-    setModalConfig,
-  });
 
   return (
     <>
@@ -174,9 +138,6 @@ export const Meters = () => {
           ) : (
             <section className="animate-in">
               <div className="meters-page">
-                <div className="report-header">
-                  <h2>Métricas de Consumo</h2>
-                </div>
                 <MeterTable data={reportData} loading={loading} />
               </div>
             </section>
