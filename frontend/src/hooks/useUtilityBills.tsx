@@ -1,5 +1,5 @@
 import { useState, useEffect, useCallback } from "react";
-import { useFilter } from "../components/context/FilterContext";
+import { useFilter } from "../context/FilterContext";
 import {
   getUtilityBills,
   createUtilityBill,
