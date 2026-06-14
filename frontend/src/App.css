@@ -2,7 +2,8 @@
 .container {
   display: flex;
   min-height: 100vh;
-  background-color: #f4f7f6; /* Cor de fundo mais suave */
+  background-color: var(--bg-primary);
+  color: var(--text-primary);
 }
 
 .main-wrapper {
@@ -34,4 +35,14 @@
   width: 100%;
   max-width: 1200px; /* Define um limite de largura para a tabela não esticar demais */
   margin: 0 auto;
+}
+
+.container,
+.main-wrapper,
+.content,
+.page-body,
+.page-content {
+  transition:
+    background-color 0.3s ease,
+    color 0.3s ease;
 }
