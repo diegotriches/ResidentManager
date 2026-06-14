@@ -112,13 +112,13 @@ export const Meters = () => {
 
           <nav className="tabs-nav">
             <button
-              className={activeTab === "register" ? "active" : ""}
+              className={`tab-btn ${activeTab === "register" ? "active" : ""}`}
               onClick={() => setActiveTab("register")}
             >
               Registro de Medições
             </button>
             <button
-              className={activeTab === "history" ? "active" : ""}
+              className={`tab-btn ${activeTab === "history" ? "active" : ""}`}
               onClick={() => setActiveTab("history")}
             >
               Visualizar Medições

@@ -144,17 +144,13 @@ export const MonthlyBills = () => {
             <button
               onClick={() => setIsUtilityModalOpen(true)}
               className="btn-new"
-              style={{ backgroundColor: "#27ae60" }}
             >
               <FaMoneyCheckAlt /> Lançar Água/Gás
             </button>
           </div>
         </header>
 
-        <div
-          className="tabs-navigation"
-          style={{ display: "flex", gap: "10px", marginBottom: "20px" }}
-        >
+        <div className="tabs-nav">
           <button
             className={`tab-btn ${activeTab === "condo" ? "active" : ""}`}
             onClick={() => setActiveTab("condo")}
