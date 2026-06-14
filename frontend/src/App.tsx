@@ -6,7 +6,7 @@ import { Vouchers } from "./pages/Vouchers";
 import { Meters } from "./pages/Meters";
 import { Warnings } from "./pages/Warnings";
 import { Requests } from "./pages/Requests";
-import { FilterProvider } from "./components/context/FilterContext";
+import { FilterProvider } from "./context/FilterContext";
 import { FilterBar } from "./components/layout/FilterBar";
 import "./App.css";
 
