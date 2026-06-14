@@ -1,5 +1,6 @@
 import { FaPencilAlt, FaTrashAlt } from "react-icons/fa";
 import type { BillsType } from "../../types/bills";
+import { formatCurrency } from "../../utils/format";
 
 interface BillsRecordsTableProps {
   bills: BillsType[];
@@ -12,13 +13,6 @@ export const BillsRecordsTable: React.FC<BillsRecordsTableProps> = ({
   handleOpenEdit,
   deleteRequest,
 }) => {
-  const formatCurrency = (value: number) => {
-    return value.toLocaleString("pt-BR", {
-      style: "currency",
-      currency: "BRL",
-    });
-  };
-
   return (
     <div className="records-container">
       <table className="records-table">
