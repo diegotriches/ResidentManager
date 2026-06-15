@@ -1,86 +1,17 @@
-import { useState, useEffect } from "react";
-import { useFilter } from "../components/context/FilterContext";
-import { getBills } from "../services/billsService";
-import { getConsumptionReport } from "../services/metersService";
+import { useVouchers } from "../hooks/useVouchers";
+import { useFilter } from "../context/FilterContext";
 import { formatCurrency } from "../utils/format";
+import { exportVoucherToPDF } from "../utils/pdf";
 import "./PagesStyles.css";
 
-interface VoucherData {
-  apartment: number;
-  fixedRate: number;
-  waterValue: number;
-  gasValue: number;
-  total: number;
-}
-
 export const Vouchers = () => {
+  const { vouchers, loading, handleTogglePaid } = useVouchers();
   const { month, year } = useFilter();
-  const [vouchers, setVouchers] = useState<VoucherData[]>([]);
-  const [loading, setLoading] = useState(false);
-  const [waterUnitPrice, setWaterUnitPrice] = useState(0);
-  const [gasUnitPrice, setGasUnitPrice] = useState(0);
-
-  const calculateVouchers = async () => {
-    setLoading(true);
-    try {
-      // 1. Obter faturas e calcular taxa fixa (Rateio por 21)
-      const bills = await getBills(month, year);
-      const totalBills = bills.reduce((acc, b) => acc + (b.totalValue || 0), 0);
-      const fixedRate = totalBills / 21;
-
-      // 2. Obter relatório de consumo (Água e Gás)
-      const consumptionData = await getConsumptionReport(month, year);
-
-      // 3. Cruzar os dados
-      const combined = consumptionData.map((item: any): VoucherData => {
-        const waterValue = (item.water_consumption || 0) * waterUnitPrice;
-        const gasValue = (item.gas_consumption || 0) * gasUnitPrice;
-
-        return {
-          apartment: item.apartment,
-          fixedRate: fixedRate,
-          waterValue: waterValue,
-          gasValue: gasValue,
-          total: fixedRate + waterValue + gasValue,
-        };
-      });
-
-      setVouchers(combined);
-    } catch (error) {
-      console.error("Erro ao gerar vouchers:", error);
-    } finally {
-      setLoading(false);
-    }
-  };
-
-  useEffect(() => {
-    calculateVouchers();
-  }, [month, year, waterUnitPrice, gasUnitPrice]);
 
   return (
     <div className="main-container">
       <header className="pages-header">
-        <h1>Fechamento de Vouchers</h1>
-        <div className="header-controls">
-          <div className="input-group">
-            <label>R$ m³ Água:</label>
-            <input
-              type="number"
-              step="0.01"
-              value={waterUnitPrice}
-              onChange={(e) => setWaterUnitPrice(Number(e.target.value))}
-            />
-          </div>
-          <div className="input-group">
-            <label>R$ kg Gás:</label>
-            <input
-              type="number"
-              step="0.01"
-              value={gasUnitPrice}
-              onChange={(e) => setGasUnitPrice(Number(e.target.value))}
-            />
-          </div>
-        </div>
+        <h1>Fechamento de Valores</h1>
       </header>
 
       <div className="tab-content">
@@ -89,10 +20,12 @@ export const Vouchers = () => {
             <thead>
               <tr>
                 <th>Apartamento</th>
-                <th>Taxa Fixa (Rateio)</th>
-                <th>Consumo Água (R$)</th>
-                <th>Consumo Gás (R$)</th>
+                <th>Condomínio</th>
+                <th>Água</th>
+                <th>Gás</th>
                 <th>Total a Pagar</th>
+                <th>Pagamento</th>
+                <th>Exportar</th>
               </tr>
             </thead>
             <tbody>
@@ -107,16 +40,63 @@ export const Vouchers = () => {
                       <strong>Apto {v.apartment}</strong>
                     </td>
                     <td>{formatCurrency(v.fixedRate)}</td>
-                    <td>{formatCurrency(v.waterValue)}</td>
+                    <td>{formatCurrency(v.waterTotalValue)}</td>
                     <td>{formatCurrency(v.gasValue)}</td>
                     <td
                       style={{
                         fontWeight: "bold",
                         color: "#27ae60",
-                        background: "#f9f9f9",
                       }}
                     >
                       {formatCurrency(v.total)}
+                    </td>
+                    <td>
+                      <div
+                        style={{
+                          display: "flex",
+                          alignItems: "center",
+                          gap: "8px",
+                        }}
+                      >
+                        <input
+                          type="checkbox"
+                          checked={v.isPaid}
+                          onChange={() =>
+                            handleTogglePaid(v.apartment, v.isPaid)
+                          }
+                          style={{
+                            cursor: "pointer",
+                            width: "16px",
+                            height: "16px",
+                          }}
+                        />
+                        <span
+                          style={{
+                            fontWeight: "500",
+                            color: v.isPaid ? "#27ae60" : "#c0392b",
+                          }}
+                        >
+                          {v.isPaid ? "Pago" : "Em aberto"}
+                        </span>
+                      </div>
+                    </td>
+                    <td>
+                      <button
+                        onClick={() => exportVoucherToPDF(v, month, Number(year))}
+                        className="pdf-btn"
+                        style={{
+                          padding: "6px 12px",
+                          backgroundColor: "#e74c3c", // Vermelho padrão para lembrar PDF
+                          color: "white",
+                          border: "none",
+                          borderRadius: "4px",
+                          cursor: "pointer",
+                          fontWeight: "bold",
+                          fontSize: "12px",
+                        }}
+                      >
+                        📄 Gerar PDF
+                      </button>
                     </td>
                   </tr>
                 ))
