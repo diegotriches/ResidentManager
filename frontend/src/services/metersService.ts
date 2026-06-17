@@ -6,8 +6,8 @@ import type {
 } from "../types/meters";
 
 export async function getMeters(
-  month?: string,
-  year?: string,
+  month: string,
+  year: string,
 ): Promise<MetersType[]> {
   const response = await api.get<MetersType[]>("/meters", {
     params: { month, year },

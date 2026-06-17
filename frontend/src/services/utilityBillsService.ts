@@ -5,8 +5,8 @@ import type {
 } from "../types/utilityBills";
 
 export async function getUtilityBills(
-  month?: string,
-  year?: string,
+  month: string,
+  year: string,
 ): Promise<UtilityBillType[]> {
   // Ajustado com a barra inicial
   const response = await api.get<UtilityBillType[]>("/utility-bills", {
