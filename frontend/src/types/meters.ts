@@ -1,5 +1,7 @@
 export type MetersType = {
-  meter_id: number;
+  id: number;
+  month: string;
+  year: number;
   apartment: number;
   water: number;
   gas: number;
@@ -8,6 +10,8 @@ export type MetersType = {
 };
 
 export type MeterFormData = {
+  month: string;
+  year: number;
   apartment: number;
   water: number;
   gas: number;
@@ -21,4 +25,9 @@ export interface MeterReportType {
   gas_previous: number;
   water_consumption: number;
   gas_consumption: number;
+  water_price_per_m3: number;
+  total_water_taxes: number;
+  water_split_count: number;
+  water_fee_per_apartment: number;
+  total_water_cost: number;
 }
