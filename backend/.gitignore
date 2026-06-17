@@ -24,5 +24,6 @@ dist-ssr
 *.sw?
 *.db
 
-# Ignorar a pasta de backups do backend
-backend/backups/
+# Ignorar pastas no backend
+/backups
+/migrations
