@@ -6,6 +6,8 @@ export async function createBillsTable() {
   await db.exec(`
         CREATE TABLE IF NOT EXISTS bills (
         bill_id INTEGER PRIMARY KEY AUTOINCREMENT,
+        month TEXT NOT NULL,
+        year INTEGER NOT NULL,
         bill VARCHAR(50),
         totalValue DECIMAL(5,2),
         unitValue DECIMAL(5,2),

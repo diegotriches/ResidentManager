@@ -5,7 +5,9 @@ export async function createMetersTable() {
 
   await db.exec(`
         CREATE TABLE IF NOT EXISTS meters (
-        meter_id INTEGER PRIMARY KEY AUTOINCREMENT,
+        id INTEGER PRIMARY KEY AUTOINCREMENT,
+        month TEXT NOT NULL,
+        year INTEGER NOT NULL,
         apartment INTEGER,
         water DECIMAL(4,3),
         gas DECIMAL(4,3),
