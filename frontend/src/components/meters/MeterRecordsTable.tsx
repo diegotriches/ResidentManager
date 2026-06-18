@@ -27,7 +27,7 @@ export const MeterRecordsTable: React.FC<MeterRecordsTableProps> = ({
         </thead>
         <tbody>
           {meters.map((m) => (
-            <tr key={m.meter_id}>
+            <tr key={m.id}>
               <td><strong>Apto {m.apartment}</strong></td>
               <td>{m.water}</td>
               <td>{m.gas}</td>
@@ -47,7 +47,7 @@ export const MeterRecordsTable: React.FC<MeterRecordsTableProps> = ({
                 </button>
                 <button 
                   className="btn-delete" 
-                  onClick={() => onDelete(m.meter_id)}
+                  onClick={() => onDelete(m.id)}
                   title="Excluir medição"
                 >
                   <FaTrashAlt />
