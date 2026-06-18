@@ -1,4 +1,4 @@
-import { useFilter } from "../../components/context/FilterContext";
+import { useFilter } from "../../context/FilterContext";
 import type { UtilityBillType } from "../../types/utilityBills";
 import { formatCurrency, formatDecimal } from "../../utils/format";
 import { FaDroplet, FaFireFlameCurved } from "react-icons/fa6";
@@ -42,7 +42,7 @@ export const UtilityBillsView = ({
                 border: "1px solid #ddd",
                 borderRadius: "8px",
                 padding: "15px",
-                background: "#fff",
+                backgroundColor: "var(--bg-primary)",
               }}
             >
               <div
@@ -51,6 +51,8 @@ export const UtilityBillsView = ({
                   alignItems: "center",
                   gap: "10px",
                   marginBottom: "10px",
+                  backgroundColor: "var(--bg-primary)",
+                  color: "var(--text-primary)",
                 }}
               >
                 {bill.type === "water" ? (
@@ -76,14 +78,18 @@ export const UtilityBillsView = ({
 
               <div
                 className="card-body"
-                style={{ fontSize: "0.9rem", color: "#555" }}
+                style={{
+                  fontSize: "0.9rem",
+                  backgroundColor: "var(--bg-primary)",
+                  color: "var(--text-primary)",
+                }}
               >
                 {bill.type === "water" ? (
                   <>
                     <p>
                       Consumo Total:{" "}
                       <strong>
-                        {formatDecimal(bill.totalConsumptionM3)} m³
+                        {parseFloat(formatDecimal(bill.totalConsumptionM3))} m³
                       </strong>
                     </p>
                     <p>

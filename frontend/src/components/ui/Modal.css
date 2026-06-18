@@ -15,24 +15,24 @@
 
 /* Caixa branca do conteúdo */
 .modal-content {
-  background: #eee;
+  background: var(--modal-bg);
   padding: 2rem;
   border-radius: 8px;
   width: 90%;
   max-width: 400px;
   text-align: center;
-  box-shadow: 0 4px 15px rgba(0, 0, 0, 0.2);
+  box-shadow: 0 4px 15px var(--shadow-color);
   animation: fadeIn 0.3s ease-out;
 }
 
 .modal-content h3 {
   margin-top: 0;
-  color: #333;
+  color: var(--modal-title);
   font-size: 1.5rem;
 }
 
 .modal-content p {
-  color: #666;
+  color: var(--modal-text);
   margin: 1.5rem 0;
   line-height: 1.4;
 }
@@ -63,12 +63,45 @@
 
 /* Botão de Fechar/Cancelar (Padrão Cinza) */
 .modal-actions button:not(.btn-confirm) {
-  background-color: #e0e0e0;
-  color: #333;
+  background-color: var(--button-secondary-bg);
+  color: var(--modal-title);
 }
 
 .modal-actions button:not(.btn-confirm):hover {
-  background-color: #d5d5d5;
+  background-color: var(--button-secondary-hover);
+}
+
+.form-section {
+  display: flex;
+  flex-direction: column; /* Empilha os elementos verticalmente */
+  gap: 16px;             /* Espaçamento uniforme entre cada bloco de campo */
+  width: 100%;           /* Garante que ocupe a largura total do modal */
+  box-sizing: border-box;
+}
+
+.form-section label {
+  font-size: 14px;
+  font-weight: 600;
+  color: var(--modal-title);        /* Cor escura para leitura clara */
+  margin-bottom: -8px;   /* Deixa o label ligeiramente mais próximo do seu respectivo input */
+}
+
+.form-section input[type="number"] {
+  width: 100%;
+  padding: 10px 14px;
+  font-size: 15px;
+  border: 1px solid var(--input-border);
+  background-color: var(--input-bg);
+  color: var(--input-text);
+  border-radius: 6px;    /* Cantos levemente arredondados */
+  transition: border-color 0.2s ease, box-shadow 0.2s ease; /* Transição suave de efeito */
+  box-sizing: border-box;
+}
+
+.form-section input[type="number"]:focus {
+  outline: none;
+  border-color: #3498db; /* Azul suave idêntico ao das suas abas ativas */
+  box-shadow: 0 0 0 3px rgba(52, 152, 219, 0.15); /* Sombra externa bem sutil */
 }
 
 /* Botão de Confirmar Exclusão (Vermelho) */
@@ -80,6 +113,18 @@
 .btn-confirm:hover {
   background-color: #c9302c;
   transform: scale(1.05); /* Pequeno efeito de zoom ao passar o mouse */
+}
+
+.modal-content,
+.modal-content h3,
+.modal-content p,
+.form-section label,
+.form-section input,
+.modal-actions button {
+  transition:
+    background-color 0.3s ease,
+    color 0.3s ease,
+    border-color 0.3s ease;
 }
 
 /* Animação de entrada */

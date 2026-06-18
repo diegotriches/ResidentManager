@@ -1,19 +1,50 @@
 .global-filter-container {
   width: 100%;
   display: flex;
-  justify-content: flex-end;
-  padding: 15px 40px;
-  background-color: #fff;
-  border-bottom: 1px solid #e0e0e0;
-  box-sizing: border-box; /* Garante que o padding não estoure a largura */
+  justify-content: space-between;
+  padding: 10px 20px;
+  background-color: var(--bg-secondary);
+  border-bottom: 1px solid var(--border-color);
+  box-sizing: border-box;
+
+  transition:
+    background-color 0.3s ease,
+    border-color 0.3s ease;
 }
 
 .filter-select {
-  padding: 0.5rem;
-  border-radius: 4px;
-  border: 1px solid #ddd;
-  background-color: #fff;
-  color: #333;
+  border-radius: 5px;
+  color: var(--input-text);
   font-weight: 500;
   cursor: pointer;
+
+  transition:
+    background-color 0.3s ease,
+    color 0.3s ease,
+    border-color 0.3s ease;
+}
+
+.filter-select select {
+  color: var(--input-text);
+  background-color: var(--bg-secondary);
+}
+
+.theme-toggle-btn {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 35px;
+  height: 35px;
+  font-size: 1rem;
+  background-color: var(--bg-secondary);
+  color: var(--text-secondary);
+  border: 1px solid var(--input-border);;
+  border-radius: 50%;
+  transition: all 0.2s ease-in-out;
+}
+
+.theme-toggle-btn:hover {
+  transform: scale(1.05);
+  cursor: pointer;
+  background-color: var(--hover-bg);
 }
