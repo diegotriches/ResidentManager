@@ -12,3 +12,8 @@ export const months = [
     { value: "11", label: "Novembro" },
     { value: "12", label: "Dezembro" },
   ] as const;
+
+  export const apartments = Array.from({ length: 7 }, (_, floorIndex) => {
+  const floor = floorIndex + 2;
+  return [1, 2, 3].map((apt) => Number(`${floor}0${apt}`));
+}).flat();

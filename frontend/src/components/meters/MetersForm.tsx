@@ -1,5 +1,5 @@
 import type { MetersType } from "../../types/meters";
-import "../FormStyles.css";
+import { months, apartments } from "../../utils/constants";
 
 interface MetersFormProps {
   formData: Partial<MetersType>;
@@ -16,14 +16,33 @@ export const MetersForm: React.FC<MetersFormProps> = ({
   handleChange,
   editingMeterId,
 }) => {
-  const apartmentMeter = Array.from({ length: 7 }, (_, floorIndex) => {
-    const floor = floorIndex + 2; // começa no andar 2
-    return [1, 2, 3].map((apt) => Number(`${floor}0${apt}`));
-  }).flat();
-
   return (
     <div className="form-wrapper">
       <form onSubmit={handleSubmit} className="form-grid">
+        <div className="form-field">
+          <label>Mês:</label>
+          <select name="month" value={formData.month} onChange={handleChange}>
+            <option value="">Selecione o mês</option>
+            {months.map((month) => (
+              <option key={month.value} value={month.value}>
+                {month.label}
+              </option>
+            ))}
+          </select>
+        </div>
+
+        <div className="form-field">
+          <label>Ano:</label>
+          <input
+            type="number"
+            name="year"
+            min="1000"
+            max="9999"
+            value={formData.year}
+            onChange={handleChange}
+          />
+        </div>
+
         <div className="form-field">
           <label>Apartamento</label>
           <select
@@ -31,7 +50,7 @@ export const MetersForm: React.FC<MetersFormProps> = ({
             value={formData.apartment}
             onChange={handleChange}
           >
-            {apartmentMeter.map((option) => (
+            {apartments.map((option) => (
               <option key={option} value={option}>
                 {option}
               </option>
