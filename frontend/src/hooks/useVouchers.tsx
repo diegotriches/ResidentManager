@@ -3,7 +3,7 @@ import { useFilter } from "../context/FilterContext";
 import { getBills } from "../services/billsService";
 import { getUtilityBills } from "../services/utilityBillsService";
 import { getFinanceReport, updateVoucherStatus } from "../services/vouchersService";
-import { calculateGasUnitPrice } from "../utils/calculations";
+import type { UtilityBillType } from "../types/utilityBills";
 
 export const useVouchers = () => {
   const { month, year } = useFilter();
@@ -19,6 +19,12 @@ export const useVouchers = () => {
 
       const totalBills = bills.reduce((acc, b) => acc + (b.totalValue || 0), 0);
       const fixedRate = totalBills / 21;
+
+      const calculateGasUnitPrice = (bill: UtilityBillType) => {
+        if (!bill.unitPrice || !bill.multiplierFactor) return 0;
+        const weight = bill.cylinderType === "P45" ? 45 : 90;
+        return (bill.unitPrice / weight) * bill.multiplierFactor;
+      }
 
       let calculatedGasPrice = 0;
       const gasBill = utilityBills.find((b) => b.type === "gas");
