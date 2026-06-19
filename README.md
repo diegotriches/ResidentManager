@@ -43,12 +43,14 @@ O projeto está dividido em duas partes: `backend` e `frontend`.
 
 ### 1. Configurando o Back-end
 No terminal, acesse a pasta do servidor, instale as dependências e inicie o serviço:
+
 ```bash
 cd backend
 npm install
 npm start
+```
 
-O servidor iniciará por padrão na porta configurada (ex: http://localhost:3001).
+O servidor iniciará por padrão na porta configurada (ex: `http://localhost:3001`).
 
 ### 2. Configurando o Front-end
 Abra um novo terminal, acesse a pasta da interface, instale as dependências e inicie o ambiente de desenvolvimento:
@@ -57,24 +59,25 @@ Abra um novo terminal, acesse a pasta da interface, instale as dependências e i
 cd frontend
 npm install
 npm run dev
+```
 
-O navegador abrirá automaticamente o projeto no endereço indicado pelo Vite (geralmente http://localhost:5173).
+O navegador abrirá automaticamente o projeto no endereço indicado pelo Vite (geralmente `http://localhost:5173`).
 
-🛠️ Tecnologias Utilizadas
+## 🛠️ Tecnologias Utilizadas
 A pilha de tecnologia (Stack) escolhida para este projeto inclui:
 
-Linguagem Principal
+### Linguagem Principal
 
-TypeScript: Adiciona tipagem estática ao JavaScript, garantindo um código mais seguro, autoexplicativo e livre de erros comuns de runtime.
+* **TypeScript:** Adiciona tipagem estática ao JavaScript, garantindo um código mais seguro, autoexplicativo e livre de erros comuns de runtime.
 
-Back-end
-Express: Framework web para construção das rotas e APIs.
-CORS: Gerenciamento de permissões de requisições externas.
-SQLite: Banco de dados relacional leve e de fácil configuração (dispensa instalação de servidores pesados).
+### Back-end
+* **Express:** Framework web para construção das rotas e APIs.
+**CORS:** Gerenciamento de permissões de requisições externas.
+**SQLite:** Banco de dados relacional leve e de fácil configuração (dispensa instalação de servidores pesados).
 
-Front-end
-React & React-dom: Biblioteca base para a construção de uma interface de usuário dinâmica e reativa.
-Vite: Ferramenta de build ultra-rápida que otimiza o fluxo de desenvolvimento do projeto.
-Axios: Cliente HTTP para comunicação e consumo das rotas do Back-end de forma assíncrona.
-jspdf: Biblioteca especializada para a geração e download dos relatórios de cobrança em formato PDF.
-React-icons: Conjunto de ícones vetoriais personalizáveis para compor o layout visual.
+### Front-end
+* **React & React-dom:** Biblioteca base para a construção de uma interface de usuário dinâmica e reativa.
+* **Vite:** Ferramenta de build ultra-rápida que otimiza o fluxo de desenvolvimento do projeto.
+* **Axios:** Cliente HTTP para comunicação e consumo das rotas do Back-end de forma assíncrona.
+* **jspdf:** Biblioteca especializada para a geração e download dos relatórios de cobrança em formato PDF.
+* **React-icons:** Conjunto de ícones vetoriais personalizáveis para compor o layout visual.
