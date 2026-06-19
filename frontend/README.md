@@ -1,73 +1,80 @@
-# React + TypeScript + Vite
+# 🏢 ResidentManager
 
-This template provides a minimal setup to get React working in Vite with HMR and some ESLint rules.
+Uma aplicação web moderna desenvolvida para simplificar e automatizar a administração e o gerenciamento financeiro de condomínios.
 
-Currently, two official plugins are available:
+## 📄 Descrição do Projeto
 
-- [@vitejs/plugin-react](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react) uses [Oxc](https://oxc.rs)
-- [@vitejs/plugin-react-swc](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react-swc) uses [SWC](https://swc.rs/)
+O **ResidentManager** foi idealizado para substituir as tradicionais planilhas de gastos — que frequentemente contêm fórmulas complexas e propensas a erros de manipulação. A aplicação automatiza o rateio de despesas de forma inteligente.
 
-## React Compiler
+### Principais Funcionalidades:
+* **Rateio Automatizado:** Insira contas fixas (água, luz, manutenção) ou ocasionais, e o sistema calcula e divide automaticamente os valores entre os moradores.
+* **Emissão de Relatórios:** Geração de arquivos PDF com os valores detalhados cobrados por cada unidade/apartamento.
+* **Controle de Inadimplência:** Registro e monitoramento em tempo real de quais moradores realizaram ou não os pagamentos.
 
-The React Compiler is not enabled on this template because of its impact on dev & build performances. To add it, see [this documentation](https://react.dev/learn/react-compiler/installation).
+## 🔍 Como Funciona (Fluxo da Aplicação)
 
-## Expanding the ESLint configuration
+Para facilitar o entendimento, o fluxo de uso do sistema segue estes passos simples:
 
-If you are developing a production application, we recommend updating the configuration to enable type-aware lint rules:
+**Cadastro de Unidades:** O administrador cadastra os apartamentos/moradores do condomínio no sistema.
 
-```js
-export default defineConfig([
-  globalIgnores(['dist']),
-  {
-    files: ['**/*.{ts,tsx}'],
-    extends: [
-      // Other configs...
+* **Lançamento de Despesas:** Ao receber uma conta do condomínio (ex: Conta de Água de R$ 1.200,00$), o administrador insere o valor, a descrição e o tipo de despesa no formulário.
 
-      // Remove tseslint.configs.recommended and replace with this
-      tseslint.configs.recommendedTypeChecked,
-      // Alternatively, use this for stricter rules
-      tseslint.configs.strictTypeChecked,
-      // Optionally, add this for stylistic rules
-      tseslint.configs.stylisticTypeChecked,
+* **Cálculo Automático:** O back-end recebe essa despesa e realiza o rateio (divisão) matemática do valor igualmente (ou conforme a regra configurada) entre todas as unidades cadastradas.
 
-      // Other configs...
-    ],
-    languageOptions: {
-      parserOptions: {
-        project: ['./tsconfig.node.json', './tsconfig.app.json'],
-        tsconfigRootDir: import.meta.dirname,
-      },
-      // other options...
-    },
-  },
-])
-```
+* **Visualização e Controle:** Na tela principal, o sistema exibe uma tabela com cada morador, o valor que ele deve pagar naquele mês e o status do pagamento (Pendente / Pago).
 
-You can also install [eslint-plugin-react-x](https://github.com/Rel1cx/eslint-react/tree/main/packages/plugins/eslint-plugin-react-x) and [eslint-plugin-react-dom](https://github.com/Rel1cx/eslint-react/tree/main/packages/plugins/eslint-plugin-react-dom) for React-specific lint rules:
+* **Geração de Relatório:** Com um clique, o administrador pode gerar um arquivo PDF individual para cada morador, servindo como um demonstrativo detalhado da cobrança.
 
-```js
-// eslint.config.js
-import reactX from 'eslint-plugin-react-x'
-import reactDom from 'eslint-plugin-react-dom'
+* **Baixa de Pagamento:** Conforme os moradores pagam, o administrador atualiza o status no painel para manter o controle de inadimplência atualizado em tempo real.
 
-export default defineConfig([
-  globalIgnores(['dist']),
-  {
-    files: ['**/*.{ts,tsx}'],
-    extends: [
-      // Other configs...
-      // Enable lint rules for React
-      reactX.configs['recommended-typescript'],
-      // Enable lint rules for React DOM
-      reactDom.configs.recommended,
-    ],
-    languageOptions: {
-      parserOptions: {
-        project: ['./tsconfig.node.json', './tsconfig.app.json'],
-        tsconfigRootDir: import.meta.dirname,
-      },
-      // other options...
-    },
-  },
-])
-```
+---
+
+## 🚀 Pré-requisitos
+
+Antes de iniciar, você precisará ter instalado em sua máquina:
+* [Node.js](https://nodejs.org/) (Recomendado: versão 20 LTS ou superior)
+* Um gerenciador de pacotes (npm já vem instalado junto com o Node)
+
+---
+
+## 💻 Como Instalar e Rodar a Aplicação
+
+O projeto está dividido em duas partes: `backend` e `frontend`.
+
+### 1. Configurando o Back-end
+No terminal, acesse a pasta do servidor, instale as dependências e inicie o serviço:
+```bash
+cd backend
+npm install
+npm start
+
+O servidor iniciará por padrão na porta configurada (ex: http://localhost:3001).
+
+### 2. Configurando o Front-end
+Abra um novo terminal, acesse a pasta da interface, instale as dependências e inicie o ambiente de desenvolvimento:
+
+```bash
+cd frontend
+npm install
+npm run dev
+
+O navegador abrirá automaticamente o projeto no endereço indicado pelo Vite (geralmente http://localhost:5173).
+
+🛠️ Tecnologias Utilizadas
+A pilha de tecnologia (Stack) escolhida para este projeto inclui:
+
+Linguagem Principal
+
+TypeScript: Adiciona tipagem estática ao JavaScript, garantindo um código mais seguro, autoexplicativo e livre de erros comuns de runtime.
+
+Back-end
+Express: Framework web para construção das rotas e APIs.
+CORS: Gerenciamento de permissões de requisições externas.
+SQLite: Banco de dados relacional leve e de fácil configuração (dispensa instalação de servidores pesados).
+
+Front-end
+React & React-dom: Biblioteca base para a construção de uma interface de usuário dinâmica e reativa.
+Vite: Ferramenta de build ultra-rápida que otimiza o fluxo de desenvolvimento do projeto.
+Axios: Cliente HTTP para comunicação e consumo das rotas do Back-end de forma assíncrona.
+jspdf: Biblioteca especializada para a geração e download dos relatórios de cobrança em formato PDF.
+React-icons: Conjunto de ícones vetoriais personalizáveis para compor o layout visual.
