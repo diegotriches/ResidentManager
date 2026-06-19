@@ -72,8 +72,8 @@ A pilha de tecnologia (Stack) escolhida para este projeto inclui:
 
 ### Back-end
 * **Express:** Framework web para construção das rotas e APIs.
-**CORS:** Gerenciamento de permissões de requisições externas.
-**SQLite:** Banco de dados relacional leve e de fácil configuração (dispensa instalação de servidores pesados).
+* **CORS:** Gerenciamento de permissões de requisições externas.
+* **SQLite:** Banco de dados relacional leve e de fácil configuração (dispensa instalação de servidores pesados).
 
 ### Front-end
 * **React & React-dom:** Biblioteca base para a construção de uma interface de usuário dinâmica e reativa.
