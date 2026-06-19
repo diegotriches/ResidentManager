@@ -1,5 +1,5 @@
 import type { BillsType } from "../../types/bills";
-import "../FormStyles.css";
+import { months } from "../../utils/constants";
 
 interface BillsFormProps {
   formData: Partial<BillsType>;
@@ -19,6 +19,36 @@ export const BillsForm: React.FC<BillsFormProps> = ({
   return (
     <div className="form-wrapper">
       <form onSubmit={handleSubmit} className="form-grid">
+        <div className="form-field">
+          <label>Mês</label>
+          <select
+            name="month"
+            value={formData.month}
+            onChange={handleChange}
+            required
+          >
+            <option value="">Selecione o mês</option>
+            {months.map((month) => (
+              <option key={month.value} value={month.value}>
+                {month.label}
+              </option>
+            ))}
+          </select>
+        </div>
+
+        <div className="form-field">
+          <label>Ano</label>
+          <input
+            name="year"
+            type="number"
+            min="1000"
+            max="9999"
+            value={formData.year}
+            onChange={handleChange}
+            required
+          />
+        </div>
+
         <div className="form-field">
           <label>Conta</label>
           <input
