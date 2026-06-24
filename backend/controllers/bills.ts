@@ -1,5 +1,5 @@
 import type { Request, Response } from "express";
-import { BillsRepository } from "../repositories/bills";
+import { BillsRepository } from "../repositories/bills.ts";
 
 export const BillsController = {
   async read(req: Request, res: Response) {
@@ -45,7 +45,7 @@ export const BillsController = {
 
       const changes = await BillsRepository.update(id, {
         month,
-        year: Number(year),
+        year,
         bill,
         totalValue,
         unitValue
