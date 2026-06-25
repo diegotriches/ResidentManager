@@ -38,8 +38,8 @@ export const useVouchers = () => {
       const consumptionData = await getFinanceReport(month, year);
 
       const combined = consumptionData.map((item: any) => {
-        const waterTotalValue = item.total_water_value || 0;
-        const gasValue = (item.gas_consumption || 0) * calculatedGasPrice;
+        const waterTotalValue = item.totalWaterValue || 0;
+        const gasValue = (item.gasConsumption || 0) * calculatedGasPrice;
 
         return {
           apartment: item.apartment,
@@ -47,7 +47,7 @@ export const useVouchers = () => {
           waterTotalValue,
           gasValue,
           total: fixedRate + waterTotalValue + gasValue,
-          isPaid: item.is_paid === 1,
+          isPaid: item.isPaid === 1,
         };
       });
 
