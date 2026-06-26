@@ -28,7 +28,7 @@ export const BillsRecordsTable: React.FC<BillsRecordsTableProps> = ({
         </thead>
         <tbody>
           {bills.map((b) => (
-            <tr key={b.bill_id}>
+            <tr key={b.id}>
               <td>{b.bill}</td>
               <td>{formatCurrency(b.totalValue || 0)}</td>
               <td>{formatCurrency(b.unitValue || 0)}</td>
@@ -40,7 +40,7 @@ export const BillsRecordsTable: React.FC<BillsRecordsTableProps> = ({
                 </button>
                 <button
                   className="btn-delete"
-                  onClick={() => deleteRequest(b.bill_id)}
+                  onClick={() => deleteRequest(b.id)}
                 >
                   <FaTrashAlt />
                 </button>

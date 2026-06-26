@@ -1,5 +1,5 @@
 export type BillsType = {
-  bill_id: number;
+  id: number;
   month: string;
   year: number;
   bill: string;
@@ -10,6 +10,8 @@ export type BillsType = {
 };
 
 export type BillsFormData = {
+  month: string;
+  year: number;
   bill: string;
   totalValue: number;
   unitValue: number;

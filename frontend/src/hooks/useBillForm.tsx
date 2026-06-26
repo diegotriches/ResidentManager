@@ -19,13 +19,32 @@ interface useBillFormProps {
 
 export const useBillForm = ({ setModalConfig }: useBillFormProps) => {
   const { month, year } = useFilter();
-  const initialForm = {
+
+  const getInitialForm = () => {
+    const savedDate = localStorage.getItem("lastBill");
+
+    if (savedDate) {
+      const { month, year } = JSON.parse(savedDate);
+  
+      return {
+        month,
+        year,
+        bill: "",
+        totalValue: 0,
+        unitValue: 0,
+      };
+    }
+  
+    return {
     month: String(new Date().getMonth() + 1).padStart(2, '0'),
     year: new Date().getFullYear(),
     bill: "",
     totalValue: 0,
     unitValue: 0,
-  };
+    }
+  }
+
+  const initialForm = getInitialForm();
   const [bills, setBills] = useState<BillsType[]>([]);
   const [formData, setFormData] = useState<BillsFormData>(initialForm);
   const [editingBillId, setEditingBillId] = useState<number | null>(null);
@@ -62,8 +81,10 @@ export const useBillForm = ({ setModalConfig }: useBillFormProps) => {
   };
 
   const handleEdit = (bill: BillsType) => {
-    setEditingBillId(bill.bill_id);
+    setEditingBillId(bill.id);
     setFormData({
+      month: bill.month,
+      year: bill.year,
       bill: bill.bill,
       totalValue: bill.totalValue,
       unitValue: bill.unitValue,
@@ -93,6 +114,14 @@ export const useBillForm = ({ setModalConfig }: useBillFormProps) => {
           type: "alert",
         });
       }
+
+      localStorage.setItem(
+        "lastBill",
+        JSON.stringify({
+          month: formData.month,
+          year: formData.year,
+        }),
+      );
 
       setFormData(initialForm);
       setEditingBillId(null);

@@ -31,7 +31,7 @@ export const BillsController = {
         unitValue
       });
 
-      return res.status(201).json({ bill_id: billId, bill, totalValue, unitValue });
+      return res.status(201).json({ id: billId, bill, totalValue, unitValue });
     } catch (error) {
       console.error("Erro ao inserir conta:", error);
       return res.status(500).json({ error: "Erro ao inserir conta" });
