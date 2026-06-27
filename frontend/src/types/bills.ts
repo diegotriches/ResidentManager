@@ -1,5 +1,5 @@
 export type BillsType = {
-  id: number;
+  id?: number;
   month: string;
   year: number;
   bill: string;

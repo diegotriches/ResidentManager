@@ -6,11 +6,7 @@ import { BillsRecordsTable } from "../components/monthly-bills/BillsRecordTable"
 import { Modal } from "../components/ui/Modal";
 // Hooks
 import { useState } from "react";
-import { useBillForm } from "../hooks/useBillForm";
-import { useUtilityBills } from "../hooks/useUtilityBills";
-// Types
-import type { BillsType } from "../types/bills";
-import type { UtilityBillType } from "../types/utilityBills";
+import { useMonthlyBills } from "../hooks/useMonthlyBills";
 // Utils
 import { formatCurrency } from "../utils/format";
 // Icons
@@ -24,105 +20,106 @@ interface ModalConfig {
 }
 
 export const MonthlyBills = () => {
+  // Configuração do Modal Global de Alertas/Confirmações
   const [modalConfig, setModalConfig] = useState<ModalConfig>({
     isOpen: false,
     title: "",
     message: "",
     type: "alert",
   });
+
+  // Estados locais para controlar a abertura dos modais de inserção/edição de dados
   const [isFormModalOpen, setIsFormModalOpen] = useState(false);
   const [isUtilityModalOpen, setIsUtilityModalOpen] = useState(false);
-  const [activeTab, setActiveTab] = useState<"condo" | "utilities">("condo");
 
+  // Consumo do Hook Unificado
   const {
-    initialForm,
-    bills,
-    formData,
-    setFormData,
-    editingBillId,
-    setEditingBillId,
-    handleChange,
-    handleEdit,
+    activeTab,
+    setActiveTab,
+    loading,
+    
+    // Dados e handlers do Condomínio (Standard)
+    standardBills,
+    standardFormData,
+    setStandardFormData,
+    editingStandardBillId,
+    setEditingStandardBillId,
+    handleStandardChange,
+    handleStandardEdit,
+    initialStandardForm,
+
+    // Dados e handlers de Consumo (Utilities)
+    utilityBills,
+    utilityFormData,
+    setUtilityFormData,
+    setEditingUtilityBillId,
+    handleUtilityChange,
+    handleUtilityEdit,
+    initialUtilityForm,
+
+    // Funções de ação Globais/Unificadas
     handleSubmit,
-    handleDelete,
     deleteRequest,
-  } = useBillForm({ setModalConfig });
+    handleDelete,
+  } = useMonthlyBills({ setModalConfig });
 
-  const {
-    bills: utilityBills,
-    formData: utilityFormData,
-    handleSubmit: handleUtilitySubmit,
-    handleChange: handleChangeUtility,
-    handleEdit: handleEditUtility,
-    handleDelete: handleDeleteUtility,
-    deleteRequest: deleteUtilityRequest,
-  } = useUtilityBills({ setModalConfig });
-
-  const totalTotalValue = bills.reduce(
+  // --- CÁLCULOS DE RESUMO (Baseados no array correto: standardBills) ---
+  const totalTotalValue = standardBills.reduce(
     (acc, bill) => acc + (bill.totalValue || 0),
     0,
   );
-  const totalUnitValue = bills.reduce(
+  const totalUnitValue = standardBills.reduce(
     (acc, bill) => acc + (bill.unitValue || 0),
     0,
   );
 
-  // Função para confirmar qual página esta para excluir
-  const handleConfirmAction = () => {
-    if (activeTab === "condo") {
-      handleDelete();
-    } else {
-      handleDeleteUtility();
-    }
-  };
-
-  // Função para abrir para NOVA medição
-  const handleOpenCreate = () => {
-    setEditingBillId(null);
-    setFormData(initialForm);
+  // --- HANDLERS DE FLUXO DA TELA ---
+  
+  // Condomínio: Gatilho para abrir criando do zero
+  const handleOpenCreateStandard = () => {
+    setStandardFormData(initialStandardForm);
+    setEditingStandardBillId(null);
     setIsFormModalOpen(true);
   };
 
-  // Função para abrir para EDIÇÃO de contas do condomínio
-  const handleOpenEdit = (bill: BillsType) => {
-    handleEdit(bill); // Carrega os dados antigos no formulário do hook
-    setIsFormModalOpen(true); // Força o modal visual a aparecer na tela
+  // Condomínio: Gatilho para abrir editando uma linha
+  const handleOpenEditStandard = (bill: any) => {
+    handleStandardEdit(bill);
+    setIsFormModalOpen(true);
   };
 
-  // Função para abrir para EDIÇÃO de contas de água/gás
-  const openEditUtility = (bill: UtilityBillType) => {
-    handleEditUtility(bill); // Carrega os dados antigos no formulário do hook
-    setIsUtilityModalOpen(true); // Força o modal visual a aparecer na tela
-  };
-
-  const onSubmitWithClose = async (e: React.FormEvent<HTMLFormElement>) => {
-    const success = await handleSubmit(e);
-
-    if (success) {
-      setIsFormModalOpen(false);
-    }
+  // Utilitários: Gatilho para abrir editando uma linha
+  const handleOpenEditUtility = (bill: any) => {
+    handleUtilityEdit(bill);
+    setIsUtilityModalOpen(true);
   };
 
   return (
     <>
+      {/* Modal do Sistema (Sucesso, Erro, Confirmação de Deleção) */}
       <Modal
         isOpen={modalConfig.isOpen}
         title={modalConfig.title}
         message={modalConfig.message}
         type={modalConfig.type}
         onClose={() => setModalConfig({ ...modalConfig, isOpen: false })}
-        onConfirm={handleConfirmAction}
+        onConfirm={handleDelete} // Conecta diretamente à função unificada de deleção
       />
 
+      {/* Modal de Formulário: Água e Gás */}
       {isUtilityModalOpen && (
         <UtilityBillModal
           formData={utilityFormData}
-          handleChange={handleChangeUtility}
-          onClose={() => setIsUtilityModalOpen(false)}
+          handleChange={handleUtilityChange}
+          onClose={() => {
+            setIsUtilityModalOpen(false);
+            setEditingUtilityBillId(null);
+            setUtilityFormData(initialUtilityForm);
+          }}
           onSave={async () => {
-            const success = await handleUtilitySubmit(); // Executa o submit e aguarda o banco
+            const success = await handleSubmit();
             if (success) {
-              setIsUtilityModalOpen(false); // Só fecha o modal se a operação deu certo
+              setIsUtilityModalOpen(false);
             }
           }}
         />
@@ -131,25 +128,18 @@ export const MonthlyBills = () => {
       <div className="main-container">
         <header>
           <h1>Gestão de Contas Mensais</h1>
-          <div
-            className="header-actions"
-            style={{ display: "flex", gap: "10px" }}
-          >
-            {/* Botão de Contas do Condomínio */}
-            <button onClick={handleOpenCreate} className="btn-new">
-              <FaMoneyCheckAlt /> Nova Conta
+          <div className="header-actions" style={{ display: "flex", gap: "10px" }}>
+            <button onClick={handleOpenCreateStandard} className="btn-new">
+              <FaMoneyCheckAlt /> Nova Conta Condomínio
             </button>
 
-            {/* Botão de Água e Gás unificado no cabeçalho */}
-            <button
-              onClick={() => setIsUtilityModalOpen(true)}
-              className="btn-new"
-            >
-              <FaMoneyCheckAlt /> Lançar Água/Gás
+            <button onClick={() => setIsUtilityModalOpen(true)} className="btn-new">
+              <FaMoneyCheckAlt /> Nova Conta Água/Gás
             </button>
           </div>
         </header>
 
+        {/* Navegação entre Abas */}
         <div className="tabs-nav">
           <button
             className={`tab-btn ${activeTab === "condo" ? "active" : ""}`}
@@ -165,11 +155,12 @@ export const MonthlyBills = () => {
           </button>
         </div>
 
-        {/* RENDERIZAÇÃO CONDICIONAL DAS ABAS */}
+        {/* Conteúdo Renderizado Condicionalmente */}
         <div className="tab-content">
-          {activeTab === "condo" ? (
+          {loading ? (
+            <p>Carregando registros...</p>
+          ) : activeTab === "condo" ? (
             <>
-              {/* Seção de Resumo para Contas do Condomínio */}
               <div className="summary-cards">
                 <div className="card">
                   <span>Total das Contas</span>
@@ -181,40 +172,48 @@ export const MonthlyBills = () => {
                 </div>
               </div>
 
-              {/* Tabela de Registros */}
               <BillsRecordsTable
-                bills={bills}
-                handleOpenEdit={handleOpenEdit}
+                bills={standardBills}
+                handleOpenEdit={handleOpenEditStandard}
                 deleteRequest={deleteRequest}
               />
             </>
           ) : (
             <UtilityBillsView
               bills={utilityBills}
-              handleOpenEdit={openEditUtility}
-              deleteRequest={deleteUtilityRequest}
+              handleOpenEdit={handleOpenEditUtility}
+              deleteRequest={deleteRequest}
             />
           )}
         </div>
 
-        {/* Modal de Formulário (Apenas para CondoBills) */}
+        {/* Modal de Formulário: Condomínio */}
         {isFormModalOpen && (
           <div className="modal-overlay">
             <div className="modal-content form-modal">
               <button
                 className="close-x"
-                onClick={() => setIsFormModalOpen(false)}
+                onClick={() => {
+                  setIsFormModalOpen(false);
+                  setEditingStandardBillId(null);
+                  setStandardFormData(initialStandardForm);
+                }}
               >
                 X
               </button>
               <h2 className="modal-title">
-                {editingBillId ? "Editar Conta" : "Nova Conta"}
+                {editingStandardBillId ? "Editar Conta" : "Nova Conta"}
               </h2>
               <BillsForm
-                formData={formData}
-                handleChange={handleChange}
-                handleSubmit={onSubmitWithClose}
-                editingBillId={editingBillId}
+                formData={standardFormData}
+                handleChange={handleStandardChange}
+                onSave={async () => {
+                  const success = await handleSubmit();
+                  if (success) {
+                    setIsFormModalOpen(false);
+                  }
+                }}
+                editingBillId={editingStandardBillId}
               />
             </div>
           </div>
