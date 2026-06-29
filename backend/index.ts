@@ -3,7 +3,8 @@ import cors from "cors";
 import meterRoutes from "./routes/meters.ts";
 import billRoutes from "./routes/bills.ts";
 import utilityBillsRoutes from "./routes/utilityBills.ts";
-import vouchersRoutes from "./routes/vouchers.ts"
+import vouchersRoutes from "./routes/vouchers.ts";
+import homeRoutes from "./routes/home.ts";
 import { createApartmentsTable } from "./models/apartments.ts";
 import { createMetersTable } from "./models/meters.ts";
 import { createBillsTable } from "./models/bills.ts";
@@ -26,5 +27,6 @@ app.use("/meters", meterRoutes);
 app.use("/bills", billRoutes);
 app.use("/utility-bills", utilityBillsRoutes);
 app.use("/vouchers", vouchersRoutes);
+app.use("/home", homeRoutes);
 
 app.listen(PORT, () => console.log(`Servidor rodando na porta ${PORT}`));
