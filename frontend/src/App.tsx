@@ -1,6 +1,7 @@
 import { Routes, Route } from "react-router-dom";
 import { Sidebar } from "./components/layout/Sidebar";
 import { Home } from "./pages/Home";
+import { Apartments } from "./pages/Apartments";
 import { MonthlyBills } from "./pages/MonthlyBills";
 import { Vouchers } from "./pages/Vouchers";
 import { Meters } from "./pages/Meters";
@@ -21,6 +22,7 @@ function App() {
             <div className="page-content">
               <Routes>
                 <Route path="/" element={<Home />} />
+                <Route path="/apartments" element={<Apartments />} />
                 <Route path="/monthly-bills" element={<MonthlyBills />} />
                 <Route path="/vouchers" element={<Vouchers />} />
                 <Route path="/meters" element={<Meters />} />
