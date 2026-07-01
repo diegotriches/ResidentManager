@@ -253,6 +253,7 @@ header h1 {
   flex-direction: column;
   width: 100%;
   gap: 1rem;
+  padding-top: 1rem;
 }
 
 /* Container que envolve os campos */

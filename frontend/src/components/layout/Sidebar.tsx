@@ -2,7 +2,8 @@ import { NavLink } from "react-router-dom";
 import {
   FaBattleNet,
   FaHome,
-  FaFileAlt,
+  FaTasks,
+  FaLayerGroup,
   FaMoneyCheckAlt,
   FaTachometerAlt,
   FaUserCog,
@@ -23,12 +24,16 @@ export const Sidebar = () => {
           <FaHome className="icon" />
           <span>Home</span>
         </NavLink>
+        <NavLink to="/apartments" className="navlink">
+          <FaLayerGroup className="icon" />
+          <span>Apartamentos</span>
+        </NavLink>
         <NavLink to="/monthly-bills" className="navlink">
           <FaMoneyCheckAlt className="icon" />
           <span>Gastos Mensais</span>
         </NavLink>
         <NavLink to="/vouchers" className="navlink">
-          <FaFileAlt className="icon" />
+          <FaTasks className="icon" />
           <span>Comprovantes</span>
         </NavLink>
         <NavLink to="/meters" className="navlink">
