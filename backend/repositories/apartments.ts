@@ -8,7 +8,7 @@ export interface CreateApartmentDTO {
 export const ApartmentsRepository = {
   async read() {
     const db = await initDB();
-    const query = "SELECT * FROM apartments";
+    const query = "SELECT id, number, owner_name AS ownerName FROM apartments";
 
     return await db.all(query);
   },
