@@ -56,15 +56,6 @@ export const Meters = () => {
     setIsFormModalOpen(true);
   };
 
-  // Handler de submissão que fecha o modal
-  const onSubmitWithClose = async (e: React.FormEvent<HTMLFormElement>) => {
-    const success = await handleSubmit(e);
-
-    if (success) {
-      setIsFormModalOpen(false);
-    }
-  };
-
   return (
     <>
       {/* Modal de Alerta/Confirmação (Exclusão) */}
@@ -94,8 +85,13 @@ export const Meters = () => {
             <MetersForm
               formData={formData}
               handleChange={handleChange}
-              handleSubmit={onSubmitWithClose}
               editingMeterId={editingMeterId}
+              onSave={async () => {
+                const success = await handleSubmit();
+                if (success) {
+                  setIsFormModalOpen(false);
+                }
+              }}
             />
           </div>
         </div>
@@ -133,6 +129,7 @@ export const Meters = () => {
                 meters={meters}
                 onEdit={handleOpenEdit}
                 onDelete={deleteRequest}
+                loading={loading}
               />
             </section>
           ) : (

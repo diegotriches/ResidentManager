@@ -1,9 +1,9 @@
-import type { MetersType } from "../../types/meters";
+import type { MeterFormData } from "../../types/meters";
 import { months, apartments } from "../../utils/constants";
 
 interface MetersFormProps {
-  formData: Partial<MetersType>;
-  handleSubmit: (event: React.FormEvent<HTMLFormElement>) => void;
+  formData: MeterFormData;
+  onSave: (data: MeterFormData) => void;
   handleChange: (
     event: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>,
   ) => void;
@@ -12,16 +12,25 @@ interface MetersFormProps {
 
 export const MetersForm: React.FC<MetersFormProps> = ({
   formData,
-  handleSubmit,
+  onSave,
   handleChange,
   editingMeterId,
 }) => {
+  const handleSave = () => {
+    onSave({ ...formData });
+  };
+
   return (
     <div className="form-wrapper">
-      <form onSubmit={handleSubmit} className="form-grid">
+      <div className="form-grid">
         <div className="form-field">
           <label>Mês:</label>
-          <select name="month" value={formData.month} onChange={handleChange}>
+          <select
+            name="month"
+            value={formData.month}
+            onChange={handleChange}
+            required
+          >
             <option value="">Selecione o mês</option>
             {months.map((month) => (
               <option key={month.value} value={month.value}>
@@ -40,24 +49,27 @@ export const MetersForm: React.FC<MetersFormProps> = ({
             max="9999"
             value={formData.year}
             onChange={handleChange}
+            required
           />
         </div>
+      </div>
 
-        <div className="form-field">
-          <label>Apartamento</label>
-          <select
-            name="apartment"
-            value={formData.apartment}
-            onChange={handleChange}
-          >
-            {apartments.map((option) => (
-              <option key={option} value={option}>
-                {option}
-              </option>
-            ))}
-          </select>
-        </div>
+      <div className="form-field">
+        <label>Apartamento</label>
+        <select
+          name="apartment"
+          value={formData.apartment}
+          onChange={handleChange}
+        >
+          {apartments.map((option) => (
+            <option key={option} value={option}>
+              {option}
+            </option>
+          ))}
+        </select>
+      </div>
 
+      <div className="form-grid">
         <div className="form-field">
           <label>Medição de Água</label>
           <input
@@ -79,14 +91,13 @@ export const MetersForm: React.FC<MetersFormProps> = ({
             required
           />
         </div>
+      </div>
 
-        <button
-          type="submit"
-          className={`btn-submit ${editingMeterId ? "editing" : ""}`}
-        >
+      <div className="modal-actions">
+        <button onClick={handleSave} className="btn-save">
           {editingMeterId ? "Salvar Medição" : "Cadastrar Medição"}
         </button>
-      </form>
+      </div>
     </div>
   );
 };

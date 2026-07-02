@@ -23,38 +23,19 @@ interface useMetersFormProps {
 }
 
 export const useMeterForm = ({ setModalConfig }: useMetersFormProps) => {
-  const getInitialForm = (): MeterFormData => {
-    const savedDate = localStorage.getItem("lastMeter");
-
-    if (savedDate) {
-      const { month, year, apartment } = JSON.parse(savedDate);
-
-      return {
-        month,
-        year,
-        apartment: apartment ?? 201,
-        water: 0,
-        gas: 0,
-      };
-    }
-
-    return {
-      month: String(new Date().getMonth() + 1).padStart(2, "0"),
-      year: new Date().getFullYear(),
-      apartment: 201,
-      water: 0,
-      gas: 0,
-    };
-  };
-
   const { month, year } = useFilter();
-  const initialForm = getInitialForm();
+
+  const initialForm: MeterFormData = {
+    month: month,
+    year: Number(year),
+    apartment: 201,
+    water: 0,
+    gas: 0,
+  };
 
   const [meters, setMeters] = useState<MetersType[]>([]);
   const [reportData, setReportData] = useState<MeterReportType[]>([]);
-  const [formData, setFormData] = useState<MeterFormData>(() =>
-    getInitialForm(),
-  );
+  const [formData, setFormData] = useState<MeterFormData>(initialForm);
   const [loading, setLoading] = useState(false);
   const [editingMeterId, setEditingMeterId] = useState<number | null>(null);
   const [idToDelete, setIdToDelete] = useState<number | null>(null);
@@ -88,11 +69,7 @@ export const useMeterForm = ({ setModalConfig }: useMetersFormProps) => {
     fetchReport();
   }, [fetchMeters, fetchReport]);
 
-  const handleSubmit = async (
-    e: React.FormEvent<HTMLFormElement>,
-  ): Promise<boolean> => {
-    e.preventDefault();
-
+  const handleSubmit = async (): Promise<boolean> => {
     try {
       if (editingMeterId) {
         await updateMeters(editingMeterId, formData);
@@ -111,15 +88,6 @@ export const useMeterForm = ({ setModalConfig }: useMetersFormProps) => {
           type: "alert",
         });
       }
-
-      localStorage.setItem(
-        "lastMeter",
-        JSON.stringify({
-          month: formData.month,
-          year: formData.year,
-          apartment: formData.apartment,
-        }),
-      );
 
       setFormData(initialForm);
       setEditingMeterId(null);
@@ -160,10 +128,10 @@ export const useMeterForm = ({ setModalConfig }: useMetersFormProps) => {
     setEditingMeterId(meter.id);
     setFormData({
       month: meter.month,
-      year: Number(meter.year),
-      apartment: Number(meter.apartment),
-      water: Number(meter.water),
-      gas: Number(meter.gas),
+      year: meter.year,
+      apartment: meter.apartment,
+      water: meter.water,
+      gas: meter.gas,
     });
   };
 
