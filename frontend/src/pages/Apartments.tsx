@@ -37,6 +37,7 @@ export const Apartments = () => {
     apartments,
     loading,
     apartmentId,
+    setApartmentId,
     formData,
     setFormData,
     handleSubmit,
@@ -65,10 +66,17 @@ export const Apartments = () => {
       {isFormModalOpen && (
         <div className="modal-overlay">
           <div className="modal-content form-modal">
-            <h2 className="modal-title">Apartamento</h2>
+            <h2 className="modal-title">
+              {apartmentId
+                ? "Edição de Apartamento"
+                : "Cadastro de Apartamento"}
+            </h2>
             <button
               className="close-x"
-              onClick={() => setIsFormModalOpen(false)}
+              onClick={() => {
+                setIsFormModalOpen(false);
+                setApartmentId(null);
+              }}
             >
               &times;
             </button>

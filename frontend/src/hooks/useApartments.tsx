@@ -137,6 +137,7 @@ export const useApartments = ({ setModalConfig }: useApartmentsFormProps) => {
     apartments,
     loading,
     apartmentId,
+    setApartmentId,
     formData,
     setFormData,
     handleSubmit,
