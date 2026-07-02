@@ -17,7 +17,10 @@ import {
 
 // Types
 import type { BillsType, BillsFormData } from "../types/bills";
-import type { UtilityBillType, UtilityFormDataType } from "../types/utilityBills";
+import type {
+  UtilityBillType,
+  UtilityFormDataType,
+} from "../types/utilityBills";
 
 interface useMonthlyBillsProps {
   setModalConfig: (config: {
@@ -36,41 +39,26 @@ export const useMonthlyBills = ({ setModalConfig }: useMonthlyBillsProps) => {
   const [loading, setLoading] = useState(true);
 
   // --- 1. ESTADOS E INITIAL FORMS DE CONDOMÍNIO (Standard) ---
-  const getInitialStandardForm = (): BillsFormData => {
-    const savedDate = localStorage.getItem("lastBill");
-    if (savedDate) {
-      try {
-        const { month: savedMonth, year: savedYear } = JSON.parse(savedDate);
-        return {
-          month: savedMonth,
-          year: savedYear,
-          bill: "",
-          totalValue: 0,
-          unitValue: 0,
-        };
-      } catch (e) {
-        console.error("Erro ao ler lastBill do localStorage", e);
-      }
-    }
-    return {
-      month: String(new Date().getMonth() + 1).padStart(2, '0'),
-      year: new Date().getFullYear(),
-      bill: "",
-      totalValue: 0,
-      unitValue: 0,
-    };
+  const initialStandardForm: BillsFormData = {
+    month: month,
+    year: Number(year),
+    bill: "",
+    totalValue: 0,
+    unitValue: 0,
   };
 
-  const initialStandardForm = getInitialStandardForm();
   const [standardBills, setStandardBills] = useState<BillsType[]>([]);
-  const [standardFormData, setStandardFormData] = useState<BillsFormData>(initialStandardForm);
-  const [editingStandardBillId, setEditingStandardBillId] = useState<number | null>(null);
+  const [standardFormData, setStandardFormData] =
+    useState<BillsFormData>(initialStandardForm);
+  const [editingStandardBillId, setEditingStandardBillId] = useState<
+    number | null
+  >(null);
 
   // --- 2. ESTADOS E INITIAL FORMS DE CONSUMO (Utilities) ---
   const initialUtilityForm: UtilityFormDataType = {
     type: "water",
-    month: String(new Date().getMonth() + 1).padStart(2, '0'),
-    year: new Date().getFullYear(),
+    month: month,
+    year: Number(year),
     totalConsumptionM3: 0,
     consumptionValue: 0,
     taxesValue: 0,
@@ -81,8 +69,11 @@ export const useMonthlyBills = ({ setModalConfig }: useMonthlyBillsProps) => {
   };
 
   const [utilityBills, setUtilityBills] = useState<UtilityBillType[]>([]);
-  const [utilityFormData, setUtilityFormData] = useState<UtilityFormDataType>(initialUtilityForm);
-  const [editingUtilityBillId, setEditingUtilityBillId] = useState<number | null>(null);
+  const [utilityFormData, setUtilityFormData] =
+    useState<UtilityFormDataType>(initialUtilityForm);
+  const [editingUtilityBillId, setEditingUtilityBillId] = useState<
+    number | null
+  >(null);
 
   // --- 3. ESTADO GLOBAL DE DELEÇÃO ---
   const [idToDelete, setIdToDelete] = useState<number | null>(null);
@@ -110,7 +101,9 @@ export const useMonthlyBills = ({ setModalConfig }: useMonthlyBillsProps) => {
   }, [fetchBills]);
 
   // --- 5. HANDLERS DE INPUTS ISOLADOS ---
-  const handleStandardChange = (e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>) => {
+  const handleStandardChange = (
+    e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>,
+  ) => {
     const { name, value } = e.target;
 
     setStandardFormData((prev) => {
@@ -128,7 +121,9 @@ export const useMonthlyBills = ({ setModalConfig }: useMonthlyBillsProps) => {
     });
   };
 
-  const handleUtilityChange = (e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>) => {
+  const handleUtilityChange = (
+    e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>,
+  ) => {
     const { name, value } = e.target;
 
     setUtilityFormData((prev) => {
@@ -170,7 +165,7 @@ export const useMonthlyBills = ({ setModalConfig }: useMonthlyBillsProps) => {
     setUtilityFormData({
       type: bill.type,
       month: bill.month,
-      year: Number(bill.year),
+      year: bill.year,
       totalConsumptionM3: bill.totalConsumptionM3,
       consumptionValue: bill.consumptionValue,
       taxesValue: bill.taxesValue,
@@ -193,6 +188,7 @@ export const useMonthlyBills = ({ setModalConfig }: useMonthlyBillsProps) => {
         } else {
           await createUtilityBill(utilityFormData);
         }
+        
         setUtilityFormData(initialUtilityForm);
         setEditingUtilityBillId(null);
       } else {
@@ -201,15 +197,8 @@ export const useMonthlyBills = ({ setModalConfig }: useMonthlyBillsProps) => {
         } else {
           await createBills(standardFormData);
         }
-        
-        localStorage.setItem(
-          "lastBill",
-          JSON.stringify({
-            month: standardFormData.month,
-            year: standardFormData.year,
-          }),
-        );
-        setStandardFormData(getInitialStandardForm());
+
+        setStandardFormData(initialStandardForm);
         setEditingStandardBillId(null);
       }
 
@@ -253,7 +242,7 @@ export const useMonthlyBills = ({ setModalConfig }: useMonthlyBillsProps) => {
         } else {
           await deleteBills(idToDelete);
         }
-        
+
         setModalConfig({
           isOpen: true,
           title: "Sucesso",
@@ -295,6 +284,7 @@ export const useMonthlyBills = ({ setModalConfig }: useMonthlyBillsProps) => {
     utilityBills,
     utilityFormData,
     setUtilityFormData,
+    editingUtilityBillId,
     setEditingUtilityBillId,
     handleUtilityChange,
     handleUtilityEdit,

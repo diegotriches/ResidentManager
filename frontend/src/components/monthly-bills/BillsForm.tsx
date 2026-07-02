@@ -1,9 +1,9 @@
-import type { BillsType } from "../../types/bills";
+import type { BillsFormData } from "../../types/bills";
 import { months } from "../../utils/constants";
 
 interface BillsFormProps {
-  formData: BillsType;
-  onSave: (data: BillsType) => void;
+  formData: BillsFormData;
+  onSave: (data: BillsFormData) => void;
   handleChange: (
     e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>,
   ) => void;

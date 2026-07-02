@@ -5,7 +5,7 @@ import { formatCurrency } from "../../utils/format";
 interface BillsRecordsTableProps {
   bills: BillsType[];
   handleOpenEdit: (bills: BillsType) => void;
-  deleteRequest: (id: number | undefined) => void;
+  deleteRequest: (id: number) => void;
 }
 
 export const BillsRecordsTable: React.FC<BillsRecordsTableProps> = ({

@@ -37,7 +37,7 @@ export const MonthlyBills = () => {
     activeTab,
     setActiveTab,
     loading,
-    
+
     // Dados e handlers do Condomínio (Standard)
     standardBills,
     standardFormData,
@@ -52,6 +52,7 @@ export const MonthlyBills = () => {
     utilityBills,
     utilityFormData,
     setUtilityFormData,
+    editingUtilityBillId,
     setEditingUtilityBillId,
     handleUtilityChange,
     handleUtilityEdit,
@@ -74,7 +75,7 @@ export const MonthlyBills = () => {
   );
 
   // --- HANDLERS DE FLUXO DA TELA ---
-  
+
   // Condomínio: Gatilho para abrir criando do zero
   const handleOpenCreateStandard = () => {
     setStandardFormData(initialStandardForm);
@@ -86,6 +87,13 @@ export const MonthlyBills = () => {
   const handleOpenEditStandard = (bill: any) => {
     handleStandardEdit(bill);
     setIsFormModalOpen(true);
+  };
+
+  // Utilitários: Gatilho para abrir criando do zero
+  const handleOpenCreateUtility = () => {
+    setUtilityFormData(initialUtilityForm);
+    setEditingUtilityBillId(null);
+    setIsUtilityModalOpen(true);
   };
 
   // Utilitários: Gatilho para abrir editando uma linha
@@ -108,32 +116,52 @@ export const MonthlyBills = () => {
 
       {/* Modal de Formulário: Água e Gás */}
       {isUtilityModalOpen && (
-        <UtilityBillModal
-          formData={utilityFormData}
-          handleChange={handleUtilityChange}
-          onClose={() => {
-            setIsUtilityModalOpen(false);
-            setEditingUtilityBillId(null);
-            setUtilityFormData(initialUtilityForm);
-          }}
-          onSave={async () => {
-            const success = await handleSubmit();
-            if (success) {
-              setIsUtilityModalOpen(false);
-            }
-          }}
-        />
+        <div className="modal-overlay">
+          <div className="modal-content form-modal">
+            <h2 className="modal-title">
+              {editingUtilityBillId
+                ? "Edição de Consumo"
+                : "Novo Consumo"}
+            </h2>
+            <button
+              className="close-x"
+              onClick={() => {
+                setIsUtilityModalOpen(false);
+                setEditingUtilityBillId(null);
+              }}
+            >
+              &times;
+            </button>
+
+            <UtilityBillModal
+              formData={utilityFormData}
+              handleChange={handleUtilityChange}
+              onSave={async () => {
+                const success = await handleSubmit();
+                if (success) {
+                  setIsUtilityModalOpen(false);
+                }
+              }}
+            />
+          </div>
+        </div>
       )}
 
       <div className="main-container">
         <header>
           <h1>Gestão de Contas Mensais</h1>
-          <div className="header-actions" style={{ display: "flex", gap: "10px" }}>
+          <div
+            className="header-actions"
+            style={{ display: "flex", gap: "10px" }}
+          >
             <button onClick={handleOpenCreateStandard} className="btn-new">
               <FaMoneyCheckAlt /> Nova Conta Condomínio
             </button>
 
-            <button onClick={() => setIsUtilityModalOpen(true)} className="btn-new">
+            <button
+              onClick={handleOpenCreateUtility}
+              className="btn-new"
+            >
               <FaMoneyCheckAlt /> Nova Conta Água/Gás
             </button>
           </div>
@@ -161,22 +189,31 @@ export const MonthlyBills = () => {
             <p>Carregando registros...</p>
           ) : activeTab === "condo" ? (
             <>
-              <div className="summary-cards">
-                <div className="card">
-                  <span>Total das Contas</span>
-                  <strong>{formatCurrency(totalTotalValue)}</strong>
-                </div>
-                <div className="card">
-                  <span>Soma por Unidade (Rateio)</span>
-                  <strong>{formatCurrency(totalUnitValue)}</strong>
-                </div>
-              </div>
+              {standardBills.length > 0 ? (
+                <>
+                  <div className="summary-cards">
+                    <div className="card">
+                      <span>Total das Contas</span>
+                      <strong>{formatCurrency(totalTotalValue)}</strong>
+                    </div>
+                    <div className="card">
+                      <span>Soma por Unidade (Rateio)</span>
+                      <strong>{formatCurrency(totalUnitValue)}</strong>
+                    </div>
+                  </div>
 
-              <BillsRecordsTable
-                bills={standardBills}
-                handleOpenEdit={handleOpenEditStandard}
-                deleteRequest={deleteRequest}
-              />
+                  <BillsRecordsTable
+                    bills={standardBills}
+                    handleOpenEdit={handleOpenEditStandard}
+                    deleteRequest={deleteRequest}
+                  />
+                </>
+              ) : (
+                <p>
+                  Nenhuma conta de condomínio cadastrada para a data
+                  selecionada.
+                </p>
+              )}
             </>
           ) : (
             <UtilityBillsView
@@ -199,7 +236,7 @@ export const MonthlyBills = () => {
                   setStandardFormData(initialStandardForm);
                 }}
               >
-                X
+                &times;
               </button>
               <h2 className="modal-title">
                 {editingStandardBillId ? "Editar Conta" : "Nova Conta"}

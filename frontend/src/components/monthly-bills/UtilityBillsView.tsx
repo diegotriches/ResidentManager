@@ -1,4 +1,3 @@
-import { useFilter } from "../../context/FilterContext";
 import type { UtilityBillType } from "../../types/utilityBills";
 import { formatCurrency, formatDecimal } from "../../utils/format";
 import { FaDroplet, FaFireFlameCurved } from "react-icons/fa6";
@@ -15,14 +14,12 @@ export const UtilityBillsView = ({
   handleOpenEdit,
   deleteRequest,
 }: UtilityBillsViewProps) => {
-  const { month, year } = useFilter();
-
   return (
     <div className="utility-view-container">
       {bills.length === 0 ? (
         <div className="empty-state">
           <p>
-            Nenhuma fatura de água ou gás cadastrada para {month}/{year}.
+            Nenhuma fatura de água ou gás cadastrada para a data selecionada.
           </p>
         </div>
       ) : (
