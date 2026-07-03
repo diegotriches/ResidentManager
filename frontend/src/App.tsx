@@ -10,30 +10,33 @@ import { Requests } from "./pages/Requests";
 import { FilterProvider } from "./context/FilterContext";
 import { FilterBar } from "./components/layout/FilterBar";
 import "./App.css";
+import { ApartmentProvider } from "./context/ApartmentContext";
 
 function App() {
   return (
-    <FilterProvider>
-      <div className="container">
-        <Sidebar />
-        <div className="main-wrapper">
-          <FilterBar />
-          <main className="content">
-            <div className="page-content">
-              <Routes>
-                <Route path="/" element={<Home />} />
-                <Route path="/apartments" element={<Apartments />} />
-                <Route path="/monthly-bills" element={<MonthlyBills />} />
-                <Route path="/vouchers" element={<Vouchers />} />
-                <Route path="/meters" element={<Meters />} />
-                <Route path="/warnings" element={<Warnings />} />
-                <Route path="/requests" element={<Requests />} />
-              </Routes>
-            </div>
-          </main>
+    <ApartmentProvider>
+      <FilterProvider>
+        <div className="container">
+          <Sidebar />
+          <div className="main-wrapper">
+            <FilterBar />
+            <main className="content">
+              <div className="page-content">
+                <Routes>
+                  <Route path="/" element={<Home />} />
+                  <Route path="/apartments" element={<Apartments />} />
+                  <Route path="/monthly-bills" element={<MonthlyBills />} />
+                  <Route path="/vouchers" element={<Vouchers />} />
+                  <Route path="/meters" element={<Meters />} />
+                  <Route path="/warnings" element={<Warnings />} />
+                  <Route path="/requests" element={<Requests />} />
+                </Routes>
+              </div>
+            </main>
+          </div>
         </div>
-      </div>
-    </FilterProvider>
+      </FilterProvider>
+    </ApartmentProvider>
   );
 }
 

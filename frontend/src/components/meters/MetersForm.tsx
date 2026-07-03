@@ -1,5 +1,6 @@
+import { useApartmentContext } from "../../context/ApartmentContext";
 import type { MeterFormData } from "../../types/meters";
-import { months, apartments } from "../../utils/constants";
+import { months } from "../../utils/constants";
 
 interface MetersFormProps {
   formData: MeterFormData;
@@ -19,6 +20,8 @@ export const MetersForm: React.FC<MetersFormProps> = ({
   const handleSave = () => {
     onSave({ ...formData });
   };
+
+  const { apartments, loading } = useApartmentContext();
 
   return (
     <div className="form-wrapper">
@@ -60,12 +63,17 @@ export const MetersForm: React.FC<MetersFormProps> = ({
           name="apartment"
           value={formData.apartment}
           onChange={handleChange}
+          disabled={loading}
         >
-          {apartments.map((option) => (
-            <option key={option} value={option}>
-              {option}
-            </option>
-          ))}
+          <option value="">
+            {loading ? "Carregando unidades..." : "Selecione o apartamento"}
+          </option>
+          {!loading &&
+            apartments.map((apt) => (
+              <option key={apt.id} value={apt.id}>
+                Apto {apt.number} {apt.ownerName ? `(${apt.ownerName})` : ""}
+              </option>
+            ))}
         </select>
       </div>
 
