@@ -7,10 +7,10 @@ import {
 } from "react";
 import type { ReactNode } from "react";
 import { getApartments } from "../services/apartmentsService";
-import type { ApartmentsData } from "../types/apartments";
+import type { Apartment } from "../types/apartments";
 
 interface ApartmentContextType {
-  apartments: ApartmentsData[];
+  apartments: Apartment[];
   loading: boolean;
   fetchApartments: () => Promise<void>;
 }
@@ -20,7 +20,7 @@ const ApartmentContext = createContext<ApartmentContextType | undefined>(
 );
 
 export const ApartmentProvider = ({ children }: { children: ReactNode }) => {
-  const [apartments, setApartments] = useState<ApartmentsData[]>([]);
+  const [apartments, setApartments] = useState<Apartment[]>([]);
   const [loading, setLoading] = useState(true);
 
   const fetchApartments = useCallback(async () => {

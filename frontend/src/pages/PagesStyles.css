@@ -295,29 +295,37 @@ header h1 {
   box-shadow: 0 0 0 3px rgba(52, 152, 219, 0.2);
 }
 
-/* Botão de salvar */
-.btn-submit {
+.modal-btns {
+  display: flex;
+  justify-content: center;
+  gap: 1rem;
   margin-top: 1rem;
-  padding: 0.8rem;
-  background-color: #27ae60;
+}
+
+/* Botão de salvar */
+.btn-save {
+  display: flex;
+  align-items: center;
+  padding: 0.6rem 1.2rem;
   color: white;
-  border: none;
-  border-radius: 6px;
+  gap: 0.6rem;
   font-size: 1rem;
-  font-weight: bold;
+  background-color: #27ae60;
+  border: none;
+  border-radius: 1rem;
   cursor: pointer;
   transition: background-color 0.2s, transform 0.1s;
 }
 
-.btn-submit:hover {
+.btn-save:hover {
   background-color: #219150;
 }
 
-.btn-submit:active {
+.btn-save:active {
   transform: scale(0.98);
 }
 
 /* Ajuste para quando estiver editando (mudar a cor do botão se quiser) */
-.btn-submit.editing {
+.btn-save.editing {
   background-color: #3498db;
 }

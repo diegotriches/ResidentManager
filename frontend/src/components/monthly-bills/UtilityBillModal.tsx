@@ -1,3 +1,4 @@
+import { FaPencilAlt, FaPlusCircle } from "react-icons/fa";
 import type { UtilityFormDataType } from "../../types/utilityBills";
 import { months } from "../../utils/constants";
 
@@ -7,12 +8,14 @@ interface UtilityBillModalProps {
   handleChange: (
     e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>,
   ) => void;
+  editingUtilityBillId: number | null;
 }
 
 export const UtilityBillModal = ({
   onSave,
   formData,
   handleChange,
+  editingUtilityBillId,
 }: UtilityBillModalProps) => {
   const handleSave = () => {
     // A lógica de cálculo é validada aqui antes de enviar ao backend
@@ -149,9 +152,19 @@ export const UtilityBillModal = ({
         </>
       )}
 
-      <div className="modal-actions">
+      <div className="modal-btns">
         <button onClick={handleSave} className="btn-save">
-          Salvar Conta
+          {!editingUtilityBillId ? (
+            <>
+              <FaPlusCircle />
+              Salvar Conta
+            </>
+          ) : (
+            <>
+              <FaPencilAlt />
+              Editar Conta
+            </>
+          )}
         </button>
       </div>
     </div>

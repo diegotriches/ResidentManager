@@ -1,3 +1,4 @@
+import { FaPencilAlt, FaPlusCircle } from "react-icons/fa";
 import type { BillsFormData } from "../../types/bills";
 import { months } from "../../utils/constants";
 
@@ -91,12 +92,19 @@ export const BillsForm = ({
         </div>
       </div>
 
-      <button
-        onClick={handleSave}
-        className={`btn-submit ${editingBillId ? "editing" : ""}`}
-      >
-        {editingBillId ? "Salvar Medição" : "Cadastrar Medição"}
-      </button>
+      <div className="modal-btns">
+        <button onClick={handleSave} className="btn-save">
+          {!editingBillId ? (
+                      <>
+                        <FaPlusCircle /> Cadastrar
+                      </>
+                    ) : (
+                      <>
+                        <FaPencilAlt /> Editar
+                      </>
+                    )}
+        </button>
+      </div>
     </div>
   );
 };

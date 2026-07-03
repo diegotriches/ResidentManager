@@ -119,9 +119,7 @@ export const MonthlyBills = () => {
         <div className="modal-overlay">
           <div className="modal-content form-modal">
             <h2 className="modal-title">
-              {editingUtilityBillId
-                ? "Edição de Consumo"
-                : "Novo Consumo"}
+              {editingUtilityBillId ? "Edição de Consumo" : "Novo Consumo"}
             </h2>
             <button
               className="close-x"
@@ -142,6 +140,7 @@ export const MonthlyBills = () => {
                   setIsUtilityModalOpen(false);
                 }
               }}
+              editingUtilityBillId={editingUtilityBillId}
             />
           </div>
         </div>
@@ -158,10 +157,7 @@ export const MonthlyBills = () => {
               <FaMoneyCheckAlt /> Nova Conta Condomínio
             </button>
 
-            <button
-              onClick={handleOpenCreateUtility}
-              className="btn-new"
-            >
+            <button onClick={handleOpenCreateUtility} className="btn-new">
               <FaMoneyCheckAlt /> Nova Conta Água/Gás
             </button>
           </div>

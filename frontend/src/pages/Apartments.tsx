@@ -84,6 +84,7 @@ export const Apartments = () => {
             <ApartmentsForm
               formData={formData}
               handleChange={handleChange}
+              apartmentId={apartmentId}
               onSave={async () => {
                 const sucesso = await handleSubmit();
                 if (sucesso) {
@@ -121,7 +122,7 @@ export const Apartments = () => {
                 </tr>
               </thead>
               <tbody>
-                {apartments.map((a) => (
+                {apartments.map((a: Apartment) => (
                   <tr key={a.id}>
                     <td>{a.number}</td>
                     <td>{a.ownerName}</td>

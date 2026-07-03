@@ -1,3 +1,4 @@
+import { FaPencilAlt, FaPlusCircle } from "react-icons/fa";
 import { useApartmentContext } from "../../context/ApartmentContext";
 import type { MeterFormData } from "../../types/meters";
 import { months } from "../../utils/constants";
@@ -101,9 +102,17 @@ export const MetersForm: React.FC<MetersFormProps> = ({
         </div>
       </div>
 
-      <div className="modal-actions">
+      <div className="modal-btns">
         <button onClick={handleSave} className="btn-save">
-          {editingMeterId ? "Salvar Medição" : "Cadastrar Medição"}
+          {!editingMeterId ? (
+            <>
+              <FaPlusCircle /> Cadastrar
+            </>
+          ) : (
+            <>
+              <FaPencilAlt /> Editar
+            </>
+          )}
         </button>
       </div>
     </div>

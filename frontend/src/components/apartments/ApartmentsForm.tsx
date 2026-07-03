@@ -1,15 +1,18 @@
+import { FaPencilAlt, FaPlusCircle } from "react-icons/fa";
 import type { ApartmentsData } from "../../types/apartments";
 
 interface ApartmentsFormProps {
   formData: ApartmentsData;
   onSave: (data: ApartmentsData) => void;
   handleChange: (e: React.ChangeEvent<HTMLInputElement>) => void;
+  apartmentId: number | null;
 }
 
 export const ApartmentsForm = ({
   onSave,
   formData,
   handleChange,
+  apartmentId,
 }: ApartmentsFormProps) => {
   const handleSave = () => {
     onSave({ ...formData });
@@ -40,9 +43,17 @@ export const ApartmentsForm = ({
         </div>
       </div>
 
-      <div className="modal-actions">
+      <div className="modal-btns">
         <button onClick={handleSave} className="btn-save">
-          Cadastrar
+          {!apartmentId ? (
+            <>
+              <FaPlusCircle /> Cadastrar
+            </>
+          ) : (
+            <>
+              <FaPencilAlt /> Editar
+            </>
+          )}
         </button>
       </div>
     </div>
