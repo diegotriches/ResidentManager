@@ -13,7 +13,7 @@ import type {
 } from "../types/meters";
 import { useFilter } from "../context/FilterContext";
 
-interface useMetersFormProps {
+interface useMetersProps {
   setModalConfig: (config: {
     isOpen: boolean;
     message: string;
@@ -22,7 +22,7 @@ interface useMetersFormProps {
   }) => void;
 }
 
-export const useMeterForm = ({ setModalConfig }: useMetersFormProps) => {
+export const useMeters = ({ setModalConfig }: useMetersProps) => {
   const { month, year } = useFilter();
 
   const initialForm: MeterFormData = {

@@ -2,7 +2,7 @@ import { useState } from "react";
 import { MetersForm } from "../components/meters/MetersForm";
 import { MeterTable } from "../components/meters/MeterTable";
 import { Modal } from "../components/ui/Modal";
-import { useMeterForm } from "../hooks/useMeterForm";
+import { useMeters } from "../hooks/useMeters";
 import type { MetersType } from "../types/meters";
 import { FaTachometerAlt } from "react-icons/fa";
 import { MeterRecordsTable } from "../components/meters/MeterRecordsTable";
@@ -41,7 +41,7 @@ export const Meters = () => {
     handleSubmit,
     deleteRequest,
     handleDelete,
-  } = useMeterForm({ setModalConfig });
+  } = useMeters({ setModalConfig });
 
   // Função para abrir para NOVA medição
   const handleOpenCreate = () => {
