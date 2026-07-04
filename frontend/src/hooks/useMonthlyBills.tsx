@@ -38,8 +38,8 @@ export const useMonthlyBills = ({ setModalConfig }: useMonthlyBillsProps) => {
   const [activeTab, setActiveTab] = useState<"condo" | "utilities">("condo");
   const [loading, setLoading] = useState(true);
 
-  // --- 1. ESTADOS E INITIAL FORMS DE CONDOMÍNIO (Standard) ---
-  const initialStandardForm: BillsFormData = {
+  // --- 1. ESTADOS E INITIAL FORMS DE CONDOMÍNIO ---
+  const initialForm: BillsFormData = {
     month: month,
     year: Number(year),
     bill: "",
@@ -47,12 +47,9 @@ export const useMonthlyBills = ({ setModalConfig }: useMonthlyBillsProps) => {
     unitValue: 0,
   };
 
-  const [standardBills, setStandardBills] = useState<BillsType[]>([]);
-  const [standardFormData, setStandardFormData] =
-    useState<BillsFormData>(initialStandardForm);
-  const [editingStandardBillId, setEditingStandardBillId] = useState<
-    number | null
-  >(null);
+  const [bills, setBills] = useState<BillsType[]>([]);
+  const [formData, setFormData] = useState<BillsFormData>(initialForm);
+  const [billId, setBillId] = useState<number | null>(null);
 
   // --- 2. ESTADOS E INITIAL FORMS DE CONSUMO (Utilities) ---
   const initialUtilityForm: UtilityFormDataType = {
@@ -71,12 +68,7 @@ export const useMonthlyBills = ({ setModalConfig }: useMonthlyBillsProps) => {
   const [utilityBills, setUtilityBills] = useState<UtilityBillType[]>([]);
   const [utilityFormData, setUtilityFormData] =
     useState<UtilityFormDataType>(initialUtilityForm);
-  const [editingUtilityBillId, setEditingUtilityBillId] = useState<
-    number | null
-  >(null);
-
-  // --- 3. ESTADO GLOBAL DE DELEÇÃO ---
-  const [idToDelete, setIdToDelete] = useState<number | null>(null);
+  const [utilityBillId, setUtilityBillId] = useState<number | null>(null);
 
   // --- 4. FUNÇÃO DE BUSCA UNIFICADA (Disparada por aba ou filtro) ---
   const fetchBills = useCallback(async () => {
@@ -87,7 +79,7 @@ export const useMonthlyBills = ({ setModalConfig }: useMonthlyBillsProps) => {
         setUtilityBills(data);
       } else {
         const data = await getBills(month, year);
-        setStandardBills(data);
+        setBills(data);
       }
     } catch (error) {
       console.error("Erro ao buscar contas:", error);
@@ -101,12 +93,12 @@ export const useMonthlyBills = ({ setModalConfig }: useMonthlyBillsProps) => {
   }, [fetchBills]);
 
   // --- 5. HANDLERS DE INPUTS ISOLADOS ---
-  const handleStandardChange = (
+  const handleChange = (
     e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>,
   ) => {
     const { name, value } = e.target;
 
-    setStandardFormData((prev) => {
+    setFormData((prev) => {
       const newData = { ...prev, [name]: value };
       const numValue = parseFloat(value);
 
@@ -149,9 +141,9 @@ export const useMonthlyBills = ({ setModalConfig }: useMonthlyBillsProps) => {
   };
 
   // --- 6. HANDLERS DE EDIÇÃO ISOLADOS ---
-  const handleStandardEdit = (bill: BillsType) => {
-    setEditingStandardBillId(bill.id ?? null); // Evita problemas se id for undefined na tipagem
-    setStandardFormData({
+  const handleEdit = (bill: BillsType) => {
+    setBillId(bill.id ?? null); // Evita problemas se id for undefined na tipagem
+    setFormData({
       month: bill.month,
       year: bill.year,
       bill: bill.bill,
@@ -161,7 +153,7 @@ export const useMonthlyBills = ({ setModalConfig }: useMonthlyBillsProps) => {
   };
 
   const handleUtilityEdit = (bill: UtilityBillType) => {
-    setEditingUtilityBillId(bill.id ?? null);
+    setUtilityBillId(bill.id ?? null);
     setUtilityFormData({
       type: bill.type,
       month: bill.month,
@@ -179,7 +171,7 @@ export const useMonthlyBills = ({ setModalConfig }: useMonthlyBillsProps) => {
   // --- 7. SUBMIT UNIFICADO E DINÂMICO ---
   const handleSubmit = async (): Promise<boolean> => {
     const isUtility = activeTab === "utilities";
-    const currentId = isUtility ? editingUtilityBillId : editingStandardBillId;
+    const currentId = isUtility ? utilityBillId : billId;
 
     try {
       if (isUtility) {
@@ -188,18 +180,18 @@ export const useMonthlyBills = ({ setModalConfig }: useMonthlyBillsProps) => {
         } else {
           await createUtilityBill(utilityFormData);
         }
-        
+
         setUtilityFormData(initialUtilityForm);
-        setEditingUtilityBillId(null);
+        setUtilityBillId(null);
       } else {
         if (currentId) {
-          await updateBills(currentId, standardFormData);
+          await updateBills(currentId, formData);
         } else {
-          await createBills(standardFormData);
+          await createBills(formData);
         }
 
-        setStandardFormData(initialStandardForm);
-        setEditingStandardBillId(null);
+        setFormData(initialForm);
+        setBillId(null);
       }
 
       setModalConfig({
@@ -225,7 +217,12 @@ export const useMonthlyBills = ({ setModalConfig }: useMonthlyBillsProps) => {
 
   // --- 8. DELEÇÃO UNIFICADA E DINÂMICA ---
   const deleteRequest = (id: number) => {
-    setIdToDelete(id);
+    if (activeTab === "condo") {
+      setBillId(id);
+    } else if (activeTab === "utilities") {
+      setUtilityBillId(id);
+    }
+
     setModalConfig({
       isOpen: true,
       title: "Confirmação",
@@ -236,11 +233,10 @@ export const useMonthlyBills = ({ setModalConfig }: useMonthlyBillsProps) => {
 
   const handleDelete = async () => {
     try {
-      if (idToDelete !== null) {
-        if (activeTab === "utilities") {
-          await deleteUtilityBill(idToDelete);
-        } else {
-          await deleteBills(idToDelete);
+      if (activeTab === "condo" && billId !== null) {
+          await deleteBills(billId);
+        } else if(activeTab === "utilities" && utilityBillId !== null) {
+          await deleteUtilityBill(utilityBillId);
         }
 
         setModalConfig({
@@ -249,9 +245,10 @@ export const useMonthlyBills = ({ setModalConfig }: useMonthlyBillsProps) => {
           message: "Conta removida com sucesso!",
           type: "alert",
         });
-        setIdToDelete(null);
+
+        setBillId(null);
+        setUtilityBillId(null);
         fetchBills();
-      }
     } catch (error) {
       console.error("Erro ao deletar:", error);
       setModalConfig({
@@ -270,22 +267,22 @@ export const useMonthlyBills = ({ setModalConfig }: useMonthlyBillsProps) => {
     loading,
     fetchBills,
 
-    // Dados e handlers do Condomínio (Standard)
-    standardBills,
-    standardFormData,
-    setStandardFormData,
-    editingStandardBillId,
-    setEditingStandardBillId,
-    handleStandardChange,
-    handleStandardEdit,
-    initialStandardForm,
+    // Dados e handlers do Condomínio
+    bills,
+    formData,
+    setFormData,
+    billId,
+    setBillId,
+    handleChange,
+    handleEdit,
+    initialForm,
 
     // Dados e handlers de Consumo (Utilities)
     utilityBills,
     utilityFormData,
     setUtilityFormData,
-    editingUtilityBillId,
-    setEditingUtilityBillId,
+    utilityBillId,
+    setUtilityBillId,
     handleUtilityChange,
     handleUtilityEdit,
     initialUtilityForm,

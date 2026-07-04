@@ -10,7 +10,8 @@ import { useMonthlyBills } from "../hooks/useMonthlyBills";
 // Utils
 import { formatCurrency } from "../utils/format";
 // Icons
-import { FaMoneyCheckAlt } from "react-icons/fa";
+import { FaMoneyCheckAlt, FaPlusCircle } from "react-icons/fa";
+import { FaDroplet, FaFireFlameCurved } from "react-icons/fa6";
 
 interface ModalConfig {
   isOpen: boolean;
@@ -38,22 +39,22 @@ export const MonthlyBills = () => {
     setActiveTab,
     loading,
 
-    // Dados e handlers do Condomínio (Standard)
-    standardBills,
-    standardFormData,
-    setStandardFormData,
-    editingStandardBillId,
-    setEditingStandardBillId,
-    handleStandardChange,
-    handleStandardEdit,
-    initialStandardForm,
+    // Dados e handlers do Condomínio
+    bills,
+    formData,
+    setFormData,
+    billId,
+    setBillId,
+    handleChange,
+    handleEdit,
+    initialForm,
 
     // Dados e handlers de Consumo (Utilities)
     utilityBills,
     utilityFormData,
     setUtilityFormData,
-    editingUtilityBillId,
-    setEditingUtilityBillId,
+    utilityBillId,
+    setUtilityBillId,
     handleUtilityChange,
     handleUtilityEdit,
     initialUtilityForm,
@@ -64,12 +65,12 @@ export const MonthlyBills = () => {
     handleDelete,
   } = useMonthlyBills({ setModalConfig });
 
-  // --- CÁLCULOS DE RESUMO (Baseados no array correto: standardBills) ---
-  const totalTotalValue = standardBills.reduce(
+  // --- CÁLCULOS DE RESUMO (Baseados no array correto: bills) ---
+  const totalTotalValue = bills.reduce(
     (acc, bill) => acc + (bill.totalValue || 0),
     0,
   );
-  const totalUnitValue = standardBills.reduce(
+  const totalUnitValue = bills.reduce(
     (acc, bill) => acc + (bill.unitValue || 0),
     0,
   );
@@ -77,22 +78,22 @@ export const MonthlyBills = () => {
   // --- HANDLERS DE FLUXO DA TELA ---
 
   // Condomínio: Gatilho para abrir criando do zero
-  const handleOpenCreateStandard = () => {
-    setStandardFormData(initialStandardForm);
-    setEditingStandardBillId(null);
+  const handleOpenCreate = () => {
+    setFormData(initialForm);
+    setBillId(null);
     setIsFormModalOpen(true);
   };
 
   // Condomínio: Gatilho para abrir editando uma linha
-  const handleOpenEditStandard = (bill: any) => {
-    handleStandardEdit(bill);
+  const handleOpenEdit = (bill: any) => {
+    handleEdit(bill);
     setIsFormModalOpen(true);
   };
 
   // Utilitários: Gatilho para abrir criando do zero
   const handleOpenCreateUtility = () => {
     setUtilityFormData(initialUtilityForm);
-    setEditingUtilityBillId(null);
+    setUtilityBillId(null);
     setIsUtilityModalOpen(true);
   };
 
@@ -119,13 +120,13 @@ export const MonthlyBills = () => {
         <div className="modal-overlay">
           <div className="modal-content form-modal">
             <h2 className="modal-title">
-              {editingUtilityBillId ? "Edição de Consumo" : "Novo Consumo"}
+              {utilityBillId ? "Edição de Consumo" : "Novo Consumo"}
             </h2>
             <button
               className="close-x"
               onClick={() => {
                 setIsUtilityModalOpen(false);
-                setEditingUtilityBillId(null);
+                setUtilityBillId(null);
               }}
             >
               &times;
@@ -140,31 +141,36 @@ export const MonthlyBills = () => {
                   setIsUtilityModalOpen(false);
                 }
               }}
-              editingUtilityBillId={editingUtilityBillId}
+              editingUtilityBillId={utilityBillId}
             />
           </div>
         </div>
       )}
 
       <div className="main-container">
-        <header>
-          <h1>Gestão de Contas Mensais</h1>
-          <div
-            className="header-actions"
-            style={{ display: "flex", gap: "10px" }}
-          >
-            <button onClick={handleOpenCreateStandard} className="btn-new">
-              <FaMoneyCheckAlt /> Nova Conta Condomínio
-            </button>
-
-            <button onClick={handleOpenCreateUtility} className="btn-new">
-              <FaMoneyCheckAlt /> Nova Conta Água/Gás
-            </button>
-          </div>
+        <header className="pages-header">
+          <h1>
+            <FaMoneyCheckAlt /> Gastos Mensais
+          </h1>
+          {activeTab === "condo" ? (
+            <div className="form-grid">
+              Nova conta:
+              <button onClick={handleOpenCreate} className="btn-new">
+                <FaPlusCircle /> Condomínio
+              </button>
+            </div>
+          ) : (
+            <div className="form-grid">
+              Nova conta:
+              <button onClick={handleOpenCreateUtility} className="btn-new">
+                <FaDroplet /> Água / <FaFireFlameCurved /> Gás
+              </button>
+            </div>
+          )}
         </header>
 
         {/* Navegação entre Abas */}
-        <div className="tabs-nav">
+        <nav className="tabs-nav">
           <button
             className={`tab-btn ${activeTab === "condo" ? "active" : ""}`}
             onClick={() => setActiveTab("condo")}
@@ -177,7 +183,7 @@ export const MonthlyBills = () => {
           >
             Consumos (Água e Gás)
           </button>
-        </div>
+        </nav>
 
         {/* Conteúdo Renderizado Condicionalmente */}
         <div className="tab-content">
@@ -185,7 +191,7 @@ export const MonthlyBills = () => {
             <p>Carregando registros...</p>
           ) : activeTab === "condo" ? (
             <>
-              {standardBills.length > 0 ? (
+              {bills.length > 0 ? (
                 <>
                   <div className="summary-cards">
                     <div className="card">
@@ -199,8 +205,8 @@ export const MonthlyBills = () => {
                   </div>
 
                   <BillsRecordsTable
-                    bills={standardBills}
-                    handleOpenEdit={handleOpenEditStandard}
+                    bills={bills}
+                    handleOpenEdit={handleOpenEdit}
                     deleteRequest={deleteRequest}
                   />
                 </>
@@ -228,25 +234,25 @@ export const MonthlyBills = () => {
                 className="close-x"
                 onClick={() => {
                   setIsFormModalOpen(false);
-                  setEditingStandardBillId(null);
-                  setStandardFormData(initialStandardForm);
+                  setBillId(null);
+                  setFormData(initialForm);
                 }}
               >
                 &times;
               </button>
               <h2 className="modal-title">
-                {editingStandardBillId ? "Editar Conta" : "Nova Conta"}
+                {billId ? "Editar Conta" : "Nova Conta"}
               </h2>
               <BillsForm
-                formData={standardFormData}
-                handleChange={handleStandardChange}
+                formData={formData}
+                handleChange={handleChange}
                 onSave={async () => {
                   const success = await handleSubmit();
                   if (success) {
                     setIsFormModalOpen(false);
                   }
                 }}
-                editingBillId={editingStandardBillId}
+                editingBillId={billId}
               />
             </div>
           </div>
