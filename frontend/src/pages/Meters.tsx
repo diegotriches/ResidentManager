@@ -4,7 +4,7 @@ import { MeterTable } from "../components/meters/MeterTable";
 import { Modal } from "../components/ui/Modal";
 import { useMeters } from "../hooks/useMeters";
 import type { MetersType } from "../types/meters";
-import { FaTachometerAlt } from "react-icons/fa";
+import { FaPlusCircle, FaTachometerAlt } from "react-icons/fa";
 import { MeterRecordsTable } from "../components/meters/MeterRecordsTable";
 import "./PagesStyles.css";
 
@@ -98,29 +98,29 @@ export const Meters = () => {
       )}
 
       <div className="main-container">
-        <div className="tabs-header">
-          <header className="pages-header">
-            <h1>Gestão de Medidores</h1>
-            <button onClick={handleOpenCreate} className="btn-new">
-              <FaTachometerAlt /> Nova Medição
-            </button>
-          </header>
+        <header className="pages-header">
+          <h1>
+            <FaTachometerAlt /> Medidores
+          </h1>
+          <button onClick={handleOpenCreate} className="btn-new">
+            <FaPlusCircle /> Nova Medição
+          </button>
+        </header>
 
-          <nav className="tabs-nav">
-            <button
-              className={`tab-btn ${activeTab === "register" ? "active" : ""}`}
-              onClick={() => setActiveTab("register")}
-            >
-              Registro de Medições
-            </button>
-            <button
-              className={`tab-btn ${activeTab === "history" ? "active" : ""}`}
-              onClick={() => setActiveTab("history")}
-            >
-              Visualizar Medições
-            </button>
-          </nav>
-        </div>
+        <nav className="tabs-nav">
+          <button
+            className={`tab-btn ${activeTab === "register" ? "active" : ""}`}
+            onClick={() => setActiveTab("register")}
+          >
+            Registro de Medições
+          </button>
+          <button
+            className={`tab-btn ${activeTab === "history" ? "active" : ""}`}
+            onClick={() => setActiveTab("history")}
+          >
+            Visualizar Medições
+          </button>
+        </nav>
 
         <div className="tab-content">
           {activeTab === "register" ? (

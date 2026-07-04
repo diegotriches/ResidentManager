@@ -1,3 +1,4 @@
+import { FaHome } from "react-icons/fa";
 import { useHome } from "../hooks/useHome";
 
 export const Home = () => {
@@ -6,7 +7,9 @@ export const Home = () => {
   return (
     <div className="main-container">
       <header className="pages-header">
-        <h1>Dashboard</h1>
+        <h1>
+          <FaHome /> Home
+        </h1>
       </header>
       <h3>Contas em aberto:</h3>
       {loading && <p>Carregando apartamentos...</p>}

@@ -1,6 +1,6 @@
 import { useState } from "react";
 import { useApartments } from "../hooks/useApartments";
-import { FaLayerGroup } from "react-icons/fa";
+import { FaLayerGroup, FaPlusCircle } from "react-icons/fa";
 import { ApartmentsForm } from "../components/apartments/ApartmentsForm";
 import { FaPencilAlt, FaTrashAlt } from "react-icons/fa";
 import type { Apartment } from "../types/apartments";
@@ -97,55 +97,56 @@ export const Apartments = () => {
       )}
 
       <div className="main-container">
-        <div className="tabs-header">
-          <header className="pages-header">
-            <h1>Apartamentos</h1>
-            <button onClick={handleOpenCreate} className="btn-new">
-              <FaLayerGroup /> Novo Apartamento
-            </button>
-          </header>
+        <header className="pages-header">
+          <h1>
+            <FaLayerGroup /> Apartamentos
+          </h1>
+          <button onClick={handleOpenCreate} className="btn-new">
+            <FaPlusCircle />
+            Novo Apartamento
+          </button>
+        </header>
 
-          {loading && <h4>Carregando apartamentos...</h4>}
-          {!loading && apartments.length === 0 && (
-            <h4>
-              Nenhum apartamento cadastrado! Cadastre clicando em Novo
-              Apartamento.
-            </h4>
-          )}
-          {!loading && apartments.length > 0 && (
-            <table className="records-table">
-              <thead>
-                <tr>
-                  <th>Apartamento</th>
-                  <th>Proprietário</th>
-                  <th>Edição</th>
+        {loading && <h4>Carregando apartamentos...</h4>}
+        {!loading && apartments.length === 0 && (
+          <h4>
+            Nenhum apartamento cadastrado! Cadastre clicando em Novo
+            Apartamento.
+          </h4>
+        )}
+        {!loading && apartments.length > 0 && (
+          <table className="records-table">
+            <thead>
+              <tr>
+                <th>Apartamento</th>
+                <th>Proprietário</th>
+                <th>Edição</th>
+              </tr>
+            </thead>
+            <tbody>
+              {apartments.map((a: Apartment) => (
+                <tr key={a.id}>
+                  <td>{a.number}</td>
+                  <td>{a.ownerName}</td>
+                  <td>
+                    <button
+                      className="btn-edit"
+                      onClick={() => handleOpenEdit(a)}
+                    >
+                      <FaPencilAlt />
+                    </button>
+                    <button
+                      className="btn-delete"
+                      onClick={() => deleteRequest(a.id)}
+                    >
+                      <FaTrashAlt />
+                    </button>
+                  </td>
                 </tr>
-              </thead>
-              <tbody>
-                {apartments.map((a: Apartment) => (
-                  <tr key={a.id}>
-                    <td>{a.number}</td>
-                    <td>{a.ownerName}</td>
-                    <td>
-                      <button
-                        className="btn-edit"
-                        onClick={() => handleOpenEdit(a)}
-                      >
-                        <FaPencilAlt />
-                      </button>
-                      <button
-                        className="btn-delete"
-                        onClick={() => deleteRequest(a.id)}
-                      >
-                        <FaTrashAlt />
-                      </button>
-                    </td>
-                  </tr>
-                ))}
-              </tbody>
-            </table>
-          )}
-        </div>
+              ))}
+            </tbody>
+          </table>
+        )}
       </div>
     </>
   );
