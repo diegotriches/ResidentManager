@@ -8,8 +8,8 @@ export const MetersController = {
 
       // Se mês e ano forem enviados, filtramos a busca
       const meters = await MetersRepository.read(
-        month ? String(month) : undefined,
-        year ? Number(year) : undefined,
+        String(month),
+        Number(year),
       );
 
       res.json(meters);
@@ -24,8 +24,8 @@ export const MetersController = {
       const { month, year } = req.query;
 
       const meters = await MetersRepository.readConsumption(
-        month ? String(month) : undefined,
-        year ? Number(year) : undefined,
+        String(month),
+        Number(year),
       );
 
       res.json(meters);
@@ -40,16 +40,16 @@ export const MetersController = {
 
   async create(req: Request, res: Response) {
     try {
-      const { month, year, apartment, water, gas } = req.body;
+      const { month, year, apartmentId, water, gas } = req.body;
       const meter = await MetersRepository.create({
         month,
         year,
-        apartment,
+        apartmentId,
         water,
         gas,
       });
 
-      res.status(201).json({ id: meter, month, year, apartment, water, gas });
+      res.status(201).json({ id: meter, month, year, apartmentId, water, gas });
     } catch (error) {
       console.error(error);
       res.status(500).json({ error: "Erro ao inserir medição" });
@@ -58,13 +58,13 @@ export const MetersController = {
 
   async update(req: Request, res: Response) {
     try {
-      const { month, year, apartment, water, gas } = req.body;
+      const { month, year, apartmentId, water, gas } = req.body;
       const id = String(req.params.id);
 
       const changes = await MetersRepository.update(id, {
         month,
         year,
-        apartment,
+        apartmentId,
         water,
         gas,
       });
@@ -73,7 +73,7 @@ export const MetersController = {
         return res.status(404).json({ error: "Conta não encontrada." });
       }
 
-      res.json({ id, month, year, apartment, water, gas });
+      res.json({ id, month, year, apartmentId, water, gas });
     } catch (error) {
       res.status(500).json({ error: "Erro ao atualizar banco de dados." });
     }

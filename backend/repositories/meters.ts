@@ -3,27 +3,36 @@ import { initDB } from "../db.ts";
 export interface CreateMeterDTO {
   month: string;
   year: number;
-  apartment: number;
+  apartmentId: number;
   water: number;
   gas: number;
 }
 
 export const MetersRepository = {
-  async read(month?: string, year?: number) {
+  async read(month: string, year: number) {
     const db = await initDB();
-    let query = "SELECT * FROM meters";
-    const params: (string | number)[] = [];
 
-    if (month && year) {
-      query += " WHERE month = ? AND year = ?";
-      params.push(String(month), Number(year));
-    }
+    let query = `
+    SELECT 
+      m.id,  
+      m.month,
+      m.year,
+      m.apartment AS apartmendId,
+      m.water,
+      m.gas,
+      m.createdAt,
+      m.updatedAt,
+      a.number AS apartment -- Traz o número real do apartamento
+    FROM meters m
+    INNER JOIN apartments a ON m.apartment = a.id
+    WHERE m.month = ? AND m.year = ?
+    ORDER BY m.createdAt DESC
+    `;
 
-    query += " ORDER BY createdAt DESC";
-    return await db.all(query, params);
+    return await db.all(query, [month, year]);
   },
 
-  async readConsumption(month?: string, year?: number) {
+  async readConsumption(month: string, year: number) {
     const db = await initDB();
 
     const query = `
@@ -46,15 +55,15 @@ export const MetersRepository = {
         FROM apartments a
         
         -- Traz a leitura do mês selecionado
-        LEFT JOIN meters m_atual ON a.number = m_atual.apartment 
+        LEFT JOIN meters m_atual ON a.id = m_atual.apartment 
           AND m_atual.month = ? 
           AND m_atual.year = ?
           
         -- Busca a leitura anterior baseando-se unicamente na data do registro, ignorando IDs
-        LEFT JOIN meters m_ant ON a.number = m_ant.apartment 
+        LEFT JOIN meters m_ant ON a.id = m_ant.apartment 
           AND m_ant.id = (
             SELECT id FROM meters 
-            WHERE apartment = a.number 
+            WHERE apartment = a.id 
               AND (year < ? OR (year = ? AND month < ?))
             ORDER BY year DESC, month DESC
             LIMIT 1
@@ -67,11 +76,11 @@ export const MetersRepository = {
 
   async create(data: CreateMeterDTO) {
     const db = await initDB();
-    const { month, year, apartment, water, gas } = data;
+    const { month, year, apartmentId, water, gas } = data;
 
     const result = await db.run(
       "INSERT INTO meters (month, year, apartment, water, gas) VALUES (?, ?, ?, ?, ?)",
-      [month, year, apartment, water, gas],
+      [month, year, apartmentId, water, gas],
     );
 
     return result.lastID;
@@ -79,11 +88,11 @@ export const MetersRepository = {
 
   async update(id: string | number, data: CreateMeterDTO) {
     const db = await initDB();
-    const { month, year, apartment, water, gas } = data;
+    const { month, year, apartmentId, water, gas } = data;
 
     const result = await db.run(
       "UPDATE meters SET month = ?, year = ?, apartment = ?, water = ?, gas = ?, updatedAt = CURRENT_TIMESTAMP WHERE id = ?",
-      [month, year, apartment, water, gas, id],
+      [month, year, apartmentId, water, gas, id],
     );
 
     return result.changes ?? 0;

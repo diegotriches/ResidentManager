@@ -26,43 +26,19 @@ export const MetersForm: React.FC<MetersFormProps> = ({
 
   return (
     <div className="form-wrapper">
-      <div className="form-grid">
-        <div className="form-field">
-          <label>Mês:</label>
-          <select
-            name="month"
-            value={formData.month}
-            onChange={handleChange}
-            required
-          >
-            <option value="">Selecione o mês</option>
-            {months.map((month) => (
-              <option key={month.value} value={month.value}>
-                {month.label}
-              </option>
-            ))}
-          </select>
-        </div>
-
-        <div className="form-field">
-          <label>Ano:</label>
-          <input
-            type="number"
-            name="year"
-            min="1000"
-            max="9999"
-            value={formData.year}
-            onChange={handleChange}
-            required
-          />
-        </div>
+      <div className="form-field">
+        <label>Data da medição:</label>
+        <span>
+          {months.find((m) => m.value === formData.month)?.label}
+          /{formData.year}
+        </span>
       </div>
 
       <div className="form-field">
         <label>Apartamento</label>
         <select
-          name="apartment"
-          value={formData.apartment}
+          name="apartmentId"
+          value={formData.apartmentId}
           onChange={handleChange}
           disabled={loading}
         >

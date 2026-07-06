@@ -28,7 +28,7 @@ export const useMeters = ({ setModalConfig }: useMetersProps) => {
   const initialForm: MeterFormData = {
     month: month,
     year: Number(year),
-    apartment: 201,
+    apartmentId: 0,
     water: 0,
     gas: 0,
   };
@@ -80,6 +80,7 @@ export const useMeters = ({ setModalConfig }: useMetersProps) => {
           type: "alert",
         });
       } else {
+        console.log(formData);
         await createMeters(formData);
         setModalConfig({
           isOpen: true,
@@ -112,7 +113,7 @@ export const useMeters = ({ setModalConfig }: useMetersProps) => {
   ) => {
     const { name, value } = e.target;
     setFormData((prev) => {
-      const numericFields = ["year", "apartment", "water", "gas"];
+      const numericFields = ["year", "apartmentId", "water", "gas"];
       const processedValue = numericFields.includes(name)
         ? parseFloat(value) || 0
         : value;
@@ -129,7 +130,7 @@ export const useMeters = ({ setModalConfig }: useMetersProps) => {
     setFormData({
       month: meter.month,
       year: meter.year,
-      apartment: meter.apartment,
+      apartmentId: meter.apartmentId,
       water: meter.water,
       gas: meter.gas,
     });

@@ -3,6 +3,7 @@ export type MetersType = {
   month: string;
   year: number;
   apartment: number;
+  apartmentId: number;
   water: number;
   gas: number;
   createdAt: string;
@@ -12,13 +13,14 @@ export type MetersType = {
 export type MeterFormData = {
   month: string;
   year: number;
-  apartment: number;
+  apartmentId: number;
   water: number;
   gas: number;
 };
 
 export interface MeterReportType {
   apartment: number;
+  apartmentId: number;
   water_current: number | null;
   gas_current: number | null;
   water_previous: number;
