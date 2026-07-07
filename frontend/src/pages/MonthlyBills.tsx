@@ -163,7 +163,7 @@ export const MonthlyBills = () => {
             <div className="form-grid">
               Nova conta:
               <button onClick={handleOpenCreateUtility} className="btn-new">
-                <FaDroplet /> Água / <FaFireFlameCurved /> Gás
+                <FaDroplet /> Água <FaFireFlameCurved /> Gás
               </button>
             </div>
           )}

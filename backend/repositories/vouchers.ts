@@ -14,14 +14,14 @@ export interface VoucherReport {
 }
 
 export interface UpdateVoucherDTO {
-  apartment: string;
+  apartmentId: string;
   month: string;
   year: number;
   isPaid: boolean;
 }
 
 export const VouchersRepository = {
-  async read(month?: string, year?: number): Promise<VoucherReport[]> {
+  async read(month: string, year: number): Promise<VoucherReport[]> {
     const db = await initDB();
 
     const query = `
@@ -105,12 +105,12 @@ export const VouchersRepository = {
 `;
 
     const rows = await db.all(query, [
-      String(month).trim(),
+      String(month),
       Number(year), // m_atual
       Number(year),
       Number(year),
-      String(month).trim(), // subquery m_ant
-      String(month).trim(),
+      String(month), // subquery m_ant
+      String(month),
       Number(year), // subquery fatura
     ]);
 
@@ -130,15 +130,15 @@ export const VouchersRepository = {
 
   async update(data: UpdateVoucherDTO) {
     const db = await initDB();
-    const { apartment, month, year, isPaid } = data;
+    const { apartmentId, month, year, isPaid } = data;
 
     const result = `
-      INSERT OR REPLACE INTO vouchers (apartment, month, year, is_paid)
+      INSERT OR REPLACE INTO vouchers (apartmentId, month, year, is_paid)
       VALUES (?, ?, ?, ?);
     `;
 
     return await db.run(result, [
-      String(apartment),
+      String(apartmentId),
       String(month),
       Number(year),
       isPaid ? 1 : 0,
