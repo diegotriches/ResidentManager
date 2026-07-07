@@ -17,14 +17,14 @@ export const MetersRepository = {
       m.id,  
       m.month,
       m.year,
-      m.apartment AS apartmendId,
+      m.apartmentId,
       m.water,
       m.gas,
       m.createdAt,
       m.updatedAt,
-      a.number AS apartment -- Traz o número real do apartamento
+      a.apartment -- Traz o número real do apartamento
     FROM meters m
-    INNER JOIN apartments a ON m.apartment = a.id
+    INNER JOIN apartments a ON m.apartmentId = a.id
     WHERE m.month = ? AND m.year = ?
     ORDER BY m.createdAt DESC
     `;
@@ -37,38 +37,38 @@ export const MetersRepository = {
 
     const query = `
         SELECT 
-          a.number AS apartment,
+          a.apartment,
           IFNULL(m_atual.water, 0) AS water_current,
           IFNULL(m_atual.gas, 0) AS gas_current,
           IFNULL(m_ant.water, 0) AS water_previous,
           IFNULL(m_ant.gas, 0) AS gas_previous,
           
           CASE 
-            WHEN m_atual.apartment IS NOT NULL THEN (IFNULL(m_atual.water, 0) - IFNULL(m_ant.water, 0))
+            WHEN m_atual.apartmentId IS NOT NULL THEN (IFNULL(m_atual.water, 0) - IFNULL(m_ant.water, 0))
             ELSE 0 
           END AS water_consumption,
           
           CASE 
-            WHEN m_atual.apartment IS NOT NULL THEN (IFNULL(m_atual.gas, 0) - IFNULL(m_ant.gas, 0))
+            WHEN m_atual.apartmentId IS NOT NULL THEN (IFNULL(m_atual.gas, 0) - IFNULL(m_ant.gas, 0))
             ELSE 0 
           END AS gas_consumption
         FROM apartments a
         
         -- Traz a leitura do mês selecionado
-        LEFT JOIN meters m_atual ON a.id = m_atual.apartment 
+        LEFT JOIN meters m_atual ON a.id = m_atual.apartmentId 
           AND m_atual.month = ? 
           AND m_atual.year = ?
           
         -- Busca a leitura anterior baseando-se unicamente na data do registro, ignorando IDs
-        LEFT JOIN meters m_ant ON a.id = m_ant.apartment 
+        LEFT JOIN meters m_ant ON a.id = m_ant.apartmentId 
           AND m_ant.id = (
             SELECT id FROM meters 
-            WHERE apartment = a.id 
+            WHERE apartmentId = a.id 
               AND (year < ? OR (year = ? AND month < ?))
             ORDER BY year DESC, month DESC
             LIMIT 1
           )
-        ORDER BY a.number ASC
+        ORDER BY a.apartment ASC
       `;
 
     return await db.all(query, [month, year, year, year, month]);
@@ -79,7 +79,7 @@ export const MetersRepository = {
     const { month, year, apartmentId, water, gas } = data;
 
     const result = await db.run(
-      "INSERT INTO meters (month, year, apartment, water, gas) VALUES (?, ?, ?, ?, ?)",
+      "INSERT INTO meters (month, year, apartmentId, water, gas) VALUES (?, ?, ?, ?, ?)",
       [month, year, apartmentId, water, gas],
     );
 
@@ -91,7 +91,7 @@ export const MetersRepository = {
     const { month, year, apartmentId, water, gas } = data;
 
     const result = await db.run(
-      "UPDATE meters SET month = ?, year = ?, apartment = ?, water = ?, gas = ?, updatedAt = CURRENT_TIMESTAMP WHERE id = ?",
+      "UPDATE meters SET month = ?, year = ?, apartmentId = ?, water = ?, gas = ?, updatedAt = CURRENT_TIMESTAMP WHERE id = ?",
       [month, year, apartmentId, water, gas, id],
     );
 

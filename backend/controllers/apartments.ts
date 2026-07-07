@@ -14,13 +14,13 @@ export const ApartmentsController = {
 
   async create(req: Request, res: Response) {
     try {
-      const { number, ownerName } = req.body;
-      const apartment = await ApartmentsRepository.create({
-        number,
+      const { apartment, ownerName } = req.body;
+      const apt = await ApartmentsRepository.create({
+        apartment,
         ownerName,
       });
 
-      return res.status(201).json({ id: apartment, number, ownerName });
+      return res.status(201).json({ id: apt, apartment, ownerName });
     } catch (error: any) {
       if (
         error.code === "SQLITE_CONSTRAINT" ||
@@ -39,11 +39,11 @@ export const ApartmentsController = {
 
   async update(req: Request, res: Response) {
     try {
-      const { number, ownerName } = req.body;
+      const { apartment, ownerName } = req.body;
       const id = Number(req.params.id);
 
       const changes = await ApartmentsRepository.update(id, {
-        number,
+        apartment,
         ownerName,
       });
 
@@ -51,7 +51,7 @@ export const ApartmentsController = {
         return res.status(404).json({ error: "Apartamento não encontrado." });
       }
 
-      return res.json({ id, number, ownerName });
+      return res.json({ id, apartment, ownerName });
     } catch (error) {
       console.error("Erro ao atualizar apartamento:", error);
       return res

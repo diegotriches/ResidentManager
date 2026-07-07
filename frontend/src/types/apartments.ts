@@ -1,6 +1,6 @@
 export interface ApartmentsData {
   id?: number;
-  number: number;
+  apartment: string;
   ownerName: string;
 }
 

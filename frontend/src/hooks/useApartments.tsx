@@ -18,7 +18,7 @@ interface useApartmentsFormProps {
 
 export const useApartments = ({ setModalConfig }: useApartmentsFormProps) => {
   const initialForm = {
-    number: 0,
+    apartment: "",
     ownerName: "",
   };
 
@@ -46,7 +46,7 @@ export const useApartments = ({ setModalConfig }: useApartmentsFormProps) => {
           type: "alert",
         });
       }
-
+      
       setFormData(initialForm);
       setApartmentId(null);
       await fetchApartments();
@@ -71,11 +71,11 @@ export const useApartments = ({ setModalConfig }: useApartmentsFormProps) => {
     setFormData((prev) => ({ ...prev, [name]: finalValue }));
   };
 
-  const handleEdit = (apartment: Apartment) => {
-    setApartmentId(apartment.id);
+  const handleEdit = (a: Apartment) => {
+    setApartmentId(a.id);
     setFormData({
-      number: apartment.number,
-      ownerName: apartment.ownerName,
+      apartment: a.apartment,
+      ownerName: a.ownerName,
     });
   };
 

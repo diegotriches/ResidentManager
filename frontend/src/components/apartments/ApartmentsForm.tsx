@@ -22,11 +22,10 @@ export const ApartmentsForm = ({
     <div className="form-wrapper">
       <div className="form-grid">
         <div className="form-field">
-          <label>Número</label>
+          <label>Apartamento</label>
           <input
-            name="number"
-            type="number"
-            value={formData.number}
+            name="apartment"
+            value={formData.apartment}
             onChange={handleChange}
             required
           />

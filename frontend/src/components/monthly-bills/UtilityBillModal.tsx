@@ -56,7 +56,7 @@ export const UtilityBillModal = ({
         </div>
       </div>
 
-      <div className="form-field">
+      <div className="form-field filter-select">
         <label>Tipo de Conta:</label>
         <select name="type" value={formData.type} onChange={handleChange}>
           <option value="water">Água (m³)</option>

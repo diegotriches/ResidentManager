@@ -18,10 +18,10 @@ export const Home = () => {
       )}
       {!loading && pendingApartments.length > 0 && (
         <div className="form-field">
-          {pendingApartments.map((item) => {
+          {pendingApartments.map((a) => {
             return (
-              <div key={item.apartment}>
-                <p>Possui pendência: {item.apartment}</p>
+              <div key={a.apartment}>
+                <p>Possui pendência: {a.apartment}</p>
               </div>
             );
           })}

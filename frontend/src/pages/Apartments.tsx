@@ -126,7 +126,7 @@ export const Apartments = () => {
             <tbody>
               {apartments.map((a: Apartment) => (
                 <tr key={a.id}>
-                  <td>{a.number}</td>
+                  <td>{a.apartment}</td>
                   <td>{a.ownerName}</td>
                   <td>
                     <button

@@ -28,7 +28,7 @@ export const ApartmentProvider = ({ children }: { children: ReactNode }) => {
       setLoading(true);
       const data = await getApartments();
       const sorted = data.sort((a, b) =>
-        String(a.number).localeCompare(String(b.number)),
+        String(a.apartment).localeCompare(String(b.apartment)),
       );
       setApartments(sorted);
     } catch (error) {

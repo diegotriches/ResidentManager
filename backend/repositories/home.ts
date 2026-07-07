@@ -5,14 +5,14 @@ export const HomeRepository = {
     const db = await initDB();
 
     const result = await db.all (`
-        SELECT a.number AS apartment
+        SELECT a.apartment
         FROM apartments a
         LEFT JOIN vouchers v
-         ON a.number = v.apartment
+         ON a.id = v.apartmentId
          AND v.month = ?
          AND v.year = ?
-         WHERE v.apartment IS NULL OR is_paid = 0
-        ORDER BY apartment ASC
+         WHERE v.apartmentId IS NULL OR is_paid = 0
+        ORDER BY a.apartment ASC
     `, [month, year]);
 
     return result;

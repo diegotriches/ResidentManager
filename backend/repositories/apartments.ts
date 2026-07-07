@@ -1,25 +1,25 @@
 import { initDB } from "../db.ts";
 
 export interface CreateApartmentDTO {
-  number: number;
+  apartment: string;
   ownerName: string;
 }
 
 export const ApartmentsRepository = {
   async read() {
     const db = await initDB();
-    const query = "SELECT id, number, owner_name AS ownerName FROM apartments";
+    const query = "SELECT id, apartment, owner_name AS ownerName FROM apartments";
 
     return await db.all(query);
   },
 
   async create(data: CreateApartmentDTO) {
     const db = await initDB();
-    const { number, ownerName } = data;
+    const { apartment, ownerName } = data;
 
     const result = await db.run(
-      "INSERT INTO apartments (number, owner_name) VALUES (?, ?)",
-      [number, ownerName],
+      "INSERT INTO apartments (apartment, owner_name) VALUES (?, ?)",
+      [apartment, ownerName],
     );
 
     return result.lastID;
@@ -27,11 +27,11 @@ export const ApartmentsRepository = {
 
   async update(id: number, data: CreateApartmentDTO) {
     const db = await initDB();
-    const { number, ownerName } = data;
+    const { apartment, ownerName } = data;
 
     const result = await db.run(
-      "UPDATE apartments SET number = ?, owner_name = ? WHERE id = ?",
-      [number, ownerName, id],
+      "UPDATE apartments SET apartment = ?, owner_name = ? WHERE id = ?",
+      [apartment, ownerName, id],
     );
 
     return result.changes;
@@ -42,6 +42,6 @@ export const ApartmentsRepository = {
 
     const result = await db.run("DELETE FROM apartments WHERE id = ?", [id]);
 
-    return (result as { changes: number }).changes ?? 0;
+    return result.changes ?? 0;
   },
 };

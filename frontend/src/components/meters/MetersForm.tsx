@@ -34,7 +34,7 @@ export const MetersForm: React.FC<MetersFormProps> = ({
         </span>
       </div>
 
-      <div className="form-field">
+      <div className="form-field filter-select">
         <label>Apartamento</label>
         <select
           name="apartmentId"
@@ -48,7 +48,7 @@ export const MetersForm: React.FC<MetersFormProps> = ({
           {!loading &&
             apartments.map((apt) => (
               <option key={apt.id} value={apt.id}>
-                Apto {apt.number} {apt.ownerName ? `(${apt.ownerName})` : ""}
+                Apto {apt.apartment} {apt.ownerName ? `(${apt.ownerName})` : ""}
               </option>
             ))}
         </select>

@@ -6,7 +6,7 @@ export async function createApartmentsTable() {
   await db.exec(`
     CREATE TABLE IF NOT EXISTS apartments (
       id INTEGER PRIMARY KEY AUTOINCREMENT,
-      number INTEGER UNIQUE,
+      apartment TEXT UNIQUE,
       owner_name TEXT
     )
   `);
