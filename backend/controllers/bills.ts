@@ -7,10 +7,7 @@ export const BillsController = {
       const { month, year } = req.query;
 
       // O Repository cuida de montar e executar a busca
-      const bills = await BillsRepository.read(
-        month ? String(month) : undefined,
-        year ? Number(year) : undefined
-      );
+      const bills = await BillsRepository.read(Number(month), Number(year));
 
       return res.json(bills);
     } catch (error) {
@@ -28,7 +25,7 @@ export const BillsController = {
         year: Number(year),
         bill,
         totalValue,
-        unitValue
+        unitValue,
       });
 
       return res.status(201).json({ id: billId, bill, totalValue, unitValue });
@@ -41,14 +38,14 @@ export const BillsController = {
   async update(req: Request, res: Response) {
     try {
       const { month, year, bill, totalValue, unitValue } = req.body;
-      const id = String(req.params.id);
+      const id = Number(req.params.id);
 
       const changes = await BillsRepository.update(id, {
         month,
         year,
         bill,
         totalValue,
-        unitValue
+        unitValue,
       });
 
       if (changes === 0) {
@@ -58,13 +55,15 @@ export const BillsController = {
       return res.json({ id, month, year, bill, totalValue, unitValue });
     } catch (error) {
       console.error("Erro ao atualizar conta:", error);
-      return res.status(500).json({ error: "Erro ao atualizar banco de dados." });
+      return res
+        .status(500)
+        .json({ error: "Erro ao atualizar banco de dados." });
     }
   },
 
   async delete(req: Request, res: Response) {
     try {
-      const id = String(req.params.id);
+      const id = Number(req.params.id);
 
       const changes = await BillsRepository.delete(id);
 

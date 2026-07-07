@@ -1,7 +1,9 @@
-import { initDB } from "../db.ts";
+import { db } from "../db/index.ts";
+import { bills } from "../db/schema.ts";
+import { eq, and } from "drizzle-orm";
 
-export interface CreateBillDTO {
-  month: string;
+export interface BillDTO {
+  month: number;
   year: number;
   bill: string;
   totalValue: number;
@@ -9,49 +11,41 @@ export interface CreateBillDTO {
 }
 
 export const BillsRepository = {
-  async read(month?: string, year?: number) {
-    const db = await initDB();
-    let query = "SELECT * FROM bills";
-    const params: (string | number)[] = [];
-
-    if (month && year) {
-      query += " WHERE month = ? AND year = ?";
-      params.push(String(month), Number(year));
-    }
-
-    query += " ORDER BY createdAt DESC";
-    return await db.all(query, params);
+  async read(month: number, year: number) {
+    return await db
+      .select()
+      .from(bills)
+      .where(and(eq(bills.month, month), eq(bills.year, year)));
   },
 
-  async create(data: CreateBillDTO) {
-    const db = await initDB();
+  async create(data: BillDTO) {
     const { month, year, bill, totalValue, unitValue } = data;
 
-    const result = await db.run(
-      "INSERT INTO bills (month, year, bill, totalValue, unitValue) VALUES (?, ?, ?, ?, ?)",
-      [month, year, bill, totalValue, unitValue],
-    );
+    const result = await db.insert(bills).values({
+      month,
+      year,
+      bill: bill?.trim(),
+      totalValue,
+      unitValue,
+    });
 
-    return result.lastID;
+    return result.lastInsertRowid;
   },
 
-  async update(id: string | number, data: CreateBillDTO) {
-    const db = await initDB();
+  async update(id: number, data: BillDTO) {
     const { month, year, bill, totalValue, unitValue } = data;
 
-    const result = await db.run(
-      "UPDATE bills SET month = ?, year = ?, bill = ?, totalValue = ?, unitValue = ?, updatedAt = CURRENT_TIMESTAMP WHERE bill_id = ?",
-      [month, year, bill, totalValue, unitValue, id],
-    );
+    const result = await db
+      .update(bills)
+      .set({ month, year, bill, totalValue, unitValue })
+      .where(eq(bills.id, id));
 
-    return result.changes ?? 0;
+    return result.changes;
   },
 
-  async delete(id: string | number) {
-    const db = await initDB();
+  async delete(id: number) {
+    const result = await db.delete(bills).where(eq(bills.id, id));
 
-    const result = await db.run("DELETE FROM bills WHERE bill_id = ?", [id]);
-
-    return (result as { changes: number }).changes ?? 0;
+    return result.changes;
   },
 };
