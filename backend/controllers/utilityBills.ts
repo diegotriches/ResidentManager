@@ -7,8 +7,8 @@ export const UtilityBillsController = {
       const { month, year } = req.query; // Captura o mês e ano enviados pelo frontend
 
       const bills = await UtilityBillsRepository.read(
-        month ? String(month) : undefined,
-        year ? Number(year) : undefined,
+        Number(month),
+        Number(year),
       );
 
       res.json(bills);
@@ -26,7 +26,7 @@ export const UtilityBillsController = {
         type,
         month,
         year,
-        totalConsumptionM3,
+        totalConsumption,
         consumptionValue,
         taxesValue,
         cylinderType,
@@ -37,12 +37,12 @@ export const UtilityBillsController = {
 
       const { id, calculatedUnitValue } = await UtilityBillsRepository.create({
         type: String(type),
-        month: String(month),
+        month: Number(month),
         year: Number(year),
-        totalConsumptionM3: Number(totalConsumptionM3),
+        totalConsumption: Number(totalConsumption),
         consumptionValue: Number(consumptionValue),
         taxesValue: Number(taxesValue),
-        cylinderType: cylinderType ? String(cylinderType) : null,
+        cylinderType: String(cylinderType),
         unitPrice: Number(unitPrice),
         multiplierFactor: Number(multiplierFactor),
         splitCount: Number(splitCount),
@@ -54,7 +54,7 @@ export const UtilityBillsController = {
         type,
         month,
         year,
-        totalConsumptionM3,
+        totalConsumption,
         consumptionValue,
         taxesValue,
         cylinderType,
@@ -77,7 +77,7 @@ export const UtilityBillsController = {
         type,
         month,
         year,
-        totalConsumptionM3,
+        totalConsumption,
         consumptionValue,
         taxesValue,
         cylinderType,
@@ -87,18 +87,19 @@ export const UtilityBillsController = {
       } = req.body;
       const id = String(req.params.id);
 
-      const { changes, calculatedUnitValue } = await UtilityBillsRepository.update(id, {
-        type,
-        month,
-        year,
-        totalConsumptionM3,
-        consumptionValue,
-        taxesValue,
-        cylinderType,
-        unitPrice,
-        multiplierFactor,
-        splitCount,
-      });
+      const { changes, calculatedUnitValue } =
+        await UtilityBillsRepository.update(id, {
+          type,
+          month,
+          year,
+          totalConsumption,
+          consumptionValue,
+          taxesValue,
+          cylinderType,
+          unitPrice,
+          multiplierFactor,
+          splitCount,
+        });
 
       if (changes === 0) {
         return res.status(404).json({ error: "Medição não encontrada." });
@@ -110,7 +111,7 @@ export const UtilityBillsController = {
         type,
         month,
         year,
-        totalConsumptionM3,
+        totalConsumption,
         consumptionValue,
         taxesValue,
         cylinderType,
@@ -127,8 +128,8 @@ export const UtilityBillsController = {
 
   async delete(req: Request, res: Response) {
     try {
-    const id = String(req.params.id);
-    const changes = await UtilityBillsRepository.delete(id)
+      const id = String(req.params.id);
+      const changes = await UtilityBillsRepository.delete(id);
 
       if (changes > 0) {
         res.status(200).json({ message: "Medição removida com sucesso." });

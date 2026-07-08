@@ -11,7 +11,6 @@ import apartmentsRoutes from "./routes/apartments.ts"
 
 // Models
 import { createMetersTable } from "./models/meters.ts";
-import { createUtilityBillsTable } from "./models/utilityBills.ts";
 import { createVouchersTable } from "./models/vouchers.ts";
 
 const app = express();
@@ -22,7 +21,6 @@ app.use(express.json());
 
 // Models
 await createMetersTable();
-await createUtilityBillsTable();
 await createVouchersTable();
 
 // Routes

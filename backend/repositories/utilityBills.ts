@@ -1,72 +1,56 @@
-import { initDB } from "../db.ts";
+import { db } from "../db/index.ts";
+import { utilityBills } from "../db/schema.ts";
+import { eq, and } from "drizzle-orm";
 
-export interface UtilityBill {
+export interface UtilityBill extends UtilityBillDTO {
   id: number;
-  type: string;
-  month: string;
-  year: number;
-  totalConsumptionM3: number;
-  consumptionValue: number;
-  taxesValue: number;
-  cylinderType: string | null;
-  unitPrice: number;
-  multiplierFactor: number;
-  splitCount: number;
   updatedAt: string;
 }
 
-export interface UpdateUtilityBillDTO {
-  type: string;
-  month: string;
+export interface UtilityBillDTO {
+  type: "water" | "gas";
+  month: number;
   year: number;
-  totalConsumptionM3: number;
+  totalConsumption: number;
   consumptionValue: number;
   taxesValue: number;
-  cylinderType: string | null;
+  cylinderType: "P45" | "P90";
   unitPrice: number;
   multiplierFactor: number;
   splitCount: number;
 }
 
 export const UtilityBillsRepository = {
-  async read(month?: string, year?: number): Promise<UtilityBill[]> {
-    const db = await initDB();
-    let query = "SELECT * FROM utility_bills";
-    const params: (string | number)[] = [];
-
-    if (month && year) {
-      query += " WHERE month = ? AND year = ?";
-      params.push(month, Number(year));
-    }
-
-    query += " ORDER BY createdAt DESC";
-    const rows = await db.all(query, params);
+  async read(month: number, year: number): Promise<UtilityBill[]> {
+    const rows = await db
+      .select()
+      .from(utilityBills)
+      .where(and(eq(utilityBills.month, month), eq(utilityBills.year, year)));
 
     return rows.map((row) => ({
       id: row.id,
       type: row.type,
       month: row.month,
       year: row.year,
-      totalConsumptionM3: row.total_consumption_m3,
-      consumptionValue: row.consumption_value,
-      taxesValue: row.taxes_value,
-      cylinderType: row.cylinder_type,
-      unitPrice: row.unit_price,
-      multiplierFactor: row.multiplier_factor,
-      splitCount: row.split_count,
-      updatedAt: row.updatedAt,
+      totalConsumption: row.totalConsumption,
+      consumptionValue: row.consumptionValue,
+      taxesValue: row.taxesValue,
+      cylinderType: row.cylinderType,
+      unitPrice: row.unitPrice,
+      multiplierFactor: row.multiplierFactor ?? 0,
+      splitCount: row.splitCount ?? 0,
+      updatedAt: row.updatedAt ?? "",
     }));
   },
 
   async create(
-    data: UpdateUtilityBillDTO,
+    data: UtilityBillDTO,
   ): Promise<{ id: number; calculatedUnitValue: number }> {
-    const db = await initDB();
     const {
       type,
       month,
       year,
-      totalConsumptionM3,
+      totalConsumption,
       consumptionValue,
       taxesValue,
       cylinderType,
@@ -79,7 +63,7 @@ export const UtilityBillsRepository = {
 
     if (type === "water") {
       calculatedUnitValue =
-        totalConsumptionM3 > 0 ? consumptionValue / totalConsumptionM3 : 0;
+        totalConsumption > 0 ? consumptionValue / totalConsumption : 0;
     } else if (type === "gas") {
       const weights: Record<string, number> = { P45: 45, P90: 90 };
       const weight = weights[cylinderType || ""] || 45;
@@ -88,50 +72,34 @@ export const UtilityBillsRepository = {
         weight > 0 ? (unitPrice / weight) * (multiplierFactor || 2.25) : 0;
     }
 
-    const result = await db.run(
-      `INSERT INTO utility_bills (
-        type,
-        month,
-        year,
-        total_consumption_m3,
-        consumption_value,
-        taxes_value,
-        cylinder_type,
-        unit_price,
-        multiplier_factor,
-        split_count
-        )
-        VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)`,
-      [
-        type,
-        month,
-        year,
-        totalConsumptionM3,
-        consumptionValue,
-        taxesValue,
-        cylinderType,
-        unitPrice,
-        multiplierFactor,
-        splitCount,
-      ],
-    );
+    const result = await db.insert(utilityBills).values({
+      type: type ? "water" : "gas",
+      month,
+      year,
+      totalConsumption,
+      consumptionValue,
+      taxesValue,
+      cylinderType: cylinderType ? "P45" : "P90",
+      unitPrice,
+      multiplierFactor,
+      splitCount,
+    });
 
     return {
-      id: Number(result.lastID),
+      id: Number(result.lastInsertRowid),
       calculatedUnitValue: calculatedUnitValue,
     };
   },
 
   async update(
-    id: string | number,
-    data: UpdateUtilityBillDTO,
+    id: number,
+    data: UtilityBillDTO,
   ): Promise<{ changes: number; calculatedUnitValue: number }> {
-    const db = await initDB();
     const {
       type,
       month,
       year,
-      totalConsumptionM3,
+      totalConsumption,
       consumptionValue,
       taxesValue,
       cylinderType,
@@ -144,45 +112,36 @@ export const UtilityBillsRepository = {
 
     if (type === "water") {
       calculatedUnitValue =
-        totalConsumptionM3 > 0 ? consumptionValue / totalConsumptionM3 : 0;
+        totalConsumption > 0 ? consumptionValue / totalConsumption : 0;
     } else if (type === "gas") {
       const weights: Record<string, number> = { P45: 45, P90: 90 };
       const weight = weights[cylinderType || ""] || 45;
       calculatedUnitValue =
-        weight > 0 ? (unitPrice / weight) * multiplierFactor : 0;
+        weight > 0 ? (unitPrice / weight) * (multiplierFactor ?? 1) : 0;
     }
 
-    const result = await db.run(
-      `UPDATE utility_bills 
-       SET type = ?, month = ?, year = ?, total_consumption_m3 = ?, 
-           consumption_value = ?, taxes_value = ?, cylinder_type = ?, 
-           unit_price = ?, multiplier_factor = ?, split_count = ?, 
-           calculated_unit_value = ?, updatedAt = CURRENT_TIMESTAMP 
-       WHERE id = ?`,
-      [
+    const result = await db
+      .update(utilityBills)
+      .set({
         type,
         month,
         year,
-        totalConsumptionM3,
+        totalConsumption,
         consumptionValue,
         taxesValue,
         cylinderType,
         unitPrice,
         multiplierFactor,
         splitCount,
-        calculatedUnitValue,
-        id,
-      ],
-    );
+      })
+      .where(eq(utilityBills.id, id));
 
     return { changes: result.changes ?? 0, calculatedUnitValue };
   },
 
-  async delete(id: string | number) {
-    const db = await initDB();
+  async delete(id: number) {
+    const result = await db.delete(utilityBills).where(eq(utilityBills.id, id));
 
-    const result = await db.run("DELETE FROM utility_bills WHERE id = ?", [id]);
-
-    return (result as { changes: number }).changes ?? 0;
+    return result.changes;
   },
 };
