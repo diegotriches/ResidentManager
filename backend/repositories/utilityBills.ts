@@ -73,13 +73,13 @@ export const UtilityBillsRepository = {
     }
 
     const result = await db.insert(utilityBills).values({
-      type: type ? "water" : "gas",
+      type,
       month,
       year,
       totalConsumption,
       consumptionValue,
       taxesValue,
-      cylinderType: cylinderType ? "P45" : "P90",
+      cylinderType,
       unitPrice,
       multiplierFactor,
       splitCount,

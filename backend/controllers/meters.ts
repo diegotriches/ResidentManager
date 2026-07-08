@@ -8,7 +8,7 @@ export const MetersController = {
 
       // Se mês e ano forem enviados, filtramos a busca
       const meters = await MetersRepository.read(
-        String(month),
+        Number(month),
         Number(year),
       );
 
@@ -24,7 +24,7 @@ export const MetersController = {
       const { month, year } = req.query;
 
       const meters = await MetersRepository.readConsumption(
-        String(month),
+        Number(month),
         Number(year),
       );
 
@@ -59,7 +59,7 @@ export const MetersController = {
   async update(req: Request, res: Response) {
     try {
       const { month, year, apartmentId, water, gas } = req.body;
-      const id = String(req.params.id);
+      const id = Number(req.params.id);
 
       const changes = await MetersRepository.update(id, {
         month,
@@ -81,7 +81,7 @@ export const MetersController = {
 
   async delete(req: Request, res: Response) {
     try {
-      const id = String(req.params.id);
+      const id = Number(req.params.id);
       const changes = await MetersRepository.delete(id);
 
       if (changes > 0) {

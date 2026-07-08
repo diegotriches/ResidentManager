@@ -1,7 +1,10 @@
-import { initDB } from "../db.ts";
+import { db } from "../db/index.ts";
+import { apartments, meters, utilityBills } from "../db/schema.ts";
+import { eq, and, or, lt, desc, sql } from "drizzle-orm";
+import { alias } from "drizzle-orm/sqlite-core";
 
-export interface CreateMeterDTO {
-  month: string;
+export interface MeterDTO {
+  month: number;
   year: number;
   apartmentId: number;
   water: number;
@@ -9,100 +12,112 @@ export interface CreateMeterDTO {
 }
 
 export const MetersRepository = {
-  async read(month: string, year: number) {
-    const db = await initDB();
+  async read(month: number, year: number) {
+    const result = await db
+      .select({
+        id: meters.id,
+        month: meters.month,
+        year: meters.year,
+        apartmentId: meters.apartmentId,
+        water: meters.water,
+        gas: meters.gas,
+        createdAt: meters.createdAt,
+        updatedAt: meters.updatedAt,
+        apartment: apartments.apartment,
+      })
+      .from(meters)
+      .innerJoin(apartments, eq(meters.apartmentId, apartments.id))
+      .where(and(eq(meters.month, month), eq(meters.year, year)))
+      .orderBy(desc(meters.createdAt));
 
-    let query = `
-    SELECT 
-      m.id,  
-      m.month,
-      m.year,
-      m.apartmentId,
-      m.water,
-      m.gas,
-      m.createdAt,
-      m.updatedAt,
-      a.apartment -- Traz o número real do apartamento
-    FROM meters m
-    INNER JOIN apartments a ON m.apartmentId = a.id
-    WHERE m.month = ? AND m.year = ?
-    ORDER BY m.createdAt DESC
-    `;
-
-    return await db.all(query, [month, year]);
+    return result;
   },
 
-  async readConsumption(month: string, year: number) {
-    const db = await initDB();
+  async readConsumption(month: number, year: number) {
+    const mAtual = alias(meters, "m_atual");
+    const mAnt = alias(meters, "m_ant");
 
-    const query = `
-        SELECT 
-          a.apartment,
-          IFNULL(m_atual.water, 0) AS water_current,
-          IFNULL(m_atual.gas, 0) AS gas_current,
-          IFNULL(m_ant.water, 0) AS water_previous,
-          IFNULL(m_ant.gas, 0) AS gas_previous,
-          
-          CASE 
-            WHEN m_atual.apartmentId IS NOT NULL THEN (IFNULL(m_atual.water, 0) - IFNULL(m_ant.water, 0))
-            ELSE 0 
-          END AS water_consumption,
-          
-          CASE 
-            WHEN m_atual.apartmentId IS NOT NULL THEN (IFNULL(m_atual.gas, 0) - IFNULL(m_ant.gas, 0))
-            ELSE 0 
-          END AS gas_consumption
-        FROM apartments a
-        
-        -- Traz a leitura do mês selecionado
-        LEFT JOIN meters m_atual ON a.id = m_atual.apartmentId 
-          AND m_atual.month = ? 
-          AND m_atual.year = ?
-          
-        -- Busca a leitura anterior baseando-se unicamente na data do registro, ignorando IDs
-        LEFT JOIN meters m_ant ON a.id = m_ant.apartmentId 
-          AND m_ant.id = (
-            SELECT id FROM meters 
-            WHERE apartmentId = a.id 
-              AND (year < ? OR (year = ? AND month < ?))
-            ORDER BY year DESC, month DESC
-            LIMIT 1
-          )
-        ORDER BY a.apartment ASC
-      `;
+    const result = await db
+      .select({
+        apartment: apartments.apartment,
+        waterCurrent: sql<number>`IFNULL(${mAtual.water}, 0)`,
+        gasCurrent: sql<number>`IFNULL(${mAtual.gas}, 0)`,
+        waterPrevious: sql<number>`IFNULL(${mAnt.water}, 0)`,
+        gasPrevious: sql<number>`IFNULL(${mAnt.gas}, 0)`,
+        waterConsumption: sql<number>`
+        CASE 
+          WHEN ${mAtual.apartmentId} IS NOT NULL THEN (IFNULL(${mAtual.water}, 0) - IFNULL(${mAnt.water}, 0))
+          ELSE 0 
+        END
+      `,
+        gasConsumption: sql<number>`
+        CASE 
+          WHEN ${mAtual.apartmentId} IS NOT NULL THEN (IFNULL(${mAtual.gas}, 0) - IFNULL(${mAnt.gas}, 0))
+          ELSE 0 
+        END
+      `,
+      })
+      .from(apartments)
+      .leftJoin(
+        mAtual,
+        and(
+          eq(apartments.id, mAtual.apartmentId),
+          eq(mAtual.month, month),
+          eq(mAtual.year, year),
+        ),
+      )
+      .leftJoin(
+        mAnt,
+        and(
+          eq(apartments.id, mAnt.apartmentId),
+          eq(
+            mAnt.id,
+            db
+              .select({ id: meters.id })
+              .from(meters)
+              .where(
+                and(
+                  eq(meters.apartmentId, apartments.id),
+                  or(
+                    lt(meters.year, year),
+                    and(eq(meters.year, year), lt(meters.month, month)),
+                  ),
+                ),
+              )
+              .orderBy(desc(meters.year), desc(meters.month))
+              .limit(1),
+          ),
+        ),
+      )
+      .orderBy(apartments.apartment);
 
-    return await db.all(query, [month, year, year, year, month]);
+    return result;
   },
 
-  async create(data: CreateMeterDTO) {
-    const db = await initDB();
+  async create(data: MeterDTO) {
     const { month, year, apartmentId, water, gas } = data;
 
-    const result = await db.run(
-      "INSERT INTO meters (month, year, apartmentId, water, gas) VALUES (?, ?, ?, ?, ?)",
-      [month, year, apartmentId, water, gas],
-    );
+    const result = await db
+      .insert(meters)
+      .values({ month, year, apartmentId, water, gas });
 
-    return result.lastID;
+    return result.lastInsertRowid;
   },
 
-  async update(id: string | number, data: CreateMeterDTO) {
-    const db = await initDB();
+  async update(id: number, data: MeterDTO) {
     const { month, year, apartmentId, water, gas } = data;
 
-    const result = await db.run(
-      "UPDATE meters SET month = ?, year = ?, apartmentId = ?, water = ?, gas = ?, updatedAt = CURRENT_TIMESTAMP WHERE id = ?",
-      [month, year, apartmentId, water, gas, id],
-    );
+    const result = await db
+      .update(meters)
+      .set({ month, year, apartmentId, water, gas })
+      .where(eq(meters.id, id));
 
     return result.changes ?? 0;
   },
 
-  async delete(id: string | number) {
-    const db = await initDB();
+  async delete(id: number) {
+    const result = await db.delete(meters).where(eq(utilityBills.id, id));
 
-    const result = await db.run("DELETE FROM meters WHERE id = ?", [id]);
-
-    return (result as { changes: number }).changes ?? 0;
+    return result.changes;
   },
 };

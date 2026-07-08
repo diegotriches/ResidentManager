@@ -10,7 +10,6 @@ import homeRoutes from "./routes/home.ts";
 import apartmentsRoutes from "./routes/apartments.ts"
 
 // Models
-import { createMetersTable } from "./models/meters.ts";
 import { createVouchersTable } from "./models/vouchers.ts";
 
 const app = express();
@@ -20,7 +19,6 @@ app.use(cors());
 app.use(express.json());
 
 // Models
-await createMetersTable();
 await createVouchersTable();
 
 // Routes

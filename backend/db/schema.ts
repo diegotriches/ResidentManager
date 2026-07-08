@@ -7,12 +7,14 @@ import {
 } from "drizzle-orm/sqlite-core";
 import { sql } from "drizzle-orm";
 
+// APARTAMENTOS
 export const apartments = sqliteTable("apartments", {
   id: integer("id").primaryKey({ autoIncrement: true }),
   apartment: text("apartment").notNull().unique(),
   ownerName: text("owner_name").notNull(),
 });
 
+// CONTAS CONDOMINIO
 export const bills = sqliteTable("bills", {
   id: integer("id").primaryKey({ autoIncrement: true }),
   month: integer("month").notNull(),
@@ -26,6 +28,7 @@ export const bills = sqliteTable("bills", {
     .$onUpdate(() => sql`(CURRENT_TIMESTAMP)`),
 });
 
+// CONTAS CONSUMO (AGUA E GAS)
 export const utilityBills = sqliteTable(
   "utility-bills",
   {
@@ -48,6 +51,32 @@ export const utilityBills = sqliteTable(
   (table) => ({
     typeMonthYearUnique: unique("unique_utility_bill").on(
       table.type,
+      table.month,
+      table.year,
+    ),
+  }),
+);
+
+// MEDIDORES
+export const meters = sqliteTable(
+  "meters",
+  {
+    id: integer("id").primaryKey({ autoIncrement: true }),
+    month: integer("month").notNull(),
+    year: integer("year").notNull(),
+    apartmentId: integer("apartment_id")
+      .notNull()
+      .references(() => apartments.id, { onDelete: "cascade" }),
+    water: real("water").notNull(),
+    gas: real("gas").notNull(),
+    createdAt: text("created_at").default(sql`(CURRENT_TIMESTAMP)`),
+    updatedAt: text("updated_at")
+      .default(sql`(CURRENT_TIMESTAMP)`)
+      .$onUpdate(() => sql`(CURRENT_TIMESTAMP)`),
+  },
+  (table) => ({
+    apartmentMonthYearUnique: unique("meters_apartment_month_year_unique").on(
+      table.apartmentId,
       table.month,
       table.year,
     ),
