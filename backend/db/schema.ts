@@ -4,6 +4,7 @@ import {
   text,
   real,
   unique,
+  primaryKey,
 } from "drizzle-orm/sqlite-core";
 import { sql } from "drizzle-orm";
 
@@ -80,5 +81,21 @@ export const meters = sqliteTable(
       table.month,
       table.year,
     ),
+  }),
+);
+
+// COMPROVANTES
+export const vouchers = sqliteTable(
+  "vouchers",
+  {
+    apartmentId: integer("apartment_id")
+      .notNull()
+      .references(() => apartments.id, { onDelete: "cascade" }),
+    month: integer("month").notNull(),
+    year: integer("year").notNull(),
+    isPaid: integer("is_paid", { mode: "boolean" }).default(false),
+  },
+  (table) => ({
+    pk: primaryKey({ columns: [table.apartmentId, table.month, table.year] }),
   }),
 );

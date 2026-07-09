@@ -1,5 +1,5 @@
 import { db } from "../db/index.ts";
-import { apartments, meters, utilityBills } from "../db/schema.ts";
+import { apartments, meters } from "../db/schema.ts";
 import { eq, and, or, lt, desc, sql } from "drizzle-orm";
 import { alias } from "drizzle-orm/sqlite-core";
 
@@ -116,7 +116,7 @@ export const MetersRepository = {
   },
 
   async delete(id: number) {
-    const result = await db.delete(meters).where(eq(utilityBills.id, id));
+    const result = await db.delete(meters).where(eq(meters.id, id));
 
     return result.changes;
   },

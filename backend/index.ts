@@ -9,17 +9,11 @@ import vouchersRoutes from "./routes/vouchers.ts";
 import homeRoutes from "./routes/home.ts";
 import apartmentsRoutes from "./routes/apartments.ts"
 
-// Models
-import { createVouchersTable } from "./models/vouchers.ts";
-
 const app = express();
 const PORT = 3000;
 
 app.use(cors());
 app.use(express.json());
-
-// Models
-await createVouchersTable();
 
 // Routes
 app.use("/meters", meterRoutes);
