@@ -1,11 +1,30 @@
 import type { Request, Response } from "express";
 import { ApartmentsRepository } from "../repositories/apartments.ts";
+import {
+  createApartmentSchema,
+  apartmentSchema,
+} from "../../packages/shared/schemas/apartment.schema.ts";
+import { z } from "zod";
 
 export const ApartmentsController = {
   async read(req: Request, res: Response) {
     try {
       const apartments = await ApartmentsRepository.read();
-      return res.json(apartments);
+
+      // Valida se o retorno do banco respeita a lista de objetos no formato { id, apartment, ownerName }
+      const parsedApartments = z.array(apartmentSchema).safeParse(apartments);
+
+      if (!parsedApartments.success) {
+        console.error(
+          "Erro na validação do schema dos apartamentos:",
+          parsedApartments.error,
+        );
+        return res.status(500).json({
+          error: "Dados retornados do banco estão em formato inválido.",
+        });
+      }
+
+      return res.json(parsedApartments.data);
     } catch (error) {
       console.error("Erro ao listar apartamentos:", error);
       return res.status(500).json({ error: "Erro ao buscar dados no banco." });
@@ -14,7 +33,17 @@ export const ApartmentsController = {
 
   async create(req: Request, res: Response) {
     try {
-      const { apartment, ownerName } = req.body;
+      const validation = createApartmentSchema.safeParse(req.body);
+
+      if (!validation.success) {
+        return res.status(400).json({
+          error: "Validação falhou.",
+          details: validation.error.flatten().fieldErrors,
+        });
+      }
+
+      const { apartment, ownerName } = validation.data;
+
       const apt = await ApartmentsRepository.create({
         apartment,
         ownerName,
@@ -39,8 +68,26 @@ export const ApartmentsController = {
 
   async update(req: Request, res: Response) {
     try {
-      const { apartment, ownerName } = req.body;
-      const id = Number(req.params.id);
+      const paramValidation = apartmentSchema.safeParse(req.params);
+
+      if (!paramValidation.success) {
+        return res.status(400).json({
+          error: "ID de apartamento inválido.",
+          details: paramValidation.error.flatten().fieldErrors,
+        });
+      }
+
+      const validation = apartmentSchema.safeParse(req.body);
+
+      if (!validation.success) {
+        return res.status(400).json({
+          error: "Dados para atualização inválidos.",
+          details: validation.error.flatten().fieldErrors,
+        });
+      }
+
+      const { id } = paramValidation.data;
+      const { apartment, ownerName } = validation.data;
 
       const changes = await ApartmentsRepository.update(id, {
         apartment,
@@ -52,7 +99,18 @@ export const ApartmentsController = {
       }
 
       return res.json({ id, apartment, ownerName });
-    } catch (error) {
+    } catch (error: any) {
+      if (
+        error.code === "SQLITE_CONSTRAINT" ||
+        error.message?.includes("UNIQUE")
+      ) {
+        return res.status(400).json({
+          error: "Validação falhou.",
+          message:
+            "Este número de apartamento já está cadastrado em outro registro.",
+        });
+      }
+
       console.error("Erro ao atualizar apartamento:", error);
       return res
         .status(500)
@@ -62,7 +120,17 @@ export const ApartmentsController = {
 
   async delete(req: Request, res: Response) {
     try {
-      const id = Number(req.params.id);
+      const paramValidation = apartmentSchema.safeParse(req.params);
+
+      if (!paramValidation.success) {
+        return res.status(400).json({
+          error: "ID de apartamento inválido.",
+          details: paramValidation.error.flatten().fieldErrors,
+        });
+      }
+
+      const { id } = paramValidation.data;
+      
       const changes = await ApartmentsRepository.delete(id);
 
       if (changes > 0) {
