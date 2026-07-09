@@ -33,7 +33,7 @@ export const MeterTable: React.FC<MeterTableProps> = ({ data, loading }) => {
         </thead>
         <tbody>
           {data.map((meter) => {
-            const hasMeasurement = meter.water_current !== null;
+            const hasMeasurement = meter.waterCurrent !== null;
 
             return (
               <tr
@@ -43,17 +43,17 @@ export const MeterTable: React.FC<MeterTableProps> = ({ data, loading }) => {
                 <td>
                   <strong>{meter.apartment}</strong>
                 </td>
-                <td>{meter.water_previous.toFixed(3)}</td>
+                <td>{meter.waterPrevious.toFixed(3)}</td>
                 <td>
-                  {hasMeasurement ? meter.water_current?.toFixed(3) : "---"}
+                  {hasMeasurement ? meter.waterCurrent?.toFixed(3) : "---"}
                 </td>
                 <td className="consumption-value">
-                  {hasMeasurement ? meter.water_consumption.toFixed(3) : "0.000"}
+                  {hasMeasurement ? meter.waterConsumption.toFixed(3) : "0.000"}
                 </td>
-                <td>{meter.gas_previous.toFixed(3)}</td>
-                <td>{hasMeasurement ? meter.gas_current?.toFixed(3) : "---"}</td>
+                <td>{meter.gasPrevious.toFixed(3)}</td>
+                <td>{hasMeasurement ? meter.gasCurrent?.toFixed(3) : "---"}</td>
                 <td className="consumption-value">
-                  {hasMeasurement ? meter.gas_consumption.toFixed(3) : "0.000"}
+                  {hasMeasurement ? meter.gasConsumption.toFixed(3) : "0.000"}
                 </td>
               </tr>
             );

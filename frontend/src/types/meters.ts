@@ -21,15 +21,15 @@ export type MeterFormData = {
 export interface MeterReportType {
   apartment: number;
   apartmentId: number;
-  water_current: number | null;
-  gas_current: number | null;
-  water_previous: number;
-  gas_previous: number;
-  water_consumption: number;
-  gas_consumption: number;
-  water_price_per_m3: number;
-  total_water_taxes: number;
-  water_split_count: number;
-  water_fee_per_apartment: number;
-  total_water_cost: number;
+  waterCurrent: number | null;
+  gasCurrent: number | null;
+  waterPrevious: number;
+  gasPrevious: number;
+  waterConsumption: number;
+  gasConsumption: number;
+  waterPricePerM3: number;
+  totalWaterTaxes: number;
+  waterSplitCount: number;
+  waterFeePerApartment: number;
+  totalWaterCost: number;
 }
