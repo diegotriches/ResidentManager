@@ -1,15 +1,41 @@
 import type { Request, Response } from "express";
 import { BillsRepository } from "../repositories/bills.ts";
+import {
+  createBillSchema,
+  billSchema,
+  billQuerySchema,
+} from "../../packages/shared/schemas/bills.schema.ts";
+import { z } from "zod";
 
 export const BillsController = {
   async read(req: Request, res: Response) {
     try {
-      const { month, year } = req.query;
+      const queryValidation = billQuerySchema.safeParse(req.query);
 
-      // O Repository cuida de montar e executar a busca
-      const bills = await BillsRepository.read(Number(month), Number(year));
+      if (!queryValidation.success) {
+        return res.status(400).json({
+          error: "Parâmetros de busca inválidos.",
+          details: queryValidation.error.issues,
+        });
+      }
 
-      return res.json(bills);
+      const { month, year } = queryValidation.data;
+
+      const bills = await BillsRepository.read(month, year);
+
+      const parsedBills = z.array(billSchema).safeParse(bills);
+
+      if (!parsedBills.success) {
+        console.error(
+          "Erro na validação do schema das contas:",
+          parsedBills.error,
+        );
+        return res.status(500).json({
+          error: "Dados retornados do banco estão em formato inválido.",
+        });
+      }
+
+      return res.json(parsedBills.data);
     } catch (error) {
       console.error("Erro ao listar contas:", error);
       return res.status(500).json({ error: "Erro ao buscar dados no banco." });
@@ -18,17 +44,28 @@ export const BillsController = {
 
   async create(req: Request, res: Response) {
     try {
-      const { month, year, bill, totalValue, unitValue } = req.body;
+      const validation = createBillSchema.safeParse(req.body);
+
+      if (!validation.success) {
+        return res.status(400).json({
+          error: "Validação falhou.",
+          details: validation.error.issues,
+        });
+      }
+
+      const { month, year, bill, totalValue, unitValue } = validation.data;
 
       const billId = await BillsRepository.create({
         month,
-        year: Number(year),
+        year,
         bill,
         totalValue,
         unitValue,
       });
 
-      return res.status(201).json({ id: billId, bill, totalValue, unitValue });
+      return res
+        .status(201)
+        .json({ id: billId, month, year, bill, totalValue, unitValue });
     } catch (error) {
       console.error("Erro ao inserir conta:", error);
       return res.status(500).json({ error: "Erro ao inserir conta" });
@@ -37,8 +74,26 @@ export const BillsController = {
 
   async update(req: Request, res: Response) {
     try {
-      const { month, year, bill, totalValue, unitValue } = req.body;
-      const id = Number(req.params.id);
+      const paramValidation = billSchema.safeParse(req.params);
+
+      if (!paramValidation.success) {
+        return res.status(400).json({
+          error: "ID de apartamento inválido.",
+          details: paramValidation.error.issues,
+        });
+      }
+
+      const validation = billSchema.safeParse(req.body);
+
+      if (!validation.success) {
+        return res.status(400).json({
+          error: "Dados para atualização inválidos.",
+          details: validation.error.issues,
+        });
+      }
+
+      const { id } = paramValidation.data;
+      const { month, year, bill, totalValue, unitValue } = validation.data;
 
       const changes = await BillsRepository.update(id, {
         month,
@@ -63,7 +118,16 @@ export const BillsController = {
 
   async delete(req: Request, res: Response) {
     try {
-      const id = Number(req.params.id);
+      const paramValidation = billSchema.safeParse(req.params);
+
+      if (!paramValidation.success) {
+        return res.status(400).json({
+          error: "ID de apartamento inválido.",
+          details: paramValidation.error.issues,
+        });
+      }
+
+      const { id } = paramValidation.data;
 
       const changes = await BillsRepository.delete(id);
 

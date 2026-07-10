@@ -1,7 +1,7 @@
 export interface UtilityBillType {
   id: number;
   type: "water" | "gas";
-  month: string;
+  month: number;
   year: number;
   
   // Campos de Água

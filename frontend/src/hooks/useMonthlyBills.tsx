@@ -40,7 +40,7 @@ export const useMonthlyBills = ({ setModalConfig }: useMonthlyBillsProps) => {
 
   // --- 1. ESTADOS E INITIAL FORMS DE CONDOMÍNIO ---
   const initialForm: BillsFormData = {
-    month: month,
+    month: Number(month),
     year: Number(year),
     bill: "",
     totalValue: 0,
@@ -54,7 +54,7 @@ export const useMonthlyBills = ({ setModalConfig }: useMonthlyBillsProps) => {
   // --- 2. ESTADOS E INITIAL FORMS DE CONSUMO (Utilities) ---
   const initialUtilityForm: UtilityFormDataType = {
     type: "water",
-    month: month,
+    month: Number(month),
     year: Number(year),
     totalConsumptionM3: 0,
     consumptionValue: 0,

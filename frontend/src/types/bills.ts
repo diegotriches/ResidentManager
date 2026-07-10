@@ -1,16 +1,11 @@
-export type BillsType = {
+export interface BillsType extends BillsFormData {
   id: number;
-  month: string;
-  year: number;
-  bill: string;
-  totalValue: number;
-  unitValue: number;
   createdAt?: string;
   updatedAt?: string;
 };
 
-export type BillsFormData = {
-  month: string;
+export interface BillsFormData {
+  month: number;
   year: number;
   bill: string;
   totalValue: number;
