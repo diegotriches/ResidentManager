@@ -26,7 +26,7 @@ export const useMeters = ({ setModalConfig }: useMetersProps) => {
   const { month, year } = useFilter();
 
   const initialForm: MeterFormData = {
-    month: month,
+    month: Number(month),
     year: Number(year),
     apartmentId: 0,
     water: 0,
