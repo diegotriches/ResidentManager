@@ -38,7 +38,7 @@ export const ApartmentsController = {
       if (!validation.success) {
         return res.status(400).json({
           error: "Validação falhou.",
-          details: validation.error.flatten().fieldErrors,
+          details: validation.error.issues,
         });
       }
 
@@ -73,7 +73,7 @@ export const ApartmentsController = {
       if (!paramValidation.success) {
         return res.status(400).json({
           error: "ID de apartamento inválido.",
-          details: paramValidation.error.flatten().fieldErrors,
+          details: paramValidation.error.issues,
         });
       }
 
@@ -82,7 +82,7 @@ export const ApartmentsController = {
       if (!validation.success) {
         return res.status(400).json({
           error: "Dados para atualização inválidos.",
-          details: validation.error.flatten().fieldErrors,
+          details: validation.error.issues,
         });
       }
 
@@ -125,7 +125,7 @@ export const ApartmentsController = {
       if (!paramValidation.success) {
         return res.status(400).json({
           error: "ID de apartamento inválido.",
-          details: paramValidation.error.flatten().fieldErrors,
+          details: paramValidation.error.issues,
         });
       }
 

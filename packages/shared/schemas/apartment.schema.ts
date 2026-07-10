@@ -13,7 +13,9 @@ export const createApartmentSchema = z.object({
 
 // 2. Schema COMPLETO (Inclusão do ID) - Para Atualizações, Respostas ou Leitura
 export const apartmentSchema = createApartmentSchema.extend({
-  id: z.number({ error: "O ID deve ser um número." }).positive("O ID deve ser um número positivo."),
+  id: z
+    .number({ error: "O ID deve ser um número." })
+    .positive("O ID deve ser um número positivo."),
 });
 
 // 3. Tipos inferidos para exportar
