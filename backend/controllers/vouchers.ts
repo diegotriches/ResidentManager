@@ -1,17 +1,27 @@
 import type { Request, Response } from "express";
 import { VouchersRepository } from "../repositories/vouchers.ts";
+import {
+  voucherSchema,
+  voucherQuerySchema,
+} from "../../packages/shared/schemas/vouchers.schema.ts";
 
 export const VouchersController = {
   async read(req: Request, res: Response) {
     try {
-      const { month, year } = req.query;
+      const queryValidation = voucherQuerySchema.safeParse(req.query);
 
-      const vouchers = await VouchersRepository.read(
-        month ? String(month) : undefined,
-        year ? Number(year) : undefined,
-      );
+      if (!queryValidation.success) {
+        return res.status(400).json({
+          error: "Parâmetros de busca inválidos.",
+          details: queryValidation.error.issues,
+        });
+      }
 
-      res.json(vouchers);
+      const { month, year } = queryValidation.data;
+
+      const vouchers = await VouchersRepository.read(month, year);
+
+      return res.json(vouchers);
     } catch (error) {
       console.error("Erro no relatório de finanças:", error);
       res
@@ -22,14 +32,23 @@ export const VouchersController = {
 
   async update(req: Request, res: Response) {
     try {
-    const { apartment, month, year, is_paid } = req.body;
+      const validation = voucherSchema.safeParse(req.body);
+      
+            if (!validation.success) {
+              return res.status(400).json({
+                error: "Dados para atualização inválidos.",
+                details: validation.error.issues,
+              });
+            }
 
-    await VouchersRepository.update({
-      apartment: String(apartment),
-      month: String(month),
-      year: Number(year),
-      isPaid: Boolean(is_paid),
-    });
+      const { apartmentId, month, year, isPaid } = validation.data;
+
+      await VouchersRepository.update({
+        apartmentId: Number(apartmentId),
+        month: Number(month),
+        year: Number(year),
+        isPaid: Boolean(isPaid),
+      });
 
       return res.json({
         success: true,

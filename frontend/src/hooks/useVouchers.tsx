@@ -4,10 +4,11 @@ import { getBills } from "../services/billsService";
 import { getUtilityBills } from "../services/utilityBillsService";
 import { getFinanceReport, updateVoucherStatus } from "../services/vouchersService";
 import type { UtilityBillType } from "../types/utilityBills";
+import type { VoucherReportItem } from "../types/vouchers";
 
 export const useVouchers = () => {
   const { month, year } = useFilter();
-  const [vouchers, setVouchers] = useState<any[]>([]);
+  const [vouchers, setVouchers] = useState<VoucherReportItem[]>([]);
   const [loading, setLoading] = useState(false);
   const [gasUnitPrice, setGasUnitPrice] = useState(0);
 
@@ -37,7 +38,7 @@ export const useVouchers = () => {
 
       const consumptionData = await getFinanceReport(month, year);
 
-      const combined = consumptionData.map((item: any) => {
+      const combined = consumptionData.map((item: VoucherReportItem) => {
         const waterTotalValue = item.totalWaterValue || 0;
         const gasValue = (item.gasConsumption || 0) * calculatedGasPrice;
 
@@ -47,7 +48,7 @@ export const useVouchers = () => {
           waterTotalValue,
           gasValue,
           total: fixedRate + waterTotalValue + gasValue,
-          isPaid: item.isPaid === 1,
+          isPaid: item.isPaid,
         };
       });
 
@@ -59,7 +60,7 @@ export const useVouchers = () => {
     }
   };
 
-  const handleTogglePaid = async (apartment: number, currentStatus: boolean) => {
+  const handleTogglePaid = async (apartment: string, currentStatus: boolean) => {
     const newStatus = !currentStatus;
 
     setVouchers((prev) =>

@@ -1,16 +1,9 @@
 import jsPDF from "jspdf";
 import autoTable from "jspdf-autotable";
 import { formatCurrency } from "./format";
+import type { VoucherReportItem } from "../types/vouchers";
 
-interface VoucherData {
-  apartment: number;
-  fixedRate: number;
-  waterTotalValue: number;
-  gasValue: number;
-  total: number;
-}
-
-export const exportVoucherToPDF = (v: VoucherData, month: string, year: number) => {
+export const exportVoucherToPDF = (v: VoucherReportItem, month: number, year: number) => {
   // 1. Cria uma instância do documento PDF (formato A4, unidade em milímetros)
   const doc = new jsPDF({
     orientation: "portrait",

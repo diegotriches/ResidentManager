@@ -82,7 +82,7 @@ export const Vouchers = () => {
                   </td>
                   <td>
                     <button
-                      onClick={() => exportVoucherToPDF(v, month, Number(year))}
+                      onClick={() => exportVoucherToPDF(v, Number(month), Number(year))}
                       className="pdf-btn"
                       style={{
                         padding: "6px 12px",
