@@ -4,6 +4,7 @@ import {
   createBillSchema,
   billSchema,
   billQuerySchema,
+  billIdParamSchema
 } from "../../packages/shared/schemas/bills.schema.ts";
 import { z } from "zod";
 
@@ -118,7 +119,7 @@ export const BillsController = {
 
   async delete(req: Request, res: Response) {
     try {
-      const paramValidation = billSchema.safeParse(req.params);
+      const paramValidation = billIdParamSchema.safeParse(req.params);
 
       if (!paramValidation.success) {
         return res.status(400).json({

@@ -4,8 +4,8 @@ import {
   createMeterSchema,
   meterSchema,
   meterQuerySchema,
+  meterIdParamSchema
 } from "../../packages/shared/schemas/meter.schema.ts";
-import { z } from "zod";
 
 export const MetersController = {
   async read(req: Request, res: Response) {
@@ -23,22 +23,10 @@ export const MetersController = {
 
       const meters = await MetersRepository.read(month, year);
 
-      const parsedMeters = z.array(meterSchema).safeParse(meters);
-
-      if (!parsedMeters.success) {
-        console.error(
-          "Erro na validação do schema das contas:",
-          parsedMeters.error,
-        );
-        return res.status(500).json({
-          error: "Dados retornados do banco estão em formato inválido.",
-        });
-      }
-
-      res.json(parsedMeters);
+      return res.json(meters);
     } catch (error) {
       console.error("Erro ao listar medições:", error);
-      res.status(500).json({ error: "Erro ao buscar dados no banco." });
+      return res.status(500).json({ error: "Erro ao buscar dados no banco." });
     }
   },
 
@@ -94,7 +82,7 @@ export const MetersController = {
         .json({ id: meter, month, year, apartmentId, water, gas });
     } catch (error) {
       console.error("Erro ao inserir medição:", error);
-      res.status(500).json({ error: "Erro ao inserir medição" });
+      return res.status(500).json({ error: "Erro ao inserir medição" });
     }
   },
 
@@ -134,7 +122,7 @@ export const MetersController = {
         return res.status(404).json({ error: "Medição não encontrada." });
       }
 
-      res.json({ id, month, year, apartmentId, water, gas });
+      return res.json({ id, month, year, apartmentId, water, gas });
     } catch (error) {
       console.error("Erro ao atualizar medição:", error);
       return res
@@ -145,7 +133,7 @@ export const MetersController = {
 
   async delete(req: Request, res: Response) {
     try {
-      const paramValidation = meterSchema.safeParse(req.params);
+      const paramValidation = meterIdParamSchema.safeParse(req.params);
 
       if (!paramValidation.success) {
         return res.status(400).json({
