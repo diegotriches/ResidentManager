@@ -1,19 +1,29 @@
-import { initDB } from "../db.ts";
+import { db } from "../db/index.ts";
+import { apartments, vouchers } from "../db/schema.ts";
+import { eq, and, isNull, or, asc } from "drizzle-orm";
 
 export const HomeRepository = {
-  async pendingApartments(month: string, year: number) {
-    const db = await initDB();
-
-    const result = await db.all (`
-        SELECT a.apartment
-        FROM apartments a
-        LEFT JOIN vouchers v
-         ON a.id = v.apartmentId
-         AND v.month = ?
-         AND v.year = ?
-         WHERE v.apartmentId IS NULL OR is_paid = 0
-        ORDER BY a.apartment ASC
-    `, [month, year]);
+  async pendingApartments(month: number, year: number) {
+    const result = await db
+      .select({
+        apartment: apartments.apartment,
+      })
+      .from(apartments)
+      .leftJoin(
+        vouchers,
+        and(
+          eq(apartments.id, vouchers.apartmentId),
+          eq(vouchers.month, month),
+          eq(vouchers.year, year)
+        )
+      )
+      .where(
+        or(
+          isNull(vouchers.apartmentId),
+          eq(vouchers.isPaid, false)
+        )
+      )
+      .orderBy(asc(apartments.apartment));
 
     return result;
   },

@@ -1,7 +1,6 @@
 import express from "express";
 import cors from "cors";
 
-// Routes
 import meterRoutes from "./routes/meters.ts";
 import billRoutes from "./routes/bills.ts";
 import utilityBillsRoutes from "./routes/utilityBills.ts";

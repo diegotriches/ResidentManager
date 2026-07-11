@@ -10,15 +10,15 @@ export const createUtilityBillSchema = z.object({
 
   // 💧 Campos de Água (Opcionais)
   totalConsumption: z.coerce.number().positive().optional(),
-  consumptionValue: z.coerce.number().nonnegative().optional(),
-  taxesValue: z.coerce.number().nonnegative().optional(),
+  consumptionValue: z.coerce.number().positive().optional(),
+  taxesValue: z.coerce.number().positive().optional(),
 
   // 🔥 Campos de Gás (Opcionais)
   cylinderType: z
     .enum(["P45", "P90"], {
       message: "O tipo de cilindro deve ser 'P45' ou 'P90'.",
     }).optional(),
-  unitPrice: z.coerce.number().nonnegative().optional(),
+  unitPrice: z.coerce.number().positive().optional(),
   multiplierFactor: z.coerce.number().positive().optional(),
 
   // Configuração global de rateio fixo
