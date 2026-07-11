@@ -86,7 +86,7 @@ export const UtilityBillsView = ({
                     <p>
                       Consumo Total:{" "}
                       <strong>
-                        {parseFloat(formatDecimal(bill.totalConsumptionM3))} m³
+                        {parseFloat(formatDecimal(bill.totalConsumption))} m³
                       </strong>
                     </p>
                     <p>
@@ -101,7 +101,7 @@ export const UtilityBillsView = ({
                     <p style={{ color: "#27ae60", fontWeight: "bold" }}>
                       Valor do m³:{" "}
                       {formatCurrency(
-                        bill.consumptionValue! / bill.totalConsumptionM3!,
+                        bill.consumptionValue! / bill.totalConsumption!,
                       )}
                     </p>
                   </>

@@ -49,7 +49,7 @@ export const UtilityBillModal = ({
                 type="number"
                 name="totalConsumptionM3"
                 placeholder="m³"
-                value={formData.totalConsumptionM3 || ""}
+                value={formData.totalConsumption || ""}
                 onChange={handleChange}
               />
             </div>

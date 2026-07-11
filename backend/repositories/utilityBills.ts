@@ -11,12 +11,12 @@ export interface UtilityBillDTO {
   type: "water" | "gas";
   month: number;
   year: number;
-  totalConsumption: number;
-  consumptionValue: number;
-  taxesValue: number;
-  cylinderType: "P45" | "P90";
-  unitPrice: number;
-  multiplierFactor: number;
+  totalConsumption?: number;
+  consumptionValue?: number;
+  taxesValue?: number;
+  cylinderType?: "P45" | "P90";
+  unitPrice?: number;
+  multiplierFactor?: number;
   splitCount: number;
 }
 
@@ -32,11 +32,11 @@ export const UtilityBillsRepository = {
       type: row.type,
       month: row.month,
       year: row.year,
-      totalConsumption: row.totalConsumption,
-      consumptionValue: row.consumptionValue,
-      taxesValue: row.taxesValue,
-      cylinderType: row.cylinderType,
-      unitPrice: row.unitPrice,
+      totalConsumption: row.totalConsumption ?? 0,
+      consumptionValue: row.consumptionValue ?? 0,
+      taxesValue: row.taxesValue ?? 0,
+      cylinderType: row.cylinderType ?? undefined,
+      unitPrice: row.unitPrice ?? 0,
       multiplierFactor: row.multiplierFactor ?? 0,
       splitCount: row.splitCount ?? 0,
       updatedAt: row.updatedAt ?? "",
@@ -62,14 +62,26 @@ export const UtilityBillsRepository = {
     let calculatedUnitValue = 0;
 
     if (type === "water") {
-      calculatedUnitValue =
-        totalConsumption > 0 ? consumptionValue / totalConsumption : 0;
-    } else if (type === "gas") {
-      const weights: Record<string, number> = { P45: 45, P90: 90 };
-      const weight = weights[cylinderType || ""] || 45;
+      // 💧 Garante que se vier undefined, vira 0 para a conta não quebrar
+      const currentTotalConsumption = totalConsumption ?? 0;
+      const currentConsumptionValue = consumptionValue ?? 0;
 
       calculatedUnitValue =
-        weight > 0 ? (unitPrice / weight) * (multiplierFactor || 2.25) : 0;
+        currentTotalConsumption > 0
+          ? currentConsumptionValue / currentTotalConsumption
+          : 0;
+    } else if (type === "gas") {
+      // 🔥 Mapeamento tipado estritamente com os seus tipos de cilindro
+      const weights: Record<"P45" | "P90", number> = { P45: 45, P90: 90 };
+
+      // Se cylinderType for undefined, o '?? "P45"' garante um valor padrão válido
+      const weight = weights[cylinderType ?? "P45"];
+
+      const currentUnitPrice = unitPrice ?? 0;
+      const currentMultiplier = multiplierFactor ?? 2.25; // Mantém o seu padrão 2.25
+
+      calculatedUnitValue =
+        weight > 0 ? (currentUnitPrice / weight) * currentMultiplier : 0;
     }
 
     const result = await db.insert(utilityBills).values({
@@ -111,13 +123,26 @@ export const UtilityBillsRepository = {
     let calculatedUnitValue = 0;
 
     if (type === "water") {
+      // 💧 Garante que se vier undefined, vira 0 para a conta não quebrar
+      const currentTotalConsumption = totalConsumption ?? 0;
+      const currentConsumptionValue = consumptionValue ?? 0;
+
       calculatedUnitValue =
-        totalConsumption > 0 ? consumptionValue / totalConsumption : 0;
+        currentTotalConsumption > 0
+          ? currentConsumptionValue / currentTotalConsumption
+          : 0;
     } else if (type === "gas") {
-      const weights: Record<string, number> = { P45: 45, P90: 90 };
-      const weight = weights[cylinderType || ""] || 45;
+      // 🔥 Mapeamento tipado estritamente com os seus tipos de cilindro
+      const weights: Record<"P45" | "P90", number> = { P45: 45, P90: 90 };
+
+      // Se cylinderType for undefined, o '?? "P45"' garante um valor padrão válido
+      const weight = weights[cylinderType ?? "P45"];
+
+      const currentUnitPrice = unitPrice ?? 0;
+      const currentMultiplier = multiplierFactor ?? 2.25; // Mantém o seu padrão 2.25
+
       calculatedUnitValue =
-        weight > 0 ? (unitPrice / weight) * (multiplierFactor ?? 1) : 0;
+        weight > 0 ? (currentUnitPrice / weight) * currentMultiplier : 0;
     }
 
     const result = await db

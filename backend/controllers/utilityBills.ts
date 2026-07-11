@@ -1,17 +1,29 @@
 import type { Request, Response } from "express";
 import { UtilityBillsRepository } from "../repositories/utilityBills.ts";
+import {
+  createUtilityBillSchema,
+  utilityBillSchema,
+  utilityBillQuerySchema,
+  utilityBillIdParamSchema,
+} from "../../packages/shared/schemas/utilityBills.schema.ts";
 
 export const UtilityBillsController = {
   async read(req: Request, res: Response) {
     try {
-      const { month, year } = req.query; // Captura o mês e ano enviados pelo frontend
+      const queryValidation = utilityBillQuerySchema.safeParse(req.query);
 
-      const bills = await UtilityBillsRepository.read(
-        Number(month),
-        Number(year),
-      );
+      if (!queryValidation.success) {
+        return res.status(400).json({
+          error: "Parâmetros de busca inválidos.",
+          details: queryValidation.error.issues,
+        });
+      }
 
-      res.json(bills);
+      const { month, year } = queryValidation.data;
+
+      const bills = await UtilityBillsRepository.read(month, year);
+
+      return res.json(bills);
     } catch (error) {
       console.error("Erro ao listar contas:", error);
       res
@@ -22,6 +34,15 @@ export const UtilityBillsController = {
 
   async create(req: Request, res: Response) {
     try {
+      const validation = createUtilityBillSchema.safeParse(req.body);
+
+      if (!validation.success) {
+        return res.status(400).json({
+          error: "Validação falhou.",
+          details: validation.error.issues,
+        });
+      }
+
       const {
         type,
         month,
@@ -33,19 +54,19 @@ export const UtilityBillsController = {
         unitPrice,
         multiplierFactor,
         splitCount,
-      } = req.body;
+      } = validation.data;
 
       const { id, calculatedUnitValue } = await UtilityBillsRepository.create({
-        type: String(type),
-        month: Number(month),
-        year: Number(year),
-        totalConsumption: Number(totalConsumption),
-        consumptionValue: Number(consumptionValue),
-        taxesValue: Number(taxesValue),
-        cylinderType: String(cylinderType),
-        unitPrice: Number(unitPrice),
-        multiplierFactor: Number(multiplierFactor),
-        splitCount: Number(splitCount),
+        type,
+        month,
+        year,
+        totalConsumption,
+        consumptionValue,
+        taxesValue,
+        cylinderType,
+        unitPrice,
+        multiplierFactor,
+        splitCount,
       });
 
       return res.status(201).json({
@@ -65,7 +86,7 @@ export const UtilityBillsController = {
       });
     } catch (error) {
       console.error(error);
-      res
+      return res
         .status(500)
         .json({ error: "Erro ao processar a fatura de concessionária." });
     }
@@ -73,6 +94,26 @@ export const UtilityBillsController = {
 
   async update(req: Request, res: Response) {
     try {
+      const paramValidation = utilityBillSchema.safeParse(req.params);
+
+      if (!paramValidation.success) {
+        return res.status(400).json({
+          error: "ID de apartamento inválido.",
+          details: paramValidation.error.issues,
+        });
+      }
+
+      const validation = utilityBillSchema.safeParse(req.body);
+
+      if (!validation.success) {
+        return res.status(400).json({
+          error: "Dados para atualização inválidos.",
+          details: validation.error.issues,
+        });
+      }
+
+      const { id } = paramValidation.data;
+
       const {
         type,
         month,
@@ -84,8 +125,7 @@ export const UtilityBillsController = {
         unitPrice,
         multiplierFactor,
         splitCount,
-      } = req.body;
-      const id = String(req.params.id);
+      } = validation.data;
 
       const { changes, calculatedUnitValue } =
         await UtilityBillsRepository.update(id, {
@@ -105,9 +145,8 @@ export const UtilityBillsController = {
         return res.status(404).json({ error: "Medição não encontrada." });
       }
 
-      // 3. Retorna a resposta de sucesso em camelCase
-      res.json({
-        id: Number(id),
+      return res.json({
+        id,
         type,
         month,
         year,
@@ -122,28 +161,40 @@ export const UtilityBillsController = {
       });
     } catch (error) {
       console.error("Erro ao atualizar despesa:", error);
-      res.status(500).json({ error: "Erro ao atualizar banco de dados." });
+      return res
+        .status(500)
+        .json({ error: "Erro ao atualizar banco de dados." });
     }
   },
 
   async delete(req: Request, res: Response) {
     try {
-      const id = String(req.params.id);
+      const paramValidation = utilityBillIdParamSchema.safeParse(req.params);
+
+      if (!paramValidation.success) {
+        return res.status(400).json({
+          error: "ID de apartamento inválido.",
+          details: paramValidation.error.issues,
+        });
+      }
+
+      const { id } = paramValidation.data;
+
       const changes = await UtilityBillsRepository.delete(id);
 
       if (changes > 0) {
-        res.status(200).json({ message: "Medição removida com sucesso." });
+        return res.status(200).json({ message: "Conta removida com sucesso." });
       } else {
-        res.status(404).json({
-          error: "Medição não encontrada.",
+        return res.status(404).json({
+          error: "Conta não encontrada.",
           message: `Não foi possível remover: o ID ${id} não existe`,
         });
       }
     } catch (error) {
-      console.error("Erro ao deletar medição:", error);
-      res.status(500).json({
+      console.error("Erro ao deletar conta:", error);
+      return res.status(500).json({
         error: "Erro interno do servidor.",
-        message: "Ocorreu um erro ao tentar acessaro o banco de dados.",
+        message: "Ocorreu um erro ao tentar acessar o banco de dados.",
       });
     }
   },

@@ -5,7 +5,7 @@ export interface UtilityBillType {
   year: number;
   
   // Campos de Água
-  totalConsumptionM3?: number;
+  totalConsumption?: number;
   consumptionValue?: number;
   taxesValue?: number;
   
