@@ -1,5 +1,5 @@
 import { Routes, Route } from "react-router-dom";
-import { Sidebar } from "./components/layout/Sidebar";
+import { Sidebar } from "./layout/Sidebar";
 import { Home } from "./pages/Home";
 import { Apartments } from "./pages/Apartments";
 import { MonthlyBills } from "./pages/MonthlyBills";
@@ -8,7 +8,7 @@ import { Meters } from "./pages/Meters";
 import { Warnings } from "./pages/Warnings";
 import { Requests } from "./pages/Requests";
 import { FilterProvider } from "./context/FilterContext";
-import { FilterBar } from "./components/layout/FilterBar";
+import { FilterBar } from "./layout/FilterBar";
 import "./App.css";
 import { ApartmentProvider } from "./context/ApartmentContext";
 

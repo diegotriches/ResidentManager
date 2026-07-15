@@ -1,6 +1,6 @@
-import { useFilter } from "../../context/FilterContext";
-import { useTheme } from "../../context/ThemeContext";
-import { months } from "../../utils/constants";
+import { useFilter } from "./../context/FilterContext";
+import { useTheme } from "./../context/ThemeContext";
+import { months } from "./../utils/constants";
 import "./FilterBar.css";
 import { FaRegSun, FaRegMoon } from "react-icons/fa";
 
