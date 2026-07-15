@@ -1,5 +1,5 @@
 export interface VoucherReport {
-  apartment: string;
+  apartmentId: number;
   waterCurrent: number;
   gasCurrent: number;
   waterPrevious: number;
@@ -12,6 +12,7 @@ export interface VoucherReport {
 }
 
 export interface VoucherReportItem extends VoucherReport {
+  apartment: string;
   fixedRate: number;
   waterTotalValue: number;
   gasValue: number;

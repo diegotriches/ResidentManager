@@ -1,6 +1,6 @@
 import api from "./axiosInstance";
 
-export async function getFinanceReport(month: string, year: string) {
+export async function getFinanceReport(month: number, year: number) {
   const response = await api.get(`/vouchers/report/finance`, {
     params: { month, year },
   });
@@ -8,16 +8,16 @@ export async function getFinanceReport(month: string, year: string) {
 }
 
 export async function updateVoucherStatus(
-  apartment: number | string,
-  month: number | string,
-  year: number | string,
+  apartmentId: number,
+  month: number,
+  year: number,
   isPaid: boolean,
 ) {
   const response = await api.put('/vouchers/status', {
-    apartment,
+    apartmentId,
     month,
     year,
-    is_paid: isPaid,
+    isPaid,
   });
   
   return response.data;

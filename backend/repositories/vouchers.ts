@@ -4,6 +4,7 @@ import { eq, and, or, lt, desc, sql } from "drizzle-orm";
 import { alias } from "drizzle-orm/sqlite-core";
 
 export interface VoucherReport {
+  apartmentId: number;
   apartment: string;
   waterCurrent: number;
   gasCurrent: number;
@@ -54,6 +55,7 @@ export const VouchersRepository = {
     // 3. Montagem da Query Principal
     const result = await db
       .select({
+        apartmentId: apartments.id,
         apartment: apartments.apartment,
         waterCurrent: sql<number>`IFNULL(${mAtual.water}, 0)`,
         gasCurrent: sql<number>`IFNULL(${mAtual.gas}, 0)`,

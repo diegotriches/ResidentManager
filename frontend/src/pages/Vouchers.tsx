@@ -37,7 +37,7 @@ export const Vouchers = () => {
               </tr>
             ) : (
               vouchers.map((v) => (
-                <tr key={v.apartment}>
+                <tr key={v.apartmentId}>
                   <td>
                     <strong>Apto {v.apartment}</strong>
                   </td>
@@ -63,7 +63,7 @@ export const Vouchers = () => {
                       <input
                         type="checkbox"
                         checked={v.isPaid}
-                        onChange={() => handleTogglePaid(v.apartment, v.isPaid)}
+                        onChange={() => handleTogglePaid(v.apartmentId, v.isPaid)}
                         style={{
                           cursor: "pointer",
                           width: "16px",

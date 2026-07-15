@@ -36,19 +36,20 @@ export const useVouchers = () => {
         setGasUnitPrice(0);
       }
 
-      const consumptionData = await getFinanceReport(month, year);
+      const consumptionData = await getFinanceReport(Number(month), Number(year));
 
       const combined = consumptionData.map((item: VoucherReportItem) => {
         const waterTotalValue = item.totalWaterValue || 0;
         const gasValue = (item.gasConsumption || 0) * calculatedGasPrice;
 
         return {
+          apartmentId: item.apartmentId,
           apartment: item.apartment,
           fixedRate,
           waterTotalValue,
           gasValue,
           total: fixedRate + waterTotalValue + gasValue,
-          isPaid: item.isPaid,
+          isPaid: Boolean(item.isPaid),
         };
       });
 
@@ -60,19 +61,19 @@ export const useVouchers = () => {
     }
   };
 
-  const handleTogglePaid = async (apartment: string, currentStatus: boolean) => {
+  const handleTogglePaid = async (apartmentId: number, currentStatus: boolean) => {
     const newStatus = !currentStatus;
 
     setVouchers((prev) =>
-      prev.map((v) => (v.apartment === apartment ? { ...v, isPaid: newStatus } : v))
+      prev.map((v) => (v.apartmentId === apartmentId ? { ...v, isPaid: newStatus } : v))
     );
 
     try {
-      await updateVoucherStatus(apartment, month, year, newStatus);
+      await updateVoucherStatus(apartmentId, Number(month), Number(year), newStatus);
     } catch (error) {
       console.error("Erro ao salvar status no banco, revertendo...", error);
       setVouchers((prev) =>
-        prev.map((v) => (v.apartment === apartment ? { ...v, isPaid: currentStatus } : v))
+        prev.map((v) => (v.apartmentId === apartmentId ? { ...v, isPaid: currentStatus } : v))
       );
     }
   };
