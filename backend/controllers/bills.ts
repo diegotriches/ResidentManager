@@ -4,7 +4,7 @@ import {
   createBillSchema,
   billSchema,
   billQuerySchema,
-  billIdParamSchema
+  billIdParamSchema,
 } from "../../packages/shared/schemas/bills.schema.ts";
 import { z } from "zod";
 
@@ -54,19 +54,18 @@ export const BillsController = {
         });
       }
 
-      const { month, year, bill, totalValue, unitValue } = validation.data;
+      const { month, year, bill, totalValue } = validation.data;
 
       const billId = await BillsRepository.create({
         month,
         year,
         bill,
         totalValue,
-        unitValue,
       });
 
       return res
         .status(201)
-        .json({ id: billId, month, year, bill, totalValue, unitValue });
+        .json({ id: billId, month, year, bill, totalValue });
     } catch (error) {
       console.error("Erro ao inserir conta:", error);
       return res.status(500).json({ error: "Erro ao inserir conta" });
@@ -94,21 +93,20 @@ export const BillsController = {
       }
 
       const { id } = paramValidation.data;
-      const { month, year, bill, totalValue, unitValue } = validation.data;
+      const { month, year, bill, totalValue } = validation.data;
 
       const changes = await BillsRepository.update(id, {
         month,
         year,
         bill,
         totalValue,
-        unitValue,
       });
 
       if (changes === 0) {
         return res.status(404).json({ error: "Conta não encontrada." });
       }
 
-      return res.json({ id, month, year, bill, totalValue, unitValue });
+      return res.json({ id, month, year, bill, totalValue });
     } catch (error) {
       console.error("Erro ao atualizar conta:", error);
       return res

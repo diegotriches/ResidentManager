@@ -22,7 +22,6 @@ export const bills = sqliteTable("bills", {
   year: integer("year").notNull(),
   bill: text("bill").notNull(),
   totalValue: real("total_value").notNull(),
-  unitValue: real("unit_value").notNull(),
   createdAt: text("created_at").default(sql`(CURRENT_TIMESTAMP)`),
   updatedAt: text("updated_at")
     .default(sql`(CURRENT_TIMESTAMP)`)
@@ -43,7 +42,6 @@ export const utilityBills = sqliteTable(
     cylinderType: text("cylinder_type", { enum: ["P45", "P90"] }),
     unitPrice: real("unit_price"),
     multiplierFactor: real("multiplier_factor").default(2.25),
-    splitCount: integer("split_count").default(21),
     createdAt: text("created_at").default(sql`(CURRENT_TIMESTAMP)`),
     updatedAt: text("updated_at")
       .default(sql`(CURRENT_TIMESTAMP)`)

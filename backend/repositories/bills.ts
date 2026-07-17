@@ -7,7 +7,6 @@ export interface BillDTO {
   year: number;
   bill: string;
   totalValue: number;
-  unitValue: number;
 }
 
 export const BillsRepository = {
@@ -19,25 +18,24 @@ export const BillsRepository = {
   },
 
   async create(data: BillDTO) {
-    const { month, year, bill, totalValue, unitValue } = data;
+    const { month, year, bill, totalValue } = data;
 
     const result = await db.insert(bills).values({
       month,
       year,
       bill: bill?.trim(),
       totalValue,
-      unitValue,
     });
 
     return result.lastInsertRowid;
   },
 
   async update(id: number, data: BillDTO) {
-    const { month, year, bill, totalValue, unitValue } = data;
+    const { month, year, bill, totalValue } = data;
 
     const result = await db
       .update(bills)
-      .set({ month, year, bill, totalValue, unitValue })
+      .set({ month, year, bill, totalValue })
       .where(eq(bills.id, id));
 
     return result.changes;
