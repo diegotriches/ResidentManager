@@ -1,4 +1,4 @@
-import api from "./axiosInstance";
+import api from "../api/axiosInstance";
 import type {
   MetersType,
   MeterFormData,
@@ -6,8 +6,8 @@ import type {
 } from "../types/meters";
 
 export async function getMeters(
-  month: string,
-  year: string,
+  month: number,
+  year: number,
 ): Promise<MetersType[]> {
   const response = await api.get<MetersType[]>("/meters", {
     params: { month, year },
@@ -38,8 +38,8 @@ export async function deleteMeters(id: number): Promise<void> {
  * apartamentos (201-803) apareçam, mesmo sem leitura.
  */
 export const getConsumptionReport = async (
-  month: string,
-  year: string,
+  month: number,
+  year: number,
 ): Promise<MeterReportType[]> => {
   const response = await api.get<MeterReportType[]>(
     `/meters/report/consumption`,

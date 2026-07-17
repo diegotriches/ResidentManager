@@ -1,4 +1,4 @@
-import api from "./axiosInstance";
+import api from "../api/axiosInstance";
 
 export async function getFinanceReport(month: number, year: number) {
   const response = await api.get(`/vouchers/report/finance`, {

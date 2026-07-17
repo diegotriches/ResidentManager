@@ -1,4 +1,4 @@
-import api from "./axiosInstance";
+import api from "../api/axiosInstance";
 import type { Apartment, ApartmentsData } from "../types/apartments";
 
 export async function getApartments(): Promise<Apartment[]> {

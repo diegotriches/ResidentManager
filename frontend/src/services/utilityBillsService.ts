@@ -1,12 +1,12 @@
-import api from "./axiosInstance";
+import api from "../api/axiosInstance";
 import type {
   UtilityBillType,
   UtilityFormDataType,
 } from "../types/utilityBills";
 
 export async function getUtilityBills(
-  month: string,
-  year: string,
+  month: number,
+  year: number,
 ): Promise<UtilityBillType[]> {
   // Ajustado com a barra inicial
   const response = await api.get<UtilityBillType[]>("/utility-bills", {

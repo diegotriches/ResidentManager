@@ -1,6 +1,6 @@
-import api from "./axiosInstance";
+import api from "../api/axiosInstance";
 
-export async function getPendingApartments(month: string, year: string) {
+export async function getPendingApartments(month: number, year: number) {
   const response = await api.get("/home/pendingapartments", {
     params: { month, year },
   });

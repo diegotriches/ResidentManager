@@ -1,4 +1,4 @@
-import api from "./axiosInstance";
+import api from "../api/axiosInstance";
 import type { BillsType, BillsFormData } from "../types/bills";
 
 export async function getBills(
