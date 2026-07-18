@@ -22,7 +22,7 @@ export const MeterTable: React.FC<MeterTableProps> = ({ data, loading }) => {
       <table className="records-table">
         <thead>
           <tr>
-            <th>Apto</th>
+            <th>Apartamento</th>
             <th>Anterior(m³)</th>
             <th>Atual(m³)</th>
             <th>Consumo Água</th>

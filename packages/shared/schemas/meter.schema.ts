@@ -3,7 +3,6 @@ import { z } from "zod";
 export const createMeterSchema = z.object({
   month: z.coerce.number().min(1).max(12),
   year: z.coerce.number().min(1900).max(2100),
-  apartment: z.string().trim().min(1),
   apartmentId: z.number().positive(),
   water: z.number().positive(),
   gas: z.number().positive(),

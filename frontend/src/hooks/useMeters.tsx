@@ -43,7 +43,7 @@ export const useMeters = ({ setModalConfig }: useMetersProps) => {
   // Memorizado com useCallback para evitar recriação constante e loops
   const fetchMeters = useCallback(async () => {
     try {
-      const response = await getMeters(month, year);
+      const response = await getMeters(Number(month), Number(year));
       setMeters(response);
     } catch (error) {
       console.error("Erro ao carregar medições:", error);
@@ -54,7 +54,7 @@ export const useMeters = ({ setModalConfig }: useMetersProps) => {
   const fetchReport = useCallback(async () => {
     setLoading(true);
     try {
-      const data = await getConsumptionReport(month, year);
+      const data = await getConsumptionReport(Number(month), Number(year));
       setReportData(data);
     } catch (error) {
       console.error("Erro ao carregar relatório:", error);

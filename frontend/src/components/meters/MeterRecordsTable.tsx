@@ -24,7 +24,7 @@ export const MeterRecordsTable: React.FC<MeterRecordsTableProps> = ({
       <table className="records-table">
         <thead>
           <tr>
-            <th>Apto</th>
+            <th>Apartamento</th>
             <th>Cons. Água</th>
             <th>Cons. Gás</th>
             <th>Registro</th>
