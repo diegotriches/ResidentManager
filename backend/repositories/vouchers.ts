@@ -30,6 +30,8 @@ export const VouchersRepository = {
     const mAtual = alias(meters, "m_atual");
     const mAnt = alias(meters, "m_ant");
 
+    const totalApts = sql<number>`(SELECT COUNT(*) FROM ${apartments})`;
+
     // 2. Subquery para buscar a fatura de água isolada do mês/ano
     const faturaSubquery = db
       .select({
@@ -37,7 +39,6 @@ export const VouchersRepository = {
         consumptionValue: utilityBills.consumptionValue,
         totalConsumption: utilityBills.totalConsumption,
         taxesValue: utilityBills.taxesValue,
-        splitCount: utilityBills.splitCount,
         month: utilityBills.month,
         year: utilityBills.year,
       })
@@ -50,7 +51,7 @@ export const VouchersRepository = {
         ),
       )
       .limit(1)
-      .as("fatura"); // Transforma a subquery em uma tabela derivada 'fatura'
+      .as("fatura");
 
     // 3. Montagem da Query Principal
     const result = await db
@@ -61,19 +62,13 @@ export const VouchersRepository = {
         gasCurrent: sql<number>`IFNULL(${mAtual.gas}, 0)`,
         waterPrevious: sql<number>`IFNULL(${mAnt.water}, 0)`,
         gasPrevious: sql<number>`IFNULL(${mAnt.gas}, 0)`,
-
-        // Status de pagamento
         isPaid: sql<boolean>`IFNULL(${vouchers.isPaid}, 0)`,
-
-        // Consumo de Gás bruto
         gasConsumption: sql<number>`
         CASE 
           WHEN ${mAtual.apartmentId} IS NOT NULL THEN (IFNULL(${mAtual.gas}, 0) - IFNULL(${mAnt.gas}, 0))
           ELSE 0 
         END
       `,
-
-        // 1. CÁLCULO DO PREÇO DO M³ DA ÁGUA
         waterPricePerM3: sql<number>`
         CASE 
           WHEN ${faturaSubquery.id} IS NOT NULL AND IFNULL(${faturaSubquery.totalConsumption}, 0) > 0 
@@ -81,20 +76,16 @@ export const VouchersRepository = {
           ELSE 0 
         END
       `,
-
-        // 2. CÁLCULO DA TAXA INDIVIDUAL RATEADA
         waterFeePerApartment: sql<number>`
         CASE 
-          WHEN ${faturaSubquery.id} IS NOT NULL AND IFNULL(${faturaSubquery.splitCount}, 0) > 0 
-          THEN (IFNULL(${faturaSubquery.taxesValue}, 0) / ${faturaSubquery.splitCount})
+          WHEN ${faturaSubquery.id} IS NOT NULL AND ${totalApts} > 0 
+          THEN (IFNULL(${faturaSubquery.taxesValue}, 0) / ${totalApts})
           ELSE 0 
         END
       `,
-
-        // 3. VALOR TOTAL DA ÁGUA
         totalWaterValue: sql<number>`
         CASE 
-          WHEN ${mAtual.apartmentId} IS NOT NULL THEN 
+          WHEN ${faturaSubquery.id} IS NOT NULL THEN 
             (IFNULL(${mAtual.water}, 0) - IFNULL(${mAnt.water}, 0)) * (
               CASE 
                 WHEN IFNULL(${faturaSubquery.totalConsumption}, 0) > 0 
@@ -103,8 +94,8 @@ export const VouchersRepository = {
               END
             ) + (
               CASE 
-                WHEN IFNULL(${faturaSubquery.splitCount}, 0) > 0 
-                THEN (CAST(IFNULL(${faturaSubquery.taxesValue}, 0) AS REAL) / ${faturaSubquery.splitCount}) 
+                WHEN ${totalApts} > 0 
+                THEN (CAST(IFNULL(${faturaSubquery.taxesValue}, 0) AS REAL) / ${totalApts}) 
                 ELSE 0 
               END
             )
@@ -124,7 +115,7 @@ export const VouchersRepository = {
         ),
       )
 
-      // 2. Leitura anterior cronológica (Subquery para m_ant.id)
+      // 2. Leitura anterior cronológica
       .leftJoin(
         mAnt,
         and(
@@ -150,15 +141,22 @@ export const VouchersRepository = {
       )
 
       // 3. Fatura de água isolada
-      .leftJoin(faturaSubquery, eq(faturaSubquery.year, mAtual.year))
+      .leftJoin(
+        faturaSubquery,
+        and(
+          sql`1 = 1`,
+          eq(faturaSubquery.year, year),
+          eq(faturaSubquery.month, month),
+        ),
+      )
 
       // 4. Status de pagamento do voucher
       .leftJoin(
         vouchers,
         and(
           eq(vouchers.apartmentId, apartments.id),
-          eq(vouchers.month, mAtual.month),
-          eq(vouchers.year, mAtual.year),
+          eq(vouchers.month, month),
+          eq(vouchers.year, year),
         ),
       )
 

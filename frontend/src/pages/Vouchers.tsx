@@ -2,8 +2,8 @@ import { useVouchers } from "../hooks/useVouchers";
 import { useFilter } from "../context/FilterContext";
 import { formatCurrency } from "../utils/format";
 import { exportVoucherToPDF } from "../utils/pdf";
-import "./PagesStyles.css";
 import { FaTasks } from "react-icons/fa";
+import "./PagesStyles.css";
 
 export const Vouchers = () => {
   const { vouchers, loading, handleTogglePaid } = useVouchers();
@@ -25,7 +25,7 @@ export const Vouchers = () => {
               <th>Condomínio</th>
               <th>Água</th>
               <th>Gás</th>
-              <th>Total a Pagar</th>
+              <th>Total</th>
               <th>Pagamento</th>
               <th>Exportar</th>
             </tr>
@@ -39,10 +39,10 @@ export const Vouchers = () => {
               vouchers.map((v) => (
                 <tr key={v.apartmentId}>
                   <td>
-                    <strong>Apto {v.apartment}</strong>
+                    <strong>{v.apartment}</strong>
                   </td>
                   <td>{formatCurrency(v.fixedRate)}</td>
-                  <td>{formatCurrency(v.waterTotalValue)}</td>
+                  <td>{formatCurrency(v.totalWaterValue)}</td>
                   <td>{formatCurrency(v.gasValue)}</td>
                   <td
                     style={{
@@ -82,7 +82,7 @@ export const Vouchers = () => {
                   </td>
                   <td>
                     <button
-                      onClick={() => exportVoucherToPDF(v, Number(month), Number(year))}
+                      onClick={() => exportVoucherToPDF(v, month, year)}
                       className="pdf-btn"
                       style={{
                         padding: "6px 12px",

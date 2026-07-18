@@ -8,15 +8,9 @@ export const voucherSchema = z.object({
 });
 
 export const voucherQuerySchema = z.object({
-  month: z.coerce
-    .number({ error: "O mês é obrigatório." })
-    .min(1, "O mês não pode ficar em branco")
-    .max(12, "O valor informado não é válido como um mês."),
+  month: z.coerce.number({ error: "O mês é obrigatório." }).min(1).max(12),
 
-  year: z.coerce
-    .number({ error: "O ano é obrigatório." })
-    .min(1900, "O ano não pode ficar em branco.")
-    .max(2100, "O valor informado não é válido como um ano."),
+  year: z.coerce.number({ error: "O ano é obrigatório." }).min(1900).max(2100),
 });
 
 export type VoucherDTO = z.infer<typeof voucherSchema>;
