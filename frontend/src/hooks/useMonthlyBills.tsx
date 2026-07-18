@@ -40,8 +40,8 @@ export const useMonthlyBills = ({ setModalConfig }: useMonthlyBillsProps) => {
 
   // --- 1. ESTADOS E INITIAL FORMS DE CONDOMÍNIO ---
   const initialForm: BillsFormData = {
-    month: Number(month),
-    year: Number(year),
+    month,
+    year,
     bill: "",
     totalValue: 0,
   };
@@ -53,8 +53,8 @@ export const useMonthlyBills = ({ setModalConfig }: useMonthlyBillsProps) => {
   // --- 2. ESTADOS E INITIAL FORMS DE CONSUMO (Utilities) ---
   const initialUtilityForm: UtilityFormDataType = {
     type: "water",
-    month: Number(month),
-    year: Number(year),
+    month,
+    year,
     totalConsumption: 0,
     consumptionValue: 0,
     taxesValue: 0,
@@ -73,7 +73,7 @@ export const useMonthlyBills = ({ setModalConfig }: useMonthlyBillsProps) => {
     setLoading(true);
     try {
       if (activeTab === "utilities") {
-        const data = await getUtilityBills(Number(month), Number(year));
+        const data = await getUtilityBills(month, year);
         setUtilityBills(data);
       } else {
         const data = await getBills(month, year);
@@ -160,7 +160,8 @@ export const useMonthlyBills = ({ setModalConfig }: useMonthlyBillsProps) => {
 
   // --- 7. SUBMIT UNIFICADO E DINÂMICO ---
   const handleSubmit = async (isUtilityParam?: boolean): Promise<boolean> => {
-    const isUtility = isUtilityParam !== undefined ? isUtilityParam: (activeTab === "utilities");
+    const isUtility =
+      isUtilityParam !== undefined ? isUtilityParam : activeTab === "utilities";
     const currentId = isUtility ? utilityBillId : billId;
 
     try {
@@ -224,21 +225,21 @@ export const useMonthlyBills = ({ setModalConfig }: useMonthlyBillsProps) => {
   const handleDelete = async () => {
     try {
       if (activeTab === "condo" && billId !== null) {
-          await deleteBills(billId);
-        } else if(activeTab === "utilities" && utilityBillId !== null) {
-          await deleteUtilityBill(utilityBillId);
-        }
+        await deleteBills(billId);
+      } else if (activeTab === "utilities" && utilityBillId !== null) {
+        await deleteUtilityBill(utilityBillId);
+      }
 
-        setModalConfig({
-          isOpen: true,
-          title: "Sucesso",
-          message: "Conta removida com sucesso!",
-          type: "alert",
-        });
+      setModalConfig({
+        isOpen: true,
+        title: "Sucesso",
+        message: "Conta removida com sucesso!",
+        type: "alert",
+      });
 
-        setBillId(null);
-        setUtilityBillId(null);
-        fetchBills();
+      setBillId(null);
+      setUtilityBillId(null);
+      fetchBills();
     } catch (error) {
       console.error("Erro ao deletar:", error);
       setModalConfig({

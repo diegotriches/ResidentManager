@@ -26,8 +26,8 @@ export const useMeters = ({ setModalConfig }: useMetersProps) => {
   const { month, year } = useFilter();
 
   const initialForm: MeterFormData = {
-    month: Number(month),
-    year: Number(year),
+    month,
+    year,
     apartmentId: 0,
     water: 0,
     gas: 0,
@@ -43,7 +43,7 @@ export const useMeters = ({ setModalConfig }: useMetersProps) => {
   // Memorizado com useCallback para evitar recriação constante e loops
   const fetchMeters = useCallback(async () => {
     try {
-      const response = await getMeters(Number(month), Number(year));
+      const response = await getMeters(month, year);
       setMeters(response);
     } catch (error) {
       console.error("Erro ao carregar medições:", error);
@@ -54,7 +54,7 @@ export const useMeters = ({ setModalConfig }: useMetersProps) => {
   const fetchReport = useCallback(async () => {
     setLoading(true);
     try {
-      const data = await getConsumptionReport(Number(month), Number(year));
+      const data = await getConsumptionReport(month, year);
       setReportData(data);
     } catch (error) {
       console.error("Erro ao carregar relatório:", error);

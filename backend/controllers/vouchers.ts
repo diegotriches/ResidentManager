@@ -45,8 +45,8 @@ export const VouchersController = {
 
       await VouchersRepository.update({
         apartmentId: Number(apartmentId),
-        month: Number(month),
-        year: Number(year),
+        month,
+        year,
         isPaid: Boolean(isPaid),
       });
 

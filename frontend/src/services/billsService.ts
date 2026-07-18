@@ -2,8 +2,8 @@ import api from "../api/axiosInstance";
 import type { BillsType, BillsFormData } from "../types/bills";
 
 export async function getBills(
-  month?: string,
-  year?: string,
+  month?: number,
+  year?: number,
 ): Promise<BillsType[]> {
   const response = await api.get<BillsType[]>("/bills", {
     params: { month, year },
