@@ -15,7 +15,6 @@ export interface UtilityBillType {
   multiplierFactor?: number;
   
   // Configuração global de rateio fixo
-  splitCount: number;
   createdAt: string;
   updatedAt: string;
 }

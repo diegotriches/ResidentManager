@@ -9,5 +9,4 @@ export interface BillsFormData {
   year: number;
   bill: string;
   totalValue: number;
-  unitValue: number;
 };

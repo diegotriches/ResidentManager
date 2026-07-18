@@ -44,7 +44,6 @@ export const useMonthlyBills = ({ setModalConfig }: useMonthlyBillsProps) => {
     year: Number(year),
     bill: "",
     totalValue: 0,
-    unitValue: 0,
   };
 
   const [bills, setBills] = useState<BillsType[]>([]);
@@ -62,7 +61,6 @@ export const useMonthlyBills = ({ setModalConfig }: useMonthlyBillsProps) => {
     cylinderType: "P45",
     unitPrice: 0,
     multiplierFactor: 2.25,
-    splitCount: 21,
   };
 
   const [utilityBills, setUtilityBills] = useState<UtilityBillType[]>([]);
@@ -75,7 +73,7 @@ export const useMonthlyBills = ({ setModalConfig }: useMonthlyBillsProps) => {
     setLoading(true);
     try {
       if (activeTab === "utilities") {
-        const data = await getUtilityBills(month, year);
+        const data = await getUtilityBills(Number(month), Number(year));
         setUtilityBills(data);
       } else {
         const data = await getBills(month, year);
@@ -96,19 +94,13 @@ export const useMonthlyBills = ({ setModalConfig }: useMonthlyBillsProps) => {
   const handleChange = (
     e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>,
   ) => {
-    const { name, value } = e.target;
+    const { name, value, type } = e.target;
+
+    const finalValue = type === "number" ? Number(value) : value;
 
     setFormData((prev) => {
-      const newData = { ...prev, [name]: value };
-      const numValue = parseFloat(value);
+      const newData = { ...prev, [name]: finalValue };
 
-      if (!isNaN(numValue)) {
-        if (name === "totalValue") {
-          newData.unitValue = parseFloat((numValue / 21).toFixed(2));
-        } else if (name === "unitValue") {
-          newData.totalValue = parseFloat((numValue * 21).toFixed(2));
-        }
-      }
       return newData;
     });
   };
@@ -120,13 +112,13 @@ export const useMonthlyBills = ({ setModalConfig }: useMonthlyBillsProps) => {
 
     setUtilityFormData((prev) => {
       const numericFields = [
+        "month",
         "year",
-        "totalConsumptionM3",
+        "totalConsumption",
         "consumptionValue",
         "taxesValue",
         "unitPrice",
         "multiplierFactor",
-        "splitCount",
       ];
 
       const processedValue = numericFields.includes(name)
@@ -148,7 +140,6 @@ export const useMonthlyBills = ({ setModalConfig }: useMonthlyBillsProps) => {
       year: bill.year,
       bill: bill.bill,
       totalValue: bill.totalValue,
-      unitValue: bill.unitValue,
     });
   };
 
@@ -164,13 +155,12 @@ export const useMonthlyBills = ({ setModalConfig }: useMonthlyBillsProps) => {
       cylinderType: bill.cylinderType,
       unitPrice: bill.unitPrice,
       multiplierFactor: bill.multiplierFactor,
-      splitCount: bill.splitCount,
     });
   };
 
   // --- 7. SUBMIT UNIFICADO E DINÂMICO ---
-  const handleSubmit = async (): Promise<boolean> => {
-    const isUtility = activeTab === "utilities";
+  const handleSubmit = async (isUtilityParam?: boolean): Promise<boolean> => {
+    const isUtility = isUtilityParam !== undefined ? isUtilityParam: (activeTab === "utilities");
     const currentId = isUtility ? utilityBillId : billId;
 
     try {

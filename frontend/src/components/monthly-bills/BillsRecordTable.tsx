@@ -20,7 +20,6 @@ export const BillsRecordsTable: React.FC<BillsRecordsTableProps> = ({
           <tr>
             <th>Despesa</th>
             <th>Valor Total</th>
-            <th>Valor Unitário</th>
             <th>Registro</th>
             <th>Atualizado</th>
             <th>Editar/Excluir</th>
@@ -31,7 +30,6 @@ export const BillsRecordsTable: React.FC<BillsRecordsTableProps> = ({
             <tr key={b.id}>
               <td>{b.bill}</td>
               <td>{formatCurrency(b.totalValue || 0)}</td>
-              <td>{formatCurrency(b.unitValue || 0)}</td>
               <td>{b.createdAt}</td>
               <td>{b.updatedAt}</td>
               <td>

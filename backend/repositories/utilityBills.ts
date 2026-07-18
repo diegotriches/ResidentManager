@@ -17,7 +17,6 @@ export interface UtilityBillDTO {
   cylinderType?: "P45" | "P90";
   unitPrice?: number;
   multiplierFactor?: number;
-  splitCount: number;
 }
 
 export const UtilityBillsRepository = {
@@ -38,7 +37,6 @@ export const UtilityBillsRepository = {
       cylinderType: row.cylinderType ?? undefined,
       unitPrice: row.unitPrice ?? 0,
       multiplierFactor: row.multiplierFactor ?? 0,
-      splitCount: row.splitCount ?? 0,
       updatedAt: row.updatedAt ?? "",
     }));
   },
@@ -56,7 +54,6 @@ export const UtilityBillsRepository = {
       cylinderType,
       unitPrice,
       multiplierFactor,
-      splitCount,
     } = data;
 
     let calculatedUnitValue = 0;
@@ -94,7 +91,6 @@ export const UtilityBillsRepository = {
       cylinderType,
       unitPrice,
       multiplierFactor,
-      splitCount,
     });
 
     return {
@@ -117,7 +113,6 @@ export const UtilityBillsRepository = {
       cylinderType,
       unitPrice,
       multiplierFactor,
-      splitCount,
     } = data;
 
     let calculatedUnitValue = 0;
@@ -157,7 +152,6 @@ export const UtilityBillsRepository = {
         cylinderType,
         unitPrice,
         multiplierFactor,
-        splitCount,
       })
       .where(eq(utilityBills.id, id));
 

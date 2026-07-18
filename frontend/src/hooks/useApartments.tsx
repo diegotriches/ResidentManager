@@ -27,6 +27,8 @@ export const useApartments = ({ setModalConfig }: useApartmentsFormProps) => {
   const [formData, setFormData] = useState<ApartmentsData>(initialForm);
   const [apartmentId, setApartmentId] = useState<number | null>(null);
 
+  const totalApartments = apartments.length;
+
   const handleSubmit = async () => {
     try {
       if (!apartmentId) {
@@ -114,6 +116,7 @@ export const useApartments = ({ setModalConfig }: useApartmentsFormProps) => {
     initialForm,
     apartments,
     loading,
+    totalApartments,
     apartmentId,
     setApartmentId,
     formData,

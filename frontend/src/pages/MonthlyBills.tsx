@@ -1,17 +1,21 @@
 // Components
 import { BillsForm } from "../components/monthly-bills/BillsForm";
 import { UtilityBillsView } from "../components/monthly-bills/UtilityBillsView";
-import { UtilityBillModal } from "../components/monthly-bills/UtilityBillModal";
+import { WaterBillModal } from "../components/monthly-bills/WaterBillModal";
+import { GasBillModal } from "../components/monthly-bills/GasBillModal";
 import { BillsRecordsTable } from "../components/monthly-bills/BillsRecordTable";
 import { Modal } from "../components/ui/Modal";
 // Hooks
 import { useState } from "react";
 import { useMonthlyBills } from "../hooks/useMonthlyBills";
+import { useApartments } from "../hooks/useApartments";
 // Utils
 import { formatCurrency } from "../utils/format";
 // Icons
-import { FaMoneyCheckAlt, FaPlusCircle } from "react-icons/fa";
+import { FaMoneyCheckAlt, FaPlusCircle, FaLayerGroup } from "react-icons/fa";
 import { FaDroplet, FaFireFlameCurved } from "react-icons/fa6";
+// UI
+import * as Dropdown from "@radix-ui/react-dropdown-menu";
 
 interface ModalConfig {
   isOpen: boolean;
@@ -65,13 +69,11 @@ export const MonthlyBills = () => {
     handleDelete,
   } = useMonthlyBills({ setModalConfig });
 
+  const { totalApartments } = useApartments({ setModalConfig });
+
   // --- CÁLCULOS DE RESUMO (Baseados no array correto: bills) ---
-  const totalTotalValue = bills.reduce(
+  const sumTotalValue = bills.reduce(
     (acc, bill) => acc + (bill.totalValue || 0),
-    0,
-  );
-  const totalUnitValue = bills.reduce(
-    (acc, bill) => acc + (bill.unitValue || 0),
     0,
   );
 
@@ -132,17 +134,31 @@ export const MonthlyBills = () => {
               &times;
             </button>
 
-            <UtilityBillModal
-              formData={utilityFormData}
-              handleChange={handleUtilityChange}
-              onSave={async () => {
-                const success = await handleSubmit();
-                if (success) {
-                  setIsUtilityModalOpen(false);
-                }
-              }}
-              editingUtilityBillId={utilityBillId}
-            />
+            {utilityFormData.type === "water" ? (
+              <WaterBillModal
+                formData={utilityFormData}
+                handleChange={handleUtilityChange}
+                onSave={async () => {
+                  const success = await handleSubmit(true);
+                  if (success) {
+                    setIsUtilityModalOpen(false);
+                  }
+                }}
+                editingUtilityBillId={utilityBillId}
+              />
+            ) : (
+              <GasBillModal
+                formData={utilityFormData}
+                handleChange={handleUtilityChange}
+                onSave={async () => {
+                  const success = await handleSubmit(true);
+                  if (success) {
+                    setIsUtilityModalOpen(false);
+                  }
+                }}
+                editingUtilityBillId={utilityBillId}
+              />
+            )}
           </div>
         </div>
       )}
@@ -152,21 +168,53 @@ export const MonthlyBills = () => {
           <h1>
             <FaMoneyCheckAlt /> Gastos Mensais
           </h1>
-          {activeTab === "condo" ? (
-            <div className="form-grid">
-              Nova conta:
-              <button onClick={handleOpenCreate} className="btn-new">
-                <FaPlusCircle /> Condomínio
-              </button>
-            </div>
-          ) : (
-            <div className="form-grid">
-              Nova conta:
-              <button onClick={handleOpenCreateUtility} className="btn-new">
-                <FaDroplet /> Água <FaFireFlameCurved /> Gás
-              </button>
-            </div>
-          )}
+          <div className="form-grid">
+            <Dropdown.Root>
+              <Dropdown.Trigger asChild>
+                <button className="btn-new">
+                  <FaPlusCircle /> Nova Conta
+                </button>
+              </Dropdown.Trigger>
+
+              <Dropdown.Portal>
+                <Dropdown.Content className="dropdown-content" sideOffset={5}>
+                  <Dropdown.Item
+                    className="dropdown-item"
+                    onSelect={handleOpenCreate}
+                  >
+                    <FaLayerGroup />
+                    Condomínio
+                  </Dropdown.Item>
+                  <Dropdown.Item
+                    className="dropdown-item"
+                    onSelect={() => {
+                      handleOpenCreateUtility();
+                      setUtilityFormData((prev) => ({
+                        ...prev,
+                        type: "water",
+                      }));
+                      setIsUtilityModalOpen(true);
+                    }}
+                  >
+                    <FaDroplet /> Água
+                  </Dropdown.Item>
+                  <Dropdown.Item
+                    className="dropdown-item"
+                    onSelect={() => {
+                      handleOpenCreateUtility();
+                      setUtilityFormData((prev) => ({
+                        ...prev,
+                        type: "gas",
+                      }));
+                      setIsUtilityModalOpen(true);
+                    }}
+                  >
+                    <FaFireFlameCurved /> Gás
+                  </Dropdown.Item>
+                </Dropdown.Content>
+              </Dropdown.Portal>
+            </Dropdown.Root>
+          </div>
         </header>
 
         {/* Navegação entre Abas */}
@@ -196,11 +244,13 @@ export const MonthlyBills = () => {
                   <div className="summary-cards">
                     <div className="card">
                       <span>Total das Contas</span>
-                      <strong>{formatCurrency(totalTotalValue)}</strong>
+                      <strong>{formatCurrency(sumTotalValue)}</strong>
                     </div>
                     <div className="card">
                       <span>Soma por Unidade (Rateio)</span>
-                      <strong>{formatCurrency(totalUnitValue)}</strong>
+                      <strong>
+                        {formatCurrency(sumTotalValue / totalApartments)}
+                      </strong>
                     </div>
                   </div>
 
@@ -247,7 +297,7 @@ export const MonthlyBills = () => {
                 formData={formData}
                 handleChange={handleChange}
                 onSave={async () => {
-                  const success = await handleSubmit();
+                  const success = await handleSubmit(false);
                   if (success) {
                     setIsFormModalOpen(false);
                   }

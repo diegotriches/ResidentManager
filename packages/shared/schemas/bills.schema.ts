@@ -5,7 +5,6 @@ export const createBillSchema = z.object({
   year: z.coerce.number().min(1900).max(2100),
   bill: z.string().trim().min(1),
   totalValue: z.number().positive(),
-  unitValue: z.number().positive(),
 });
 
 export const billSchema = createBillSchema.extend({

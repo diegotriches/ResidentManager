@@ -26,23 +26,23 @@ export const BillsForm = ({
       <div className="form-field">
         <label>Data da medição:</label>
         <span>
-          {months.find((m) => m.value === formData.month)?.label}
-          /{formData.year}
+          {months.find((m) => m.value === formData.month)?.label}/
+          {formData.year}
         </span>
       </div>
 
-      <div className="form-field">
-        <label>Conta</label>
-        <input
-          name="bill"
-          value={formData.bill}
-          onChange={handleChange}
-          placeholder="Digite o nome da conta"
-          required
-        />
-      </div>
-
       <div className="form-grid">
+        <div className="form-field">
+          <label>Conta</label>
+          <input
+            name="bill"
+            value={formData.bill}
+            onChange={handleChange}
+            placeholder="Ex.: Limpeza"
+            required
+          />
+        </div>
+
         <div className="form-field">
           <label>Valor Total</label>
           <input
@@ -51,18 +51,7 @@ export const BillsForm = ({
             name="totalValue"
             value={formData.totalValue || ""}
             onChange={handleChange}
-            required
-          />
-        </div>
-
-        <div className="form-field">
-          <label>Valor Unitário</label>
-          <input
-            type="number"
-            step="0.01"
-            name="unitValue"
-            value={formData.unitValue || ""}
-            onChange={handleChange}
+            placeholder="R$ 0,00"
             required
           />
         </div>
@@ -71,14 +60,14 @@ export const BillsForm = ({
       <div className="modal-btns">
         <button onClick={handleSave} className="btn-save">
           {!editingBillId ? (
-                      <>
-                        <FaPlusCircle /> Cadastrar
-                      </>
-                    ) : (
-                      <>
-                        <FaPencilAlt /> Editar
-                      </>
-                    )}
+            <>
+              <FaPlusCircle /> Cadastrar
+            </>
+          ) : (
+            <>
+              <FaPencilAlt /> Editar
+            </>
+          )}
         </button>
       </div>
     </div>
