@@ -6,7 +6,6 @@ import { useMeters } from "../hooks/useMeters";
 import type { MetersType } from "../types/meters";
 import { FaPlusCircle, FaTachometerAlt } from "react-icons/fa";
 import { MeterRecordsTable } from "../components/meters/MeterRecordsTable";
-import "./PagesStyles.css";
 
 interface ModalConfig {
   isOpen: boolean;

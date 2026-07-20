@@ -3,7 +3,6 @@ import { useFilter } from "../context/FilterContext";
 import { formatCurrency } from "../utils/format";
 import { exportVoucherToPDF } from "../utils/pdf";
 import { FaTasks } from "react-icons/fa";
-import "./PagesStyles.css";
 
 export const Vouchers = () => {
   const { vouchers, loading, handleTogglePaid } = useVouchers();
