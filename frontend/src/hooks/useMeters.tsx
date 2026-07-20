@@ -1,4 +1,6 @@
-import { useState, useEffect, useCallback } from "react";
+import { useState } from "react";
+import { useFilter } from "../context/FilterContext";
+import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import {
   getMeters,
   getConsumptionReport,
@@ -6,12 +8,8 @@ import {
   deleteMeters,
   updateMeters,
 } from "../services/metersService";
-import type {
-  MetersType,
-  MeterFormData,
-  MeterReportType,
-} from "../types/meters";
-import { useFilter } from "../context/FilterContext";
+import type { MeterFormData } from "../types/meters";
+import { queryKeys } from "../keys/queryKeys";
 
 interface useMetersProps {
   setModalConfig: (config: {
@@ -24,6 +22,7 @@ interface useMetersProps {
 
 export const useMeters = ({ setModalConfig }: useMetersProps) => {
   const { month, year } = useFilter();
+  const queryClient = useQueryClient();
 
   const initialForm: MeterFormData = {
     month,
@@ -33,77 +32,118 @@ export const useMeters = ({ setModalConfig }: useMetersProps) => {
     gas: 0,
   };
 
-  const [meters, setMeters] = useState<MetersType[]>([]);
-  const [reportData, setReportData] = useState<MeterReportType[]>([]);
   const [formData, setFormData] = useState<MeterFormData>(initialForm);
-  const [loading, setLoading] = useState(false);
+  const [isFormModalOpen, setIsFormModalOpen] = useState(false);
   const [editingMeterId, setEditingMeterId] = useState<number | null>(null);
   const [idToDelete, setIdToDelete] = useState<number | null>(null);
 
-  // Memorizado com useCallback para evitar recriação constante e loops
-  const fetchMeters = useCallback(async () => {
-    try {
-      const response = await getMeters(month, year);
-      setMeters(response);
-    } catch (error) {
-      console.error("Erro ao carregar medições:", error);
-    }
-  }, [month, year]);
+  // 1. QUERY: Busca das Medições (Reage a mês/ano automaticamente)
+  const { data: meters = [], isLoading: isLoadingMeters } = useQuery({
+    queryKey: queryKeys.meters.byDate(month, year),
+    queryFn: () => getMeters(month, year),
+  });
 
-  // Memorizado para sincronização perfeita com os filtros
-  const fetchReport = useCallback(async () => {
-    setLoading(true);
-    try {
-      const data = await getConsumptionReport(month, year);
-      setReportData(data);
-    } catch (error) {
-      console.error("Erro ao carregar relatório:", error);
-    } finally {
-      setLoading(false);
-    }
-  }, [month, year]);
+  // 2. QUERY: Busca do Relatório de Consumo
+  const { data: reportData = [], isLoading: isLoadingReport } = useQuery({
+    queryKey: queryKeys.meters.report(month, year),
+    queryFn: () => getConsumptionReport(month, year),
+  });
 
-  // Efeito unificado para recarregar tudo quando o filtro global de mês/ano mudar
-  useEffect(() => {
-    fetchMeters();
-    fetchReport();
-  }, [fetchMeters, fetchReport]);
+  // Função auxiliar para recarregar as duas queries após qualquer alteração
+  const invalidateMetersAndReports = () => {
+    queryClient.invalidateQueries({ queryKey: queryKeys.meters.all });
+  };
 
-  const handleSubmit = async (): Promise<boolean> => {
-    try {
-      if (editingMeterId) {
-        await updateMeters(editingMeterId, formData);
-        setModalConfig({
-          isOpen: true,
-          title: "Atualização",
-          message: "Medição atualizada com sucesso!",
-          type: "alert",
-        });
-      } else {
-        console.log(formData);
-        await createMeters(formData);
-        setModalConfig({
-          isOpen: true,
-          title: "Cadastro",
-          message: "Medição cadastrada com sucesso!",
-          type: "alert",
-        });
-      }
-
-      setFormData(initialForm);
-      setEditingMeterId(null);
-      await fetchMeters();
-      await fetchReport();
-
-      return true;
-    } catch (error) {
-      console.error("Erro na operação:", error);
+  // 3. MUTATION: Criar Medição
+  const createMutation = useMutation({
+    mutationFn: createMeters,
+    onSuccess: () => {
+      invalidateMetersAndReports();
+      setModalConfig({
+        isOpen: true,
+        title: "Cadastro",
+        message: "Medição cadastrada com sucesso!",
+        type: "alert",
+      });
+      resetForm();
+    },
+    onError: (error) => {
+      console.error("Erro ao cadastrar medição:", error);
       setModalConfig({
         isOpen: true,
         title: "Erro",
         message: "Ocorreu um erro ao processar a solicitação.",
         type: "alert",
       });
+    },
+  });
+
+  // 4. MUTATION: Atualizar Medição
+  const updateMutation = useMutation({
+    mutationFn: ({ id, data }: { id: number; data: MeterFormData }) =>
+      updateMeters(id, data),
+    onSuccess: () => {
+      invalidateMetersAndReports();
+      setModalConfig({
+        isOpen: true,
+        title: "Atualização",
+        message: "Medição atualizada com sucesso!",
+        type: "alert",
+      });
+      resetForm();
+    },
+    onError: (error) => {
+      console.error("Erro ao atualizar medição:", error);
+      setModalConfig({
+        isOpen: true,
+        title: "Erro",
+        message: "Ocorreu um erro ao processar a solicitação.",
+        type: "alert",
+      });
+    },
+  });
+
+  // 5. MUTATION: Deletar Medição
+  const deleteMutation = useMutation({
+    mutationFn: deleteMeters,
+    onSuccess: () => {
+      invalidateMetersAndReports();
+      setModalConfig({
+        isOpen: true,
+        title: "Sucesso",
+        message: "Medição removida com sucesso!",
+        type: "alert",
+      });
+      setIdToDelete(null);
+    },
+    onError: (error) => {
+      console.error("Erro ao deletar medição:", error);
+      setModalConfig({
+        isOpen: true,
+        title: "Erro",
+        message: "Ocorreu um problema ao tentar excluir a medição.",
+        type: "alert",
+      });
+    },
+  });
+
+  const resetForm = () => {
+    setFormData(initialForm);
+    setEditingMeterId(null);
+  };
+
+  const handleSubmit = async (): Promise<boolean> => {
+    try {
+      if (editingMeterId) {
+        await updateMutation.mutateAsync({
+          id: editingMeterId,
+          data: formData,
+        });
+      } else {
+        await createMutation.mutateAsync(formData);
+      }
+      return true;
+    } catch {
       return false;
     }
   };
@@ -125,7 +165,7 @@ export const useMeters = ({ setModalConfig }: useMetersProps) => {
     });
   };
 
-  const handleEdit = (meter: MetersType) => {
+  const handleEdit = (meter: (typeof meters)[0]) => {
     setEditingMeterId(meter.id);
     setFormData({
       month: meter.month,
@@ -147,30 +187,17 @@ export const useMeters = ({ setModalConfig }: useMetersProps) => {
   };
 
   const handleDelete = async () => {
-    try {
-      if (idToDelete !== null) {
-        await deleteMeters(idToDelete);
-      }
-      setModalConfig({
-        isOpen: true,
-        title: "Sucesso",
-        message: "Medição removida com sucesso!",
-        type: "alert",
-      });
-
-      // Recarrega os dados e o relatório de consumos após deletar
-      await fetchMeters();
-      await fetchReport();
-    } catch (error) {
-      console.error("Erro ao deletar:", error);
-      setModalConfig({
-        isOpen: true,
-        title: "Erro",
-        message: "Ocorreu um problema ao tentar excluir a medição.",
-        type: "alert",
-      });
+    if (idToDelete !== null) {
+      await deleteMutation.mutateAsync(idToDelete);
     }
   };
+
+  const loading =
+    isLoadingMeters ||
+    isLoadingReport ||
+    createMutation.isPending ||
+    updateMutation.isPending ||
+    deleteMutation.isPending;
 
   return {
     initialForm,
@@ -179,6 +206,8 @@ export const useMeters = ({ setModalConfig }: useMetersProps) => {
     loading,
     formData,
     setFormData,
+    isFormModalOpen,
+    setIsFormModalOpen,
     editingMeterId,
     setEditingMeterId,
     handleChange,

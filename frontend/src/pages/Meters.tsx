@@ -19,7 +19,6 @@ export const Meters = () => {
   const [activeTab, setActiveTab] = useState<"register" | "history">(
     "register",
   );
-  const [isFormModalOpen, setIsFormModalOpen] = useState(false);
   const [modalConfig, setModalConfig] = useState<ModalConfig>({
     isOpen: false,
     title: "",
@@ -34,6 +33,8 @@ export const Meters = () => {
     loading,
     formData,
     setFormData,
+    isFormModalOpen,
+    setIsFormModalOpen,
     editingMeterId,
     setEditingMeterId,
     handleChange,

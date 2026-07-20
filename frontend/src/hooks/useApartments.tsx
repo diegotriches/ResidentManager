@@ -6,7 +6,7 @@ import {
   deleteApartments,
   updateApartments,
 } from "../services/apartmentsService";
-import { apartmentKeys } from "../keys/apartmentKeys";
+import { queryKeys } from "../keys/queryKeys";
 import type { ApartmentsData, Apartment } from "../types/apartments";
 
 interface useApartmentsFormProps {
@@ -31,7 +31,7 @@ export const useApartments = ({ setModalConfig }: useApartmentsFormProps) => {
   const [isFormModalOpen, setIsFormModalOpen] = useState(false);
 
   const { data: apartments = [], isLoading: loading } = useQuery({
-    queryKey: apartmentKeys.all,
+    queryKey: queryKeys.apartments.all,
     queryFn: getApartments,
     select: (data) =>
       [...data].sort((a, b) =>
@@ -44,7 +44,7 @@ export const useApartments = ({ setModalConfig }: useApartmentsFormProps) => {
   const createMutation = useMutation({
     mutationFn: createApartments,
     onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: apartmentKeys.all });
+      queryClient.invalidateQueries({ queryKey: queryKeys.apartments.all });
       setModalConfig({
         isOpen: true,
         title: "Cadastro",
@@ -72,7 +72,7 @@ export const useApartments = ({ setModalConfig }: useApartmentsFormProps) => {
     mutationFn: ({ id, data }: { id: number; data: ApartmentsData }) =>
       updateApartments(id, data),
     onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: apartmentKeys.all });
+      queryClient.invalidateQueries({ queryKey: queryKeys.apartments.all });
       setModalConfig({
         isOpen: true,
         title: "Atualização",
@@ -95,7 +95,7 @@ export const useApartments = ({ setModalConfig }: useApartmentsFormProps) => {
   const deleteMutation = useMutation({
     mutationFn: deleteApartments,
     onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: apartmentKeys.all });
+      queryClient.invalidateQueries({ queryKey: queryKeys.apartments.all });
       setModalConfig({
         isOpen: true,
         title: "Sucesso",
