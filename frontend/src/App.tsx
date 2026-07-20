@@ -10,11 +10,9 @@ import { Requests } from "./pages/Requests";
 import { FilterProvider } from "./context/FilterContext";
 import { FilterBar } from "./layout/FilterBar";
 import "./App.css";
-import { ApartmentProvider } from "./context/ApartmentContext";
 
 function App() {
   return (
-    <ApartmentProvider>
       <FilterProvider>
         <div className="container">
           <Sidebar />
@@ -36,7 +34,6 @@ function App() {
           </div>
         </div>
       </FilterProvider>
-    </ApartmentProvider>
   );
 }
 

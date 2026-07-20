@@ -1,5 +1,5 @@
 import { FaPencilAlt, FaPlusCircle } from "react-icons/fa";
-import { useApartmentContext } from "../../context/ApartmentContext";
+import { useApartments } from "../../hooks/useApartments";
 import type { MeterFormData } from "../../types/meters";
 import { months } from "../../utils/constants";
 
@@ -22,7 +22,7 @@ export const MetersForm: React.FC<MetersFormProps> = ({
     onSave({ ...formData });
   };
 
-  const { apartments, loading } = useApartmentContext();
+  const { apartments, loading } = useApartments({ setModalConfig: () => {} });
 
   return (
     <div className="form-wrapper">

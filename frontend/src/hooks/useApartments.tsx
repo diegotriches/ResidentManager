@@ -1,10 +1,12 @@
 import { useState } from "react";
+import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import {
+  getApartments,
   createApartments,
   deleteApartments,
   updateApartments,
 } from "../services/apartmentsService";
-import { useApartmentContext } from "../context/ApartmentContext";
+import { apartmentKeys } from "../keys/apartmentKeys";
 import type { ApartmentsData, Apartment } from "../types/apartments";
 
 interface useApartmentsFormProps {
@@ -17,52 +19,111 @@ interface useApartmentsFormProps {
 }
 
 export const useApartments = ({ setModalConfig }: useApartmentsFormProps) => {
+  const queryClient = useQueryClient();
+
   const initialForm = {
     apartment: "",
     ownerName: "",
   };
 
-  const { apartments, loading, fetchApartments } = useApartmentContext();
-
   const [formData, setFormData] = useState<ApartmentsData>(initialForm);
   const [apartmentId, setApartmentId] = useState<number | null>(null);
+  const [isFormModalOpen, setIsFormModalOpen] = useState(false);
+
+  const { data: apartments = [], isLoading: loading } = useQuery({
+    queryKey: apartmentKeys.all,
+    queryFn: getApartments,
+    select: (data) =>
+      [...data].sort((a, b) =>
+        String(a.apartment).localeCompare(String(b.apartment)),
+      ),
+  });
 
   const totalApartments = apartments.length;
 
-  const handleSubmit = async () => {
-    try {
-      if (!apartmentId) {
-        await createApartments(formData);
-        setModalConfig({
-          isOpen: true,
-          title: "Cadastro",
-          message: "Apartamento cadastrado com sucesso!",
-          type: "alert",
-        });
-      } else {
-        await updateApartments(apartmentId, formData);
-        setModalConfig({
-          isOpen: true,
-          title: "Atualização",
-          message: "Apartamento atualizado com sucesso!",
-          type: "alert",
-        });
-      }
-      
-      setFormData(initialForm);
-      setApartmentId(null);
-      await fetchApartments();
+  const createMutation = useMutation({
+    mutationFn: createApartments,
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: apartmentKeys.all });
+      setModalConfig({
+        isOpen: true,
+        title: "Cadastro",
+        message: "Apartamento cadastrado com sucesso!",
+        type: "alert",
+      });
 
-      return true;
-    } catch (error) {
-      console.error("Erro na operação:", error);
+      setIsFormModalOpen(false);
+      resetForm();
+    },
+    onError: (error) => {
+      console.error("Erro no cadastro:", error);
       setModalConfig({
         isOpen: true,
         title: "Erro",
         message: "Ocorreu um erro ao processar a solicitação.",
         type: "alert",
       });
-      return false;
+
+      return { handleSubmit, setIsFormModalOpen, isFormModalOpen };
+    },
+  });
+
+  const updateMutation = useMutation({
+    mutationFn: ({ id, data }: { id: number; data: ApartmentsData }) =>
+      updateApartments(id, data),
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: apartmentKeys.all });
+      setModalConfig({
+        isOpen: true,
+        title: "Atualização",
+        message: "Apartamento atualizado com sucesso!",
+        type: "alert",
+      });
+      resetForm();
+    },
+    onError: (error) => {
+      console.error("Erro na atualização:", error);
+      setModalConfig({
+        isOpen: true,
+        title: "Erro",
+        message: "Ocorreu um erro ao atualizar o apartamento.",
+        type: "alert",
+      });
+    },
+  });
+
+  const deleteMutation = useMutation({
+    mutationFn: deleteApartments,
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: apartmentKeys.all });
+      setModalConfig({
+        isOpen: true,
+        title: "Sucesso",
+        message: "Apartamento removido com sucesso!",
+        type: "alert",
+      });
+    },
+    onError: (error) => {
+      console.error("Erro ao deletar:", error);
+      setModalConfig({
+        isOpen: true,
+        title: "Erro",
+        message: "Ocorreu um problema ao tentar excluir o apartamento.",
+        type: "alert",
+      });
+    },
+  });
+
+  const resetForm = () => {
+    setFormData(initialForm);
+    setApartmentId(null);
+  };
+
+  const handleSubmit = () => {
+    if (!apartmentId) {
+      createMutation.mutate(formData);
+    } else {
+      updateMutation.mutate({ id: apartmentId, data: formData });
     }
   };
 
@@ -91,36 +152,23 @@ export const useApartments = ({ setModalConfig }: useApartmentsFormProps) => {
     });
   };
 
-  const handleDelete = async (id: number) => {
-    try {
-      await deleteApartments(id);
-      await fetchApartments();
-      setModalConfig({
-        isOpen: true,
-        title: "Sucesso",
-        message: "Apartamento removido com sucesso!",
-        type: "alert",
-      });
-    } catch (error) {
-      console.error("Erro ao deletar apartamento:", error);
-      setModalConfig({
-        isOpen: true,
-        title: "Erro",
-        message: "Ocorreu um problema ao tentar excluir a medição.",
-        type: "alert",
-      });
+  const handleDelete = () => {
+    if (apartmentId) {
+      deleteMutation.mutate(apartmentId);
     }
   };
 
   return {
     initialForm,
     apartments,
-    loading,
+    loading: loading || createMutation.isPending || updateMutation.isPending,
     totalApartments,
     apartmentId,
     setApartmentId,
     formData,
     setFormData,
+    isFormModalOpen,
+    setIsFormModalOpen,
     handleSubmit,
     handleChange,
     handleEdit,

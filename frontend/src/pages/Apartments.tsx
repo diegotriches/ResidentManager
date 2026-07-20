@@ -14,13 +14,29 @@ interface ModalConfig {
 }
 
 export const Apartments = () => {
-  const [isFormModalOpen, setIsFormModalOpen] = useState(false);
   const [modalConfig, setModalConfig] = useState<ModalConfig>({
     isOpen: false,
     title: "",
     message: "",
     type: "alert",
   });
+
+  const {
+    initialForm,
+    apartments,
+    loading,
+    apartmentId,
+    setApartmentId,
+    formData,
+    setFormData,
+    isFormModalOpen,
+    setIsFormModalOpen,
+    handleSubmit,
+    handleChange,
+    handleEdit,
+    deleteRequest,
+    handleDelete,
+  } = useApartments({ setModalConfig });
 
   const handleOpenCreate = () => {
     setFormData(initialForm);
@@ -32,21 +48,6 @@ export const Apartments = () => {
     setIsFormModalOpen(true);
   };
 
-  const {
-    initialForm,
-    apartments,
-    loading,
-    apartmentId,
-    setApartmentId,
-    formData,
-    setFormData,
-    handleSubmit,
-    handleChange,
-    handleEdit,
-    deleteRequest,
-    handleDelete,
-  } = useApartments({ setModalConfig });
-
   return (
     <>
       <Modal
@@ -57,7 +58,7 @@ export const Apartments = () => {
         onClose={() => setModalConfig({ ...modalConfig, isOpen: false })}
         onConfirm={() => {
           if (apartmentId) {
-            handleDelete(apartmentId);
+            handleDelete();
           }
           setModalConfig((prev) => ({ ...prev, isOpen: false }));
         }}
@@ -85,12 +86,7 @@ export const Apartments = () => {
               formData={formData}
               handleChange={handleChange}
               apartmentId={apartmentId}
-              onSave={async () => {
-                const sucesso = await handleSubmit();
-                if (sucesso) {
-                  setIsFormModalOpen(false);
-                }
-              }}
+              onSave={handleSubmit}
             />
           </div>
         </div>
