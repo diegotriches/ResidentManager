@@ -1,3 +1,4 @@
+import { useState } from "react";
 // Components
 import { BillsForm } from "../components/monthly-bills/BillsForm";
 import { UtilityBillsView } from "../components/monthly-bills/UtilityBillsView";
@@ -6,8 +7,8 @@ import { GasBillModal } from "../components/monthly-bills/GasBillModal";
 import { BillsRecordsTable } from "../components/monthly-bills/BillsRecordTable";
 import { Modal } from "../components/ui/Modal";
 // Hooks
-import { useState } from "react";
-import { useMonthlyBills } from "../hooks/useMonthlyBills";
+import { useBills } from "../hooks/useBills";
+import { useUtilityBills } from "../hooks/useUtilityBills";
 import { useApartments } from "../hooks/useApartments";
 // Utils
 import { formatCurrency } from "../utils/format";
@@ -22,10 +23,11 @@ interface ModalConfig {
   title: string;
   message: string;
   type: "confirm" | "alert";
+  onConfirm?: () => void;
 }
 
 export const MonthlyBills = () => {
-  // Configuração do Modal Global de Alertas/Confirmações
+  const [activeTab, setActiveTab] = useState<"condo" | "utilities">("condo");
   const [modalConfig, setModalConfig] = useState<ModalConfig>({
     isOpen: false,
     title: "",
@@ -33,41 +35,34 @@ export const MonthlyBills = () => {
     type: "alert",
   });
 
-  // Estados locais para controlar a abertura dos modais de inserção/edição de dados
-  const [isFormModalOpen, setIsFormModalOpen] = useState(false);
-  const [isUtilityModalOpen, setIsUtilityModalOpen] = useState(false);
-
-  // Consumo do Hook Unificado
   const {
-    activeTab,
-    setActiveTab,
     loading,
-
-    // Dados e handlers do Condomínio
     bills,
-    formData,
-    setFormData,
     billId,
-    setBillId,
+    isFormModalOpen,
+    setIsFormModalOpen,
+    formData,
     handleChange,
     handleEdit,
-    initialForm,
-
-    // Dados e handlers de Consumo (Utilities)
-    utilityBills,
-    utilityFormData,
-    setUtilityFormData,
-    utilityBillId,
-    setUtilityBillId,
-    handleUtilityChange,
-    handleUtilityEdit,
-    initialUtilityForm,
-
-    // Funções de ação Globais/Unificadas
     handleSubmit,
     deleteRequest,
-    handleDelete,
-  } = useMonthlyBills({ setModalConfig });
+    resetForm,
+  } = useBills({ setModalConfig });
+
+  const {
+    utilityBills,
+    loading: loadingUtility,
+    utilityBillId,
+    isFormModalOpen: isUtilityModalOpen,
+    setIsFormModalOpen: setIsUtilityModalOpen,
+    formData: utilityFormData,
+    setFormData: setUtilityFormData,
+    handleChange: handleUtilityChange,
+    handleEdit: handleUtilityEdit,
+    handleSubmit: handleUtilitySubmit,
+    deleteRequest: deleteUtilityRequest,
+    resetForm: resetUtilityForm,
+  } = useUtilityBills({ setModalConfig });
 
   const { totalApartments } = useApartments({ setModalConfig });
 
@@ -81,29 +76,18 @@ export const MonthlyBills = () => {
 
   // Condomínio: Gatilho para abrir criando do zero
   const handleOpenCreate = () => {
-    setFormData(initialForm);
-    setBillId(null);
-    setIsFormModalOpen(true);
-  };
-
-  // Condomínio: Gatilho para abrir editando uma linha
-  const handleOpenEdit = (bill: any) => {
-    handleEdit(bill);
+    resetForm();
     setIsFormModalOpen(true);
   };
 
   // Utilitários: Gatilho para abrir criando do zero
-  const handleOpenCreateUtility = () => {
-    setUtilityFormData(initialUtilityForm);
-    setUtilityBillId(null);
+  const handleOpenCreateUtility = (type: "water" | "gas") => {
+    resetUtilityForm();
+    setUtilityFormData((prev) => ({ ...prev, type }));
     setIsUtilityModalOpen(true);
   };
 
-  // Utilitários: Gatilho para abrir editando uma linha
-  const handleOpenEditUtility = (bill: any) => {
-    handleUtilityEdit(bill);
-    setIsUtilityModalOpen(true);
-  };
+  const isLoading = activeTab === "condo" ? loading : loadingUtility;
 
   return (
     <>
@@ -114,7 +98,7 @@ export const MonthlyBills = () => {
         message={modalConfig.message}
         type={modalConfig.type}
         onClose={() => setModalConfig({ ...modalConfig, isOpen: false })}
-        onConfirm={handleDelete} // Conecta diretamente à função unificada de deleção
+        onConfirm={modalConfig.onConfirm}
       />
 
       {/* Modal de Formulário: Água e Gás */}
@@ -128,7 +112,7 @@ export const MonthlyBills = () => {
               className="close-x"
               onClick={() => {
                 setIsUtilityModalOpen(false);
-                setUtilityBillId(null);
+                resetUtilityForm();
               }}
             >
               &times;
@@ -139,7 +123,7 @@ export const MonthlyBills = () => {
                 formData={utilityFormData}
                 handleChange={handleUtilityChange}
                 onSave={async () => {
-                  const success = await handleSubmit(true);
+                  const success = await handleUtilitySubmit();
                   if (success) {
                     setIsUtilityModalOpen(false);
                   }
@@ -151,7 +135,7 @@ export const MonthlyBills = () => {
                 formData={utilityFormData}
                 handleChange={handleUtilityChange}
                 onSave={async () => {
-                  const success = await handleSubmit(true);
+                  const success = await handleUtilitySubmit();
                   if (success) {
                     setIsUtilityModalOpen(false);
                   }
@@ -159,6 +143,34 @@ export const MonthlyBills = () => {
                 editingUtilityBillId={utilityBillId}
               />
             )}
+          </div>
+        </div>
+      )}
+
+      {isFormModalOpen && (
+        <div className="modal-overlay">
+          <div className="modal-content form-modal">
+            <button
+              className="close-x"
+              onClick={() => {
+                setIsFormModalOpen(false);
+                resetForm();
+              }}
+            >
+              &times;
+            </button>
+            <h2 className="modal-title">
+              {billId ? "Editar Conta" : "Nova Conta"}
+            </h2>
+            <BillsForm
+              formData={formData}
+              handleChange={handleChange}
+              onSave={async () => {
+                const success = await handleSubmit();
+                if (success) setIsFormModalOpen(false);
+              }}
+              editingBillId={billId}
+            />
           </div>
         </div>
       )}
@@ -188,12 +200,7 @@ export const MonthlyBills = () => {
                   <Dropdown.Item
                     className="dropdown-item"
                     onSelect={() => {
-                      handleOpenCreateUtility();
-                      setUtilityFormData((prev) => ({
-                        ...prev,
-                        type: "water",
-                      }));
-                      setIsUtilityModalOpen(true);
+                      handleOpenCreateUtility("water");
                     }}
                   >
                     <FaDroplet /> Água
@@ -201,12 +208,7 @@ export const MonthlyBills = () => {
                   <Dropdown.Item
                     className="dropdown-item"
                     onSelect={() => {
-                      handleOpenCreateUtility();
-                      setUtilityFormData((prev) => ({
-                        ...prev,
-                        type: "gas",
-                      }));
-                      setIsUtilityModalOpen(true);
+                      handleOpenCreateUtility("gas");
                     }}
                   >
                     <FaFireFlameCurved /> Gás
@@ -235,7 +237,7 @@ export const MonthlyBills = () => {
 
         {/* Conteúdo Renderizado Condicionalmente */}
         <div className="tab-content">
-          {loading ? (
+          {isLoading ? (
             <p>Carregando registros...</p>
           ) : activeTab === "condo" ? (
             <>
@@ -249,14 +251,18 @@ export const MonthlyBills = () => {
                     <div className="card">
                       <span>Soma por Unidade (Rateio)</span>
                       <strong>
-                        {formatCurrency(sumTotalValue / totalApartments)}
+                        {formatCurrency(
+                          totalApartments > 0
+                            ? sumTotalValue / totalApartments
+                            : 0,
+                        )}
                       </strong>
                     </div>
                   </div>
 
                   <BillsRecordsTable
                     bills={bills}
-                    handleOpenEdit={handleOpenEdit}
+                    handleOpenEdit={handleEdit}
                     deleteRequest={deleteRequest}
                   />
                 </>
@@ -270,43 +276,11 @@ export const MonthlyBills = () => {
           ) : (
             <UtilityBillsView
               bills={utilityBills}
-              handleOpenEdit={handleOpenEditUtility}
-              deleteRequest={deleteRequest}
+              handleOpenEdit={handleUtilityEdit}
+              deleteRequest={deleteUtilityRequest}
             />
           )}
         </div>
-
-        {/* Modal de Formulário: Condomínio */}
-        {isFormModalOpen && (
-          <div className="modal-overlay">
-            <div className="modal-content form-modal">
-              <button
-                className="close-x"
-                onClick={() => {
-                  setIsFormModalOpen(false);
-                  setBillId(null);
-                  setFormData(initialForm);
-                }}
-              >
-                &times;
-              </button>
-              <h2 className="modal-title">
-                {billId ? "Editar Conta" : "Nova Conta"}
-              </h2>
-              <BillsForm
-                formData={formData}
-                handleChange={handleChange}
-                onSave={async () => {
-                  const success = await handleSubmit(false);
-                  if (success) {
-                    setIsFormModalOpen(false);
-                  }
-                }}
-                editingBillId={billId}
-              />
-            </div>
-          </div>
-        )}
       </div>
     </>
   );
