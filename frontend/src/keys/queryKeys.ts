@@ -22,4 +22,8 @@ export const queryKeys = {
     byDate: (month: number, year: number) =>
       [...queryKeys.utilityBills.all, "by-date", { month, year }] as const,
   },
+  vouchers: {
+    all: ["vouchers"] as const,
+    byDate: (month: number, year: number) => ["vouchers", month, year] as const,
+  },
 };
