@@ -1,6 +1,6 @@
 import { useState } from "react";
 // Components
-import { BillsForm } from "../components/monthly-bills/BillsForm";
+import { BillsFormModal } from "../components/monthly-bills/BillsFormModal";
 import { UtilityBillsView } from "../components/monthly-bills/UtilityBillsView";
 import { WaterBillModal } from "../components/monthly-bills/WaterBillModal";
 import { GasBillModal } from "../components/monthly-bills/GasBillModal";
@@ -18,7 +18,7 @@ import { FaDroplet, FaFireFlameCurved } from "react-icons/fa6";
 // UI
 import * as Dropdown from "@radix-ui/react-dropdown-menu";
 
-interface ModalConfig {
+export interface ModalConfig {
   isOpen: boolean;
   title: string;
   message: string;
@@ -91,17 +91,7 @@ export const MonthlyBills = () => {
 
   return (
     <>
-      {/* Modal do Sistema (Sucesso, Erro, Confirmação de Deleção) */}
-      <Modal
-        isOpen={modalConfig.isOpen}
-        title={modalConfig.title}
-        message={modalConfig.message}
-        type={modalConfig.type}
-        onClose={() => setModalConfig({ ...modalConfig, isOpen: false })}
-        onConfirm={modalConfig.onConfirm}
-      />
-
-      {/* Modal de Formulário: Água e Gás */}
+            {/* Modal de Formulário: Água e Gás */}
       {isUtilityModalOpen && (
         <div className="modal-overlay">
           <div className="modal-content form-modal">
@@ -162,7 +152,7 @@ export const MonthlyBills = () => {
             <h2 className="modal-title">
               {billId ? "Editar Conta" : "Nova Conta"}
             </h2>
-            <BillsForm
+            <BillsFormModal
               formData={formData}
               handleChange={handleChange}
               onSave={async () => {
@@ -170,6 +160,7 @@ export const MonthlyBills = () => {
                 if (success) setIsFormModalOpen(false);
               }}
               editingBillId={billId}
+              setModalConfig={setModalConfig}
             />
           </div>
         </div>
@@ -282,6 +273,16 @@ export const MonthlyBills = () => {
           )}
         </div>
       </div>
+
+      {/* Modal do Sistema (Sucesso, Erro, Confirmação de Deleção) */}
+      <Modal
+        isOpen={modalConfig.isOpen}
+        title={modalConfig.title}
+        message={modalConfig.message}
+        type={modalConfig.type}
+        onClose={() => setModalConfig({ ...modalConfig, isOpen: false })}
+        onConfirm={modalConfig.onConfirm}
+      />
     </>
   );
 };
