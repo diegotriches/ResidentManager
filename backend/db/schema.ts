@@ -97,3 +97,9 @@ export const vouchers = sqliteTable(
     pk: primaryKey({ columns: [table.apartmentId, table.month, table.year] }),
   }),
 );
+
+// CATEGORIAS
+export const billsCategories = sqliteTable("billsCategories", {
+  id: integer("id").primaryKey({ autoIncrement: true }),
+  categoryName: text("category_name").notNull(),
+});

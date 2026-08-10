@@ -3,6 +3,7 @@ import cors from "cors";
 
 import meterRoutes from "./routes/meters.ts";
 import billRoutes from "./routes/bills.ts";
+import billCategoriesRoutes from "./routes/billsCategories.ts";
 import utilityBillsRoutes from "./routes/utilityBills.ts";
 import vouchersRoutes from "./routes/vouchers.ts";
 import homeRoutes from "./routes/home.ts";
@@ -16,6 +17,7 @@ app.use(express.json());
 
 // Routes
 app.use("/meters", meterRoutes);
+app.use("/bills/categories", billCategoriesRoutes);
 app.use("/bills", billRoutes);
 app.use("/utility-bills", utilityBillsRoutes);
 app.use("/vouchers", vouchersRoutes);
