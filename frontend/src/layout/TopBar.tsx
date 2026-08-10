@@ -1,10 +1,10 @@
-import { useFilter } from "./../context/FilterContext";
-import { useTheme } from "./../context/ThemeContext";
-import { months } from "./../utils/constants";
-import { FaRegSun, FaRegMoon } from "react-icons/fa";
-import "./FilterBar.css";
+import { useFilter } from "../context/FilterContext";
+import { useTheme } from "../context/ThemeContext";
+import { months } from "../utils/constants";
+import { FiSun, FiMoon  } from "react-icons/fi";
+import "./TopBar.css";
 
-export const FilterBar = () => {
+export const TopBar = () => {
   const { month, setMonth, year, setYear } = useFilter();
   const { theme, toggleTheme } = useTheme();
 
@@ -31,7 +31,7 @@ export const FilterBar = () => {
         className="theme-toggle-btn"
         title="Alternar tema"
       >
-        {theme === "light" ? <FaRegMoon /> : <FaRegSun />}
+        {theme === "light" ? <FiMoon /> : <FiSun />}
       </button>
     </div>
   );
