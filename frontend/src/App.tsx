@@ -8,7 +8,7 @@ import { Meters } from "./pages/Meters";
 import { Warnings } from "./pages/Warnings";
 import { Requests } from "./pages/Requests";
 import { FilterProvider } from "./context/FilterContext";
-import { FilterBar } from "./layout/FilterBar";
+import { TopBar } from "./layout/TopBar";
 import "./App.css";
 
 function App() {
@@ -17,7 +17,7 @@ function App() {
         <div className="container">
           <Sidebar />
           <div className="main-wrapper">
-            <FilterBar />
+            <TopBar />
             <main className="content">
               <div className="page-content">
                 <Routes>

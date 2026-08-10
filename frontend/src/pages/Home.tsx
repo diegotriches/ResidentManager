@@ -1,5 +1,6 @@
 import { FaHome } from "react-icons/fa";
 import { useHome } from "../hooks/useHome";
+import type { Apartment } from "../types/apartments";
 
 export const Home = () => {
   const { pendingApartments, loading } = useHome();
@@ -18,7 +19,7 @@ export const Home = () => {
       )}
       {!loading && pendingApartments.length > 0 && (
         <div className="form-field">
-          {pendingApartments.map((a) => {
+          {pendingApartments.map((a: Apartment) => {
             return (
               <div key={a.apartment}>
                 <p>Possui pendência: {a.apartment}</p>
@@ -27,6 +28,10 @@ export const Home = () => {
           })}
         </div>
       )}
+
+      <div className="">
+        <p>Reserva do Condomínio</p>
+      </div>
     </div>
   );
 };

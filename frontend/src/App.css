@@ -93,6 +93,7 @@ header h1 {
   gap: 8px;
   background-color: #27ae60;
   align-items: center;
+  justify-content: center;
   color: white;
   border: none;
   padding: 0.6rem;
@@ -393,4 +394,25 @@ header h1 {
 /* Ajuste para quando estiver editando (mudar a cor do botão se quiser) */
 .btn-save.editing {
   background-color: #3498db;
+}
+
+.dropdown-content {
+  display: flex;
+  flex-direction: column;
+  color: var(--text-primary);
+  background-color: var(--bg-secondary);
+  padding: 9px;
+  cursor: pointer;
+  border: 1px solid var(--border-color);
+  border-radius: 1rem;
+}
+
+.dropdown-item {
+  padding: 7px;
+}
+
+.dropdown-item:hover {
+  background-color: var(--hover-bg);
+  color: #3498db;
+  border-radius: 1rem;
 }
