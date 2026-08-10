@@ -17,6 +17,11 @@ export const queryKeys = {
     byDate: (month: number, year: number) =>
       [...queryKeys.bills.all, "by-date", { month, year }] as const,
   },
+  billsCategories: {
+    all: ["billsCategories"] as const,
+    lists: () =>
+      [...queryKeys.billsCategories.all, "lists"] as const,
+  },
   utilityBills: {
     all: ["utility-bills"] as const,
     byDate: (month: number, year: number) =>
