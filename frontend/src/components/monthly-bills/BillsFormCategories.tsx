@@ -55,30 +55,34 @@ export const BillsFormCategories = ({
         </button>
       </div>
 
-      <div className="form-field">
-        {loading ? (
-          <p>Carregando registros...</p>
-        ) : (
-          categories.map((c) => (
-            <div key={c.id ?? c.categoryName} className="category-item">
-              <p>{c.categoryName}</p>
-              <button
-                type="button"
-                className="btn-edit"
-                onClick={() => onEdit(c)}
-              >
-                <FaPencilAlt /> Editar
-              </button>
-              <button
-                type="button"
-                className="btn-delete"
-                onClick={() => c.id && onDelete(c.id)}
-              >
-                <FaTrashAlt /> Excluir
-              </button>
-            </div>
-          ))
-        )}
+      <div className="category-container">
+        <h4>Categorias</h4>
+        <p>Selecione para mais opções:</p>
+        <div className="categories-grid">
+          {loading ? (
+            <p>Carregando registros...</p>
+          ) : (
+            categories.map((c) => (
+              <ul key={c.id ?? c.categoryName} className="category-item">
+                <li>{c.categoryName}</li>
+                <button
+                  type="button"
+                  className="category-edit"
+                  onClick={() => onEdit(c)}
+                >
+                  <FaPencilAlt />
+                </button>
+                <button
+                  type="button"
+                  className="category-delete"
+                  onClick={() => c.id && onDelete(c.id)}
+                >
+                  <FaTrashAlt />
+                </button>
+              </ul>
+            ))
+          )}
+        </div>
       </div>
     </div>
   );

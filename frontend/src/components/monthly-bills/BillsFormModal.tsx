@@ -89,24 +89,27 @@ export const BillsFormModal = ({
               {formData.year}
             </span>
           </div>
-
-          <div className="form-field">
-            <button onClick={handleOpenCreate} className="btn-new">
-              Ver Categorias
-            </button>
-          </div>
         </div>
 
         <div className="form-grid">
-          <div className="form-field">
+          <div className="form-field filter-select">
             <label>Conta</label>
-            <input
+            <select
               name="bill"
               value={formData.bill}
               onChange={handleChange}
-              placeholder="Ex.: Limpeza"
               required
-            />
+            >
+              <option value="">
+                {loading ? "Carregando categorias..." : "Selecione a categoria"}
+              </option>
+              {!loading &&
+                categories.map((c) => (
+                  <option key={c.id} value={c.id}>
+                    {c.categoryName}
+                  </option>
+                ))}
+            </select>
           </div>
 
           <div className="form-field">
@@ -134,6 +137,10 @@ export const BillsFormModal = ({
                 <FaPencilAlt /> Editar
               </>
             )}
+          </button>
+
+          <button onClick={handleOpenCreate} className="btn-new">
+            Ver Categorias
           </button>
         </div>
       </div>

@@ -416,3 +416,117 @@ header h1 {
   color: #3498db;
   border-radius: 1rem;
 }
+
+/* ------------- CATEGORIAS ------------ */
+/* Container Principal */
+.category-container {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  width: 100%;
+  max-width: 480px;
+  padding: 16px;
+  border-radius: 8px;
+  border: 1px solid var(--border-color);
+  box-sizing: border-box;
+}
+
+/* Grid para organizar em 2 colunas */
+.categories-grid {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr); /* Divide em 2 colunas idênticas */
+  gap: 10px; /* Espaçamento entre os cards de categoria */
+  width: 100%;
+}
+
+/* Tratamento para o texto do estado de carregamento dentro da grid */
+.categories-grid > p {
+  grid-column: 1 / -1; /* Ocupa as 2 colunas caso esteja carregando */
+  margin: 0;
+}
+
+/* Título e Subtítulo */
+.category-container h4 {
+  margin: 0;
+  font-size: 1rem;
+  font-weight: 600;
+  color: var(--text-primary);
+}
+
+.category-container p {
+  margin: 0 0 8px 0;
+  font-size: 0.85rem;
+  color: var(--text-secondary);
+}
+
+/* Item da Lista */
+.category-item {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 8px 12px;
+  margin: 0;
+  list-style: none;
+  border: 1px solid var(--border-color);
+  border-radius: 6px;
+  transition: background-color 0.2s ease, border-color 0.2s ease;
+  min-width: 0; /* Permite o truncamento correto dentro da grid */
+}
+
+.category-item:hover {
+  background-color: var(--bg-secondary);
+  border-color: #4b4b5a;
+}
+
+/* Texto da Categoria (revela o conteúdo da tag <li>) */
+.category-item li {
+  font-size: 0.9rem;
+  font-weight: 500;
+  color: var(--text-primary);
+  flex: 1;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis; /* Adiciona '...' se o texto for maior que a coluna */
+}
+
+/* Botões de Ação - Estilo Base */
+.category-edit,
+.category-delete {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  padding: 6px;
+  margin-left: 6px;
+  border: none;
+  border-radius: 4px;
+  background: transparent;
+  cursor: pointer;
+  opacity: 0; /* Escondido por padrão */
+  transition: opacity 0.2s ease, background-color 0.2s ease, color 0.2s ease;
+}
+
+/* Revela os botões quando passa o mouse no item */
+.category-item:hover .category-edit,
+.category-item:hover .category-delete {
+  opacity: 1;
+}
+
+/* Botão Editar */
+.category-edit {
+  color: var(--text-primary);
+}
+
+.category-edit:hover {
+  background-color: var(--bg-primary);
+  color: #60a5fa;
+}
+
+/* Botão Excluir */
+.category-delete {
+  color: var(--text-primary);
+}
+
+.category-delete:hover {
+  background-color: #ef444420;
+  color: #f87171;
+}
