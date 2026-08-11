@@ -105,7 +105,7 @@ export const BillsFormModal = ({
               </option>
               {!loading &&
                 categories.map((c) => (
-                  <option key={c.id} value={c.id}>
+                  <option key={c.id} value={c.categoryName}>
                     {c.categoryName}
                   </option>
                 ))}

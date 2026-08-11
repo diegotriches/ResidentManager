@@ -63,7 +63,7 @@ export const BillsFormCategories = ({
             <p>Carregando registros...</p>
           ) : (
             categories.map((c) => (
-              <ul key={c.id ?? c.categoryName} className="category-item">
+              <ul key={c.id} className="category-item">
                 <li>{c.categoryName}</li>
                 <button
                   type="button"
