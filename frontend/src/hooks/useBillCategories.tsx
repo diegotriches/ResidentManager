@@ -1,5 +1,6 @@
 import { useState } from "react";
 import { useQuery, useQueryClient, useMutation } from "@tanstack/react-query";
+import { toast } from "sonner";
 import {
   getBillsCategories,
   createBillCategory,
@@ -54,22 +55,13 @@ export const useBillCategories = ({
     mutationFn: createBillCategory,
     onSuccess: () => {
       invalidate();
-      setModalConfig({
-        isOpen: true,
-        title: "Cadastro",
-        message: "Categoria cadastrada com sucesso!",
-        type: "alert",
-      });
+      toast.success("Categoria cadastrada com sucesso!");
+      setIsFormModalOpen(false);
       resetForm();
     },
     onError: (error) => {
       console.error("Erro ao cadastrar categoria:", error);
-      setModalConfig({
-        isOpen: true,
-        title: "Erro",
-        message: "Ocorreu um erro ao processar a solicitação.",
-        type: "alert",
-      });
+      toast.error("Ocorreu um erro ao processar a solicitação.");
     },
   });
 
@@ -78,22 +70,13 @@ export const useBillCategories = ({
       updateBillsCategories(id, data),
     onSuccess: () => {
       invalidate();
-      setModalConfig({
-        isOpen: true,
-        title: "Atualização",
-        message: "Categoria atualizada com sucesso!",
-        type: "alert",
-      });
+      toast.success("Categoria atualizada com sucesso!");
+      setIsFormModalOpen(false);
       resetForm();
     },
     onError: (error) => {
       console.error("Erro ao atualizar conta:", error);
-      setModalConfig({
-        isOpen: true,
-        title: "Erro",
-        message: "Ocorreu um erro ao processar a solicitação.",
-        type: "alert",
-      });
+      toast.error("Ocorreu um erro ao processar a solicitação.");
     },
   });
 
@@ -101,22 +84,12 @@ export const useBillCategories = ({
     mutationFn: deleteBillsCategories,
     onSuccess: () => {
       invalidate();
-      setModalConfig({
-        isOpen: true,
-        title: "Sucesso",
-        message: "Categoria removido com sucesso!",
-        type: "alert",
-      });
+      toast.success("Categoria removida com sucesso!");
       setCategoryId(null);
     },
     onError: (error) => {
       console.error("Erro ao deletar cadastro:", error);
-      setModalConfig({
-        isOpen: true,
-        title: "Erro",
-        message: "Ocorreu um problema ao tentar excluir o cadastro.",
-        type: "alert",
-      });
+      toast.error("Ocorreu um problema ao tentar excluir o cadastro.");
     },
   });
 
