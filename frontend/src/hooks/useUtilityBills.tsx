@@ -12,6 +12,7 @@ import type {
 } from "../types/utilityBills";
 import { queryKeys } from "../keys/queryKeys";
 import { useQueryClient, useQuery, useMutation } from "@tanstack/react-query";
+import { toast } from "sonner";
 
 interface useUtilityBillsProps {
   setModalConfig: (config: {
@@ -56,22 +57,13 @@ export const useUtilityBills = ({ setModalConfig }: useUtilityBillsProps) => {
     mutationFn: createUtilityBill,
     onSuccess: () => {
       invalidate();
-      setModalConfig({
-        isOpen: true,
-        title: "Cadastro",
-        message: "Conta cadastrada com sucesso!",
-        type: "alert",
-      });
+      toast.success("Conta cadastrada com sucesso!");
+      setIsFormModalOpen(false);
       resetForm();
     },
     onError: (error) => {
       console.error("Erro ao cadastrar conta:", error);
-      setModalConfig({
-        isOpen: true,
-        title: "Erro",
-        message: "Ocorreu um erro ao processar a solicitação.",
-        type: "alert",
-      });
+      toast.error("Ocorreu um erro ao processar a solicitação.");
     },
   });
 
@@ -80,22 +72,13 @@ export const useUtilityBills = ({ setModalConfig }: useUtilityBillsProps) => {
       updateUtilityBill(id, data),
     onSuccess: () => {
       invalidate();
-      setModalConfig({
-        isOpen: true,
-        title: "Atualização",
-        message: "Conta atualizada com sucesso!",
-        type: "alert",
-      });
+      toast.success("Conta atualizada com sucesso!");
+      setIsFormModalOpen(false);
       resetForm();
     },
     onError: (error) => {
       console.error("Erro ao atualizar conta:", error);
-      setModalConfig({
-        isOpen: true,
-        title: "Erro",
-        message: "Ocorreu um erro ao processar a solicitação.",
-        type: "alert",
-      });
+      toast.error("Ocorreu um erro ao processar a solicitação.");
     },
   });
 
@@ -103,22 +86,13 @@ export const useUtilityBills = ({ setModalConfig }: useUtilityBillsProps) => {
     mutationFn: deleteUtilityBill,
     onSuccess: () => {
       invalidate();
-      setModalConfig({
-        isOpen: true,
-        title: "Sucesso",
-        message: "Conta removida com sucesso!",
-        type: "alert",
-      });
+      toast.success("Conta removida com sucesso!");
+      setIsFormModalOpen(false);
       setUtilityBillId(null);
     },
     onError: (error) => {
       console.error("Erro ao deletar conta:", error);
-      setModalConfig({
-        isOpen: true,
-        title: "Erro",
-        message: "Ocorreu um problema ao tentar excluir a conta.",
-        type: "alert",
-      });
+      toast.error("Ocorreu um problema ao tentar excluir a conta.");
     },
   });
 
