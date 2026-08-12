@@ -10,6 +10,7 @@ import {
 } from "../services/metersService";
 import type { MeterFormData } from "../types/meters";
 import { queryKeys } from "../keys/queryKeys";
+import { toast } from "sonner";
 
 interface useMetersProps {
   setModalConfig: (config: {
@@ -59,22 +60,13 @@ export const useMeters = ({ setModalConfig }: useMetersProps) => {
     mutationFn: createMeters,
     onSuccess: () => {
       invalidateMetersAndReports();
-      setModalConfig({
-        isOpen: true,
-        title: "Cadastro",
-        message: "Medição cadastrada com sucesso!",
-        type: "alert",
-      });
+      toast.success("Medição cadastrada com sucesso!");
+      setIsFormModalOpen(false);
       resetForm();
     },
     onError: (error) => {
       console.error("Erro ao cadastrar medição:", error);
-      setModalConfig({
-        isOpen: true,
-        title: "Erro",
-        message: "Ocorreu um erro ao processar a solicitação.",
-        type: "alert",
-      });
+      toast.error("Ocorreu um erro ao processar a solicitação.");
     },
   });
 
@@ -84,22 +76,13 @@ export const useMeters = ({ setModalConfig }: useMetersProps) => {
       updateMeters(id, data),
     onSuccess: () => {
       invalidateMetersAndReports();
-      setModalConfig({
-        isOpen: true,
-        title: "Atualização",
-        message: "Medição atualizada com sucesso!",
-        type: "alert",
-      });
+      toast.success("Medição atualizada com sucesso!");
+      setIsFormModalOpen(false);
       resetForm();
     },
     onError: (error) => {
       console.error("Erro ao atualizar medição:", error);
-      setModalConfig({
-        isOpen: true,
-        title: "Erro",
-        message: "Ocorreu um erro ao processar a solicitação.",
-        type: "alert",
-      });
+      toast.error("Ocorreu um erro ao processar a solicitação.");
     },
   });
 
@@ -108,22 +91,13 @@ export const useMeters = ({ setModalConfig }: useMetersProps) => {
     mutationFn: deleteMeters,
     onSuccess: () => {
       invalidateMetersAndReports();
-      setModalConfig({
-        isOpen: true,
-        title: "Sucesso",
-        message: "Medição removida com sucesso!",
-        type: "alert",
-      });
+      toast.success("Medição removida com sucesso!");
+      setIsFormModalOpen(false);
       setIdToDelete(null);
     },
     onError: (error) => {
       console.error("Erro ao deletar medição:", error);
-      setModalConfig({
-        isOpen: true,
-        title: "Erro",
-        message: "Ocorreu um problema ao tentar excluir a medição.",
-        type: "alert",
-      });
+      toast.error("Ocorreu um problema ao tentar excluir a medição.");
     },
   });
 
