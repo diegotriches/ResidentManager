@@ -10,15 +10,7 @@ import type { UtilityBillType } from "../types/utilityBills";
 import type { BackendVoucherReport, FrontendVoucher } from "../types/vouchers";
 import { queryKeys } from "../keys/queryKeys";
 import type { BillsType } from "../types/bills";
-
-interface UseVouchersProps {
-  setModalConfig?: (config: {
-    isOpen: boolean;
-    title: string;
-    message: string;
-    type: "confirm" | "alert";
-  }) => void;
-}
+import { toast } from "sonner";
 
 // Função utilitária para cálculo do preço unitário do gás
 const calculateGasUnitPrice = (bill: UtilityBillType) => {
@@ -27,7 +19,7 @@ const calculateGasUnitPrice = (bill: UtilityBillType) => {
   return (bill.unitPrice / weight) * bill.multiplierFactor;
 };
 
-export const useVouchers = ({ setModalConfig }: UseVouchersProps = {}) => {
+export const useVouchers = () => {
   const { month, year } = useFilter();
   const queryClient = useQueryClient();
 
@@ -125,12 +117,7 @@ export const useVouchers = ({ setModalConfig }: UseVouchersProps = {}) => {
         );
       }
 
-      setModalConfig?.({
-        isOpen: true,
-        title: "Erro",
-        message: "Não foi possível atualizar o status de pagamento.",
-        type: "alert",
-      });
+      toast?.success("Não foi possível atualizar o status de pagamento.");
     },
 
     // Sempre invalida ao final para ter certeza que os dados estão sincronizados com o banco
