@@ -1,5 +1,6 @@
 import { useState } from "react";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
+import { toast } from "sonner";
 import {
   getApartments,
   createApartments,
@@ -41,30 +42,23 @@ export const useApartments = ({ setModalConfig }: useApartmentsFormProps) => {
 
   const totalApartments = apartments.length;
 
+  const resetForm = () => {
+    setFormData(initialForm);
+    setApartmentId(null);
+  };
+
   const createMutation = useMutation({
     mutationFn: createApartments,
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: queryKeys.apartments.all });
-      setModalConfig({
-        isOpen: true,
-        title: "Cadastro",
-        message: "Apartamento cadastrado com sucesso!",
-        type: "alert",
-      });
+      toast.success("Apartamento cadastrado com sucesso!");
 
       setIsFormModalOpen(false);
       resetForm();
     },
     onError: (error) => {
       console.error("Erro no cadastro:", error);
-      setModalConfig({
-        isOpen: true,
-        title: "Erro",
-        message: "Ocorreu um erro ao processar a solicitação.",
-        type: "alert",
-      });
-
-      return { handleSubmit, setIsFormModalOpen, isFormModalOpen };
+      toast.error("Ocorreu um erro ao cadastrar o apartamento.");
     },
   });
 
@@ -73,22 +67,12 @@ export const useApartments = ({ setModalConfig }: useApartmentsFormProps) => {
       updateApartments(id, data),
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: queryKeys.apartments.all });
-      setModalConfig({
-        isOpen: true,
-        title: "Atualização",
-        message: "Apartamento atualizado com sucesso!",
-        type: "alert",
-      });
+      toast.success("Apartamento atualizado com sucesso!");
       resetForm();
     },
     onError: (error) => {
       console.error("Erro na atualização:", error);
-      setModalConfig({
-        isOpen: true,
-        title: "Erro",
-        message: "Ocorreu um erro ao atualizar o apartamento.",
-        type: "alert",
-      });
+      toast.error("Ocorreu um erro ao atualizar o apartamento.");
     },
   });
 
@@ -96,28 +80,14 @@ export const useApartments = ({ setModalConfig }: useApartmentsFormProps) => {
     mutationFn: deleteApartments,
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: queryKeys.apartments.all });
-      setModalConfig({
-        isOpen: true,
-        title: "Sucesso",
-        message: "Apartamento removido com sucesso!",
-        type: "alert",
-      });
+      toast.success("Apartamento removido com sucesso!");
+      resetForm();
     },
     onError: (error) => {
       console.error("Erro ao deletar:", error);
-      setModalConfig({
-        isOpen: true,
-        title: "Erro",
-        message: "Ocorreu um problema ao tentar excluir o apartamento.",
-        type: "alert",
-      });
+      toast.error("Ocorreu um problema ao tentar excluir o apartamento.");
     },
   });
-
-  const resetForm = () => {
-    setFormData(initialForm);
-    setApartmentId(null);
-  };
 
   const handleSubmit = () => {
     if (!apartmentId) {
@@ -161,7 +131,11 @@ export const useApartments = ({ setModalConfig }: useApartmentsFormProps) => {
   return {
     initialForm,
     apartments,
-    loading: loading || createMutation.isPending || updateMutation.isPending,
+    loading:
+      loading ||
+      createMutation.isPending ||
+      updateMutation.isPending ||
+      deleteMutation.isPending,
     totalApartments,
     apartmentId,
     setApartmentId,
@@ -174,5 +148,6 @@ export const useApartments = ({ setModalConfig }: useApartmentsFormProps) => {
     handleEdit,
     deleteRequest,
     handleDelete,
+    resetForm,
   };
 };
