@@ -1,6 +1,6 @@
 import { z } from "zod";
 
-// 1. Schema para CRIAÇÃO (POST / Formulário de Cadastro) - Sem ID
+// Dados enviados pelo formulário
 export const createApartmentSchema = z.object({
   apartment: z
     .string({ error: "O número/nome do apartamento é obrigatório." })
@@ -11,13 +11,20 @@ export const createApartmentSchema = z.object({
   ownerName: z.string().trim(),
 });
 
-// 2. Schema COMPLETO (Inclusão do ID) - Para Atualizações, Respostas ou Leitura
+// Registro completo retornado pelo banco/API
 export const apartmentSchema = createApartmentSchema.extend({
   id: z
     .number({ error: "O ID deve ser um número." })
     .positive("O ID deve ser um número positivo."),
 });
 
-// 3. Tipos inferidos para exportar
+// Parâmetro da URL: /apartments/:id
+export const apartmentIdSchema = z.object({
+  id: z.coerce
+    .number({ error: "O ID deve ser um número." })
+    .positive("O ID deve ser um número positivo."),
+});
+
 export type CreateApartmentDTO = z.infer<typeof createApartmentSchema>;
 export type Apartment = z.infer<typeof apartmentSchema>;
+export type ApartmentIdParams = z.infer<typeof apartmentIdSchema>;

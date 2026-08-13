@@ -50,20 +50,6 @@ export const Apartments = () => {
 
   return (
     <>
-      <Modal
-        isOpen={modalConfig.isOpen}
-        title={modalConfig.title}
-        message={modalConfig.message}
-        type={modalConfig.type}
-        onClose={() => setModalConfig({ ...modalConfig, isOpen: false })}
-        onConfirm={() => {
-          if (apartmentId) {
-            handleDelete();
-          }
-          setModalConfig((prev) => ({ ...prev, isOpen: false }));
-        }}
-      />
-
       {isFormModalOpen && (
         <div className="modal-overlay">
           <div className="modal-content form-modal">
@@ -144,6 +130,20 @@ export const Apartments = () => {
           </table>
         )}
       </div>
+
+      <Modal
+        isOpen={modalConfig.isOpen}
+        title={modalConfig.title}
+        message={modalConfig.message}
+        type={modalConfig.type}
+        onClose={() => setModalConfig({ ...modalConfig, isOpen: false })}
+        onConfirm={() => {
+          if (apartmentId) {
+            handleDelete();
+          }
+          setModalConfig((prev) => ({ ...prev, isOpen: false }));
+        }}
+      />
     </>
   );
 };

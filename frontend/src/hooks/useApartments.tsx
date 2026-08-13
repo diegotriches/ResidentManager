@@ -52,7 +52,6 @@ export const useApartments = ({ setModalConfig }: useApartmentsFormProps) => {
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: queryKeys.apartments.all });
       toast.success("Apartamento cadastrado com sucesso!");
-
       setIsFormModalOpen(false);
       resetForm();
     },
@@ -68,6 +67,7 @@ export const useApartments = ({ setModalConfig }: useApartmentsFormProps) => {
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: queryKeys.apartments.all });
       toast.success("Apartamento atualizado com sucesso!");
+      setIsFormModalOpen(false);
       resetForm();
     },
     onError: (error) => {
@@ -81,6 +81,7 @@ export const useApartments = ({ setModalConfig }: useApartmentsFormProps) => {
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: queryKeys.apartments.all });
       toast.success("Apartamento removido com sucesso!");
+      setIsFormModalOpen(false);
       resetForm();
     },
     onError: (error) => {
@@ -99,9 +100,7 @@ export const useApartments = ({ setModalConfig }: useApartmentsFormProps) => {
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const { name, value } = e.target;
-    const finalValue = name === "number" ? Number(value) : value;
-
-    setFormData((prev) => ({ ...prev, [name]: finalValue }));
+    setFormData((prev) => ({ ...prev, [name]: value }));
   };
 
   const handleEdit = (a: Apartment) => {

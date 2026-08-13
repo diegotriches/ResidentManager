@@ -3,6 +3,7 @@ import { ApartmentsRepository } from "../repositories/apartments.ts";
 import {
   createApartmentSchema,
   apartmentSchema,
+  apartmentIdSchema,
 } from "../../packages/shared/schemas/apartment.schema.ts";
 import { z } from "zod";
 
@@ -68,7 +69,7 @@ export const ApartmentsController = {
 
   async update(req: Request, res: Response) {
     try {
-      const paramValidation = apartmentSchema.safeParse(req.params);
+      const paramValidation = apartmentIdSchema.safeParse(req.params);
 
       if (!paramValidation.success) {
         return res.status(400).json({
@@ -77,7 +78,7 @@ export const ApartmentsController = {
         });
       }
 
-      const validation = apartmentSchema.safeParse(req.body);
+      const validation = createApartmentSchema.safeParse(req.body);
 
       if (!validation.success) {
         return res.status(400).json({
@@ -120,7 +121,7 @@ export const ApartmentsController = {
 
   async delete(req: Request, res: Response) {
     try {
-      const paramValidation = apartmentSchema.safeParse(req.params);
+      const paramValidation = apartmentIdSchema.safeParse(req.params);
 
       if (!paramValidation.success) {
         return res.status(400).json({
