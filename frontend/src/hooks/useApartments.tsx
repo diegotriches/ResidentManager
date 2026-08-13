@@ -10,16 +10,7 @@ import {
 import { queryKeys } from "../keys/queryKeys";
 import type { ApartmentsData, Apartment } from "../types/apartments";
 
-interface useApartmentsFormProps {
-  setModalConfig: (config: {
-    isOpen: boolean;
-    message: string;
-    title: string;
-    type: "confirm" | "alert";
-  }) => void;
-}
-
-export const useApartments = ({ setModalConfig }: useApartmentsFormProps) => {
+export const useApartments = () => {
   const queryClient = useQueryClient();
 
   const initialForm = {
@@ -113,12 +104,6 @@ export const useApartments = ({ setModalConfig }: useApartmentsFormProps) => {
 
   const deleteRequest = (id: number) => {
     setApartmentId(id);
-    setModalConfig({
-      isOpen: true,
-      title: "Confirmação",
-      message: "Tem certeza que deseja excluir este apartamento?",
-      type: "confirm",
-    });
   };
 
   const handleDelete = () => {

@@ -4,22 +4,25 @@ import { FaLayerGroup, FaPlusCircle } from "react-icons/fa";
 import { ApartmentsForm } from "../components/apartments/ApartmentsForm";
 import { FaPencilAlt, FaTrashAlt } from "react-icons/fa";
 import type { Apartment } from "../types/apartments";
-import { Modal } from "../components/ui/Modal";
-
-interface ModalConfig {
-  isOpen: boolean;
-  title: string;
-  message: string;
-  type: "confirm" | "alert";
-}
+import {
+  Dialog,
+  DialogContent,
+  DialogHeader,
+  DialogTitle,
+} from "@/components/ui/dialog";
+import {
+  AlertDialog,
+  AlertDialogAction,
+  AlertDialogCancel,
+  AlertDialogContent,
+  AlertDialogDescription,
+  AlertDialogFooter,
+  AlertDialogHeader,
+  AlertDialogTitle,
+} from "@/components/ui/alert-dialog";
 
 export const Apartments = () => {
-  const [modalConfig, setModalConfig] = useState<ModalConfig>({
-    isOpen: false,
-    title: "",
-    message: "",
-    type: "alert",
-  });
+  const [isDeleteDialogOpen, setIsDeleteDialogOpen] = useState(false);
 
   const {
     initialForm,
@@ -36,7 +39,7 @@ export const Apartments = () => {
     handleEdit,
     deleteRequest,
     handleDelete,
-  } = useApartments({ setModalConfig });
+  } = useApartments();
 
   const handleOpenCreate = () => {
     setFormData(initialForm);
@@ -50,33 +53,33 @@ export const Apartments = () => {
 
   return (
     <>
-      {isFormModalOpen && (
-        <div className="modal-overlay">
-          <div className="modal-content form-modal">
-            <h2 className="modal-title">
+      <Dialog
+        open={isFormModalOpen}
+        onOpenChange={(open) => {
+          setIsFormModalOpen(open);
+
+          if (!open) {
+            setApartmentId(null);
+          }
+        }}
+      >
+        <DialogContent>
+          <DialogHeader>
+            <DialogTitle>
               {apartmentId
                 ? "Edição de Apartamento"
                 : "Cadastro de Apartamento"}
-            </h2>
-            <button
-              className="close-x"
-              onClick={() => {
-                setIsFormModalOpen(false);
-                setApartmentId(null);
-              }}
-            >
-              &times;
-            </button>
+            </DialogTitle>
+          </DialogHeader>
 
-            <ApartmentsForm
-              formData={formData}
-              handleChange={handleChange}
-              apartmentId={apartmentId}
-              onSave={handleSubmit}
-            />
-          </div>
-        </div>
-      )}
+          <ApartmentsForm
+            formData={formData}
+            handleChange={handleChange}
+            apartmentId={apartmentId}
+            onSave={handleSubmit}
+          />
+        </DialogContent>
+      </Dialog>
 
       <div className="main-container">
         <header className="pages-header">
@@ -119,7 +122,10 @@ export const Apartments = () => {
                     </button>
                     <button
                       className="btn-delete"
-                      onClick={() => deleteRequest(a.id)}
+                      onClick={() => {
+                        deleteRequest(a.id);
+                        setIsDeleteDialogOpen(true);
+                      }}
                     >
                       <FaTrashAlt />
                     </button>
@@ -131,19 +137,34 @@ export const Apartments = () => {
         )}
       </div>
 
-      <Modal
-        isOpen={modalConfig.isOpen}
-        title={modalConfig.title}
-        message={modalConfig.message}
-        type={modalConfig.type}
-        onClose={() => setModalConfig({ ...modalConfig, isOpen: false })}
-        onConfirm={() => {
-          if (apartmentId) {
-            handleDelete();
-          }
-          setModalConfig((prev) => ({ ...prev, isOpen: false }));
-        }}
-      />
+      <AlertDialog
+        open={isDeleteDialogOpen}
+        onOpenChange={setIsDeleteDialogOpen}
+      >
+        <AlertDialogContent>
+          <AlertDialogHeader>
+            <AlertDialogTitle>Excluir apartamento?</AlertDialogTitle>
+
+            <AlertDialogDescription>
+              Tem certeza que deseja excluir este apartamento? Esta ação não
+              poderá ser desfeita.
+            </AlertDialogDescription>
+          </AlertDialogHeader>
+
+          <AlertDialogFooter>
+            <AlertDialogCancel>Cancelar</AlertDialogCancel>
+
+            <AlertDialogAction
+              onClick={() => {
+                handleDelete();
+                setIsDeleteDialogOpen(false);
+              }}
+            >
+              Excluir
+            </AlertDialogAction>
+          </AlertDialogFooter>
+        </AlertDialogContent>
+      </AlertDialog>
     </>
   );
 };

@@ -1,5 +1,7 @@
 import { FaPencilAlt, FaPlusCircle } from "react-icons/fa";
 import type { ApartmentsData } from "../../types/apartments";
+import { Input } from "@/components/ui/input";
+import { Button } from "@/components/ui/button";
 
 interface ApartmentsFormProps {
   formData: ApartmentsData;
@@ -19,11 +21,14 @@ export const ApartmentsForm = ({
   };
 
   return (
-    <div className="form-wrapper">
-      <div className="form-grid">
-        <div className="form-field">
-          <label>Apartamento</label>
-          <input
+    <div className="space-y-6">
+      <div className="grid gap-4">
+        <div className="grid gap-2">
+          <label htmlFor="apartment" className="text-sm font-medium">
+            Apartamento
+          </label>
+          <Input
+            id="apartment"
             name="apartment"
             value={formData.apartment}
             onChange={handleChange}
@@ -31,9 +36,12 @@ export const ApartmentsForm = ({
           />
         </div>
 
-        <div className="form-field">
-          <label>Proprietário</label>
-          <input
+        <div className="grid gap-2">
+          <label htmlFor="ownerName" className="text-sm font-medium">
+            Proprietário
+          </label>
+          <Input
+            id="ownerName"
             name="ownerName"
             value={formData.ownerName}
             onChange={handleChange}
@@ -42,18 +50,20 @@ export const ApartmentsForm = ({
         </div>
       </div>
 
-      <div className="modal-btns">
-        <button onClick={handleSave} className="btn-save">
+      <div className="flex justify-end">
+        <Button onClick={handleSave}>
           {!apartmentId ? (
             <>
-              <FaPlusCircle /> Cadastrar
+              <FaPlusCircle />
+              Cadastrar
             </>
           ) : (
             <>
-              <FaPencilAlt /> Editar
+              <FaPencilAlt />
+              Editar
             </>
           )}
-        </button>
+        </Button>
       </div>
     </div>
   );
