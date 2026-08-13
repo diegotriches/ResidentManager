@@ -1,9 +1,9 @@
 import jsPDF from "jspdf";
 import autoTable from "jspdf-autotable";
 import { formatCurrency } from "./format";
-import type { VoucherReportItem } from "../types/vouchers";
+import type { FrontendVoucher } from "../types/vouchers";
 
-export const exportVoucherToPDF = (v: VoucherReportItem, month: number, year: number) => {
+export const exportVoucherToPDF = (v: FrontendVoucher, month: number, year: number) => {
   // 1. Cria uma instância do documento PDF (formato A4, unidade em milímetros)
   const doc = new jsPDF({
     orientation: "portrait",
@@ -46,7 +46,7 @@ export const exportVoucherToPDF = (v: VoucherReportItem, month: number, year: nu
     head: [["Descrição da Despesa", "Valor Unitário (R$)"]],
     body: [
       ["Taxas de Condomínio / Taxas Fixas", formatCurrency(v.fixedRate)],
-      ["Consumo de Água + Taxas", formatCurrency(v.waterTotalValue)],
+      ["Consumo de Água + Taxas", formatCurrency(v.totalWaterValue)],
       ["Consumo de Gás Individual", formatCurrency(v.gasValue)],
     ],
     theme: "striped",
