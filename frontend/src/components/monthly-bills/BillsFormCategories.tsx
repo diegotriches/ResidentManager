@@ -15,7 +15,7 @@ interface BillsFormCategoriesProps {
   ) => void;
   onSave: () => void;
   onEdit: (category: Categories) => void;
-  onDelete: (id: number) => void;
+  deleteRequest: (id: number) => void;
 }
 
 export const BillsFormCategories = ({
@@ -26,7 +26,7 @@ export const BillsFormCategories = ({
   onChange,
   onSave,
   onEdit,
-  onDelete,
+  deleteRequest,
 }: BillsFormCategoriesProps) => {
   return (
     <div className="form-wrapper">
@@ -75,7 +75,7 @@ export const BillsFormCategories = ({
                 <button
                   type="button"
                   className="category-delete"
-                  onClick={() => c.id && onDelete(c.id)}
+                  onClick={() => c.id && deleteRequest(c.id)}
                 >
                   <FaTrashAlt />
                 </button>

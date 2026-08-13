@@ -9,24 +9,12 @@ import {
 } from "../services/billsCategoriesService";
 import { queryKeys } from "../keys/queryKeys";
 
-interface useBillCategoriesProps {
-  setModalConfig: (config: {
-    isOpen: boolean;
-    message: string;
-    title: string;
-    type: "confirm" | "alert";
-    onConfirm?: () => void;
-  }) => void;
-}
-
 interface BillsCategories {
   id?: number;
   categoryName: string;
 }
 
-export const useBillCategories = ({
-  setModalConfig,
-}: useBillCategoriesProps) => {
+export const useBillCategories = () => {
   const queryClient = useQueryClient();
 
   const initialForm: BillsCategories = {
@@ -122,19 +110,8 @@ export const useBillCategories = ({
     setIsFormModalOpen(true);
   };
 
-  const handleDelete = async (id: number) => {
-    await deleteMutation.mutateAsync(id);
-  };
-
-  const deleteRequest = (id: number) => {
-    setCategoryId(id);
-    setModalConfig({
-      isOpen: true,
-      title: "Confirmação",
-      message: "Tem certeza que deseja excluir esta categoria?",
-      type: "confirm",
-      onConfirm: () => handleDelete(id),
-    });
+  const handleDelete = (id: number) => {
+      deleteMutation.mutateAsync(id);
   };
 
   return {
@@ -151,7 +128,7 @@ export const useBillCategories = ({
     handleChange,
     handleEdit,
     handleSubmit,
-    deleteRequest,
+    handleDelete,
     resetForm,
   };
 };

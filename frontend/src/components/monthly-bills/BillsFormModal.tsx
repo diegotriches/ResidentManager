@@ -3,7 +3,19 @@ import type { BillsFormData } from "../../types/bills";
 import { months } from "../../utils/constants";
 import { BillsFormCategories } from "./BillsFormCategories";
 import { useBillCategories } from "../../hooks/useBillCategories";
-import type { ModalConfig } from "../../pages/MonthlyBills";
+import {
+  AlertDialog,
+  AlertDialogAction,
+  AlertDialogCancel,
+  AlertDialogContent,
+  AlertDialogDescription,
+  AlertDialogFooter,
+  AlertDialogHeader,
+  AlertDialogTitle,
+} from "@/components/ui/alert-dialog";
+import { Input } from "@/components/ui/input";
+import { Button } from "@/components/ui/button";
+import { useState } from "react";
 
 interface BillsFormProps {
   formData: BillsFormData;
@@ -12,7 +24,6 @@ interface BillsFormProps {
     e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>,
   ) => void;
   editingBillId?: number | null;
-  setModalConfig: React.Dispatch<React.SetStateAction<ModalConfig>>;
 }
 
 export const BillsFormModal = ({
@@ -20,11 +31,13 @@ export const BillsFormModal = ({
   formData,
   handleChange,
   editingBillId,
-  setModalConfig,
 }: BillsFormProps) => {
   const handleSave = () => {
     onSave({ ...formData });
   };
+
+  const [isDeleteDialogOpen, setIsDeleteDialogOpen] = useState(false);
+  const [deleteCategoryId, setDeleteCategoryId] = useState<number | null>(null);
 
   const {
     loading,
@@ -36,9 +49,9 @@ export const BillsFormModal = ({
     handleChange: handleCategoryChange,
     handleEdit,
     handleSubmit,
-    deleteRequest,
+    handleDelete,
     resetForm,
-  } = useBillCategories({ setModalConfig });
+  } = useBillCategories();
 
   const handleOpenCreate = () => {
     resetForm();
@@ -74,15 +87,18 @@ export const BillsFormModal = ({
                 if (success) setIsFormModalOpen(false);
               }}
               onEdit={handleEdit}
-              onDelete={deleteRequest}
+              deleteRequest={(id) => {
+                setDeleteCategoryId(id);
+                setIsDeleteDialogOpen(true);
+              }}
             />
           </div>
         </div>
       )}
 
-      <div className="form-wrapper">
-        <div className="form-grid">
-          <div className="form-field">
+      <div className="space-y-6">
+        <div className="grid gap-4">
+          <div className="grid gap-2">
             <label>Data da medição:</label>
             <span>
               {months.find((m) => m.value === formData.month)?.label}/
@@ -91,8 +107,8 @@ export const BillsFormModal = ({
           </div>
         </div>
 
-        <div className="form-grid">
-          <div className="form-field filter-select">
+        <div className="grid gap-4">
+          <div className="grid gap-2 filter-select">
             <label>Conta</label>
             <select
               name="bill"
@@ -112,9 +128,10 @@ export const BillsFormModal = ({
             </select>
           </div>
 
-          <div className="form-field">
+          <div className="grid gap-2">
             <label>Valor Total</label>
-            <input
+            <Input
+              id="totalValue"
               type="number"
               step="0.01"
               name="totalValue"
@@ -126,8 +143,8 @@ export const BillsFormModal = ({
           </div>
         </div>
 
-        <div className="modal-btns">
-          <button onClick={handleSave} className="btn-save">
+        <div className="flex justify-end">
+          <Button onClick={handleSave} className="btn-save">
             {!editingBillId ? (
               <>
                 <FaPlusCircle /> Cadastrar
@@ -137,13 +154,46 @@ export const BillsFormModal = ({
                 <FaPencilAlt /> Editar
               </>
             )}
-          </button>
+          </Button>
 
-          <button onClick={handleOpenCreate} className="btn-new">
+          <Button onClick={handleOpenCreate} className="btn-new">
             Ver Categorias
-          </button>
+          </Button>
         </div>
       </div>
+
+      <AlertDialog
+        open={isDeleteDialogOpen}
+        onOpenChange={setIsDeleteDialogOpen}
+      >
+        <AlertDialogContent>
+          <AlertDialogHeader>
+            <AlertDialogTitle>Excluir categoria?</AlertDialogTitle>
+
+            <AlertDialogDescription>
+              Tem certeza que deseja excluir esta categoria? Esta ação não
+              poderá ser desfeita.
+            </AlertDialogDescription>
+          </AlertDialogHeader>
+
+          <AlertDialogFooter>
+            <AlertDialogCancel>Cancelar</AlertDialogCancel>
+
+            <AlertDialogAction
+              onClick={() => {
+                if (deleteCategoryId !== null) {
+                  handleDelete(deleteCategoryId);
+                }
+
+                setIsDeleteDialogOpen(false);
+                setDeleteCategoryId(null);
+              }}
+            >
+              Excluir
+            </AlertDialogAction>
+          </AlertDialogFooter>
+        </AlertDialogContent>
+      </AlertDialog>
     </>
   );
 };
