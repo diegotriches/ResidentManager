@@ -1,7 +1,6 @@
 import type { Request, Response } from "express";
 import { UtilityBillsRepository } from "../repositories/utilityBills.ts";
 import {
-  createUtilityBillSchema,
   utilityBillSchema,
   utilityBillQuerySchema,
   utilityBillIdParamSchema,
@@ -34,7 +33,7 @@ export const UtilityBillsController = {
 
   async create(req: Request, res: Response) {
     try {
-      const validation = createUtilityBillSchema.safeParse(req.body);
+      const validation = utilityBillSchema.safeParse(req.body);
 
       if (!validation.success) {
         return res.status(400).json({
@@ -53,7 +52,6 @@ export const UtilityBillsController = {
         cylinderType,
         unitPrice,
         multiplierFactor,
-        splitCount,
       } = validation.data;
 
       const { id, calculatedUnitValue } = await UtilityBillsRepository.create({
@@ -66,7 +64,6 @@ export const UtilityBillsController = {
         cylinderType,
         unitPrice,
         multiplierFactor,
-        splitCount,
       });
 
       return res.status(201).json({
@@ -81,7 +78,6 @@ export const UtilityBillsController = {
         cylinderType,
         unitPrice,
         multiplierFactor,
-        splitCount,
         calculatedUnitValue,
       });
     } catch (error) {
@@ -94,11 +90,11 @@ export const UtilityBillsController = {
 
   async update(req: Request, res: Response) {
     try {
-      const paramValidation = utilityBillSchema.safeParse(req.params);
+      const paramValidation = utilityBillIdParamSchema.safeParse(req.params);
 
       if (!paramValidation.success) {
         return res.status(400).json({
-          error: "ID de apartamento inválido.",
+          error: "ID da conta inválido.",
           details: paramValidation.error.issues,
         });
       }
@@ -124,7 +120,6 @@ export const UtilityBillsController = {
         cylinderType,
         unitPrice,
         multiplierFactor,
-        splitCount,
       } = validation.data;
 
       const { changes, calculatedUnitValue } =
@@ -138,11 +133,10 @@ export const UtilityBillsController = {
           cylinderType,
           unitPrice,
           multiplierFactor,
-          splitCount,
         });
 
       if (changes === 0) {
-        return res.status(404).json({ error: "Medição não encontrada." });
+        return res.status(404).json({ error: "Conta não encontrada." });
       }
 
       return res.json({
@@ -156,7 +150,6 @@ export const UtilityBillsController = {
         cylinderType,
         unitPrice,
         multiplierFactor,
-        splitCount,
         calculatedUnitValue,
       });
     } catch (error) {
@@ -173,7 +166,7 @@ export const UtilityBillsController = {
 
       if (!paramValidation.success) {
         return res.status(400).json({
-          error: "ID de apartamento inválido.",
+          error: "ID da conta inválido.",
           details: paramValidation.error.issues,
         });
       }

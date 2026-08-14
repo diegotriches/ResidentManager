@@ -74,16 +74,16 @@ export const BillsController = {
 
   async update(req: Request, res: Response) {
     try {
-      const paramValidation = billSchema.safeParse(req.params);
+      const paramValidation = billIdParamSchema.safeParse(req.params);
 
       if (!paramValidation.success) {
         return res.status(400).json({
-          error: "ID de apartamento inválido.",
+          error: "ID da conta inválido.",
           details: paramValidation.error.issues,
         });
       }
 
-      const validation = billSchema.safeParse(req.body);
+      const validation = createBillSchema.safeParse(req.body);
 
       if (!validation.success) {
         return res.status(400).json({
@@ -121,7 +121,7 @@ export const BillsController = {
 
       if (!paramValidation.success) {
         return res.status(400).json({
-          error: "ID de apartamento inválido.",
+          error: "ID da conta inválido.",
           details: paramValidation.error.issues,
         });
       }
