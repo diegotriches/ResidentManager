@@ -1,6 +1,6 @@
 import { z } from "zod";
 
-export const createUtilityBillSchema = z.object({
+export const utilityBillSchema = z.object({
   type: z.enum(["water", "gas"], {
     message: "O tipo deve ser 'water' ou 'gas'.",
   }),
@@ -23,15 +23,6 @@ export const createUtilityBillSchema = z.object({
   multiplierFactor: z.coerce.number().positive().optional(),
 });
 
-export const utilityBillSchema = createUtilityBillSchema.extend({
-  id: z.coerce
-    .number({ message: "O ID deve ser um número." })
-    .positive("O ID deve ser positivo."),
-
-  createdAt: z.string(),
-  updatedAt: z.string(),
-});
-
 export const utilityBillIdParamSchema = z.object({
   id: z.coerce
     .number({ message: "O ID deve ser um número." })
@@ -39,13 +30,12 @@ export const utilityBillIdParamSchema = z.object({
 });
 
 export const utilityBillQuerySchema = z.object({
-  month: z.coerce.number({ message: "O mês é obrigatório." }).min(1).max(12),
+  month: z.coerce.number().min(1).max(12),
 
   year: z.coerce
-    .number({ message: "O ano é obrigatório." })
+    .number()
     .min(1900)
     .max(2100),
 });
 
-export type CreateUtilityBillDTO = z.infer<typeof createUtilityBillSchema>;
-export type UtilityBill = z.infer<typeof utilityBillSchema>;
+export type UtilityBillDTO = z.infer<typeof utilityBillSchema>;
