@@ -11,17 +11,7 @@ import type { BillsType, BillsFormData } from "../types/bills";
 import { queryKeys } from "../keys/queryKeys";
 import { toast } from "sonner";
 
-interface useBillsProps {
-  setModalConfig: (config: {
-    isOpen: boolean;
-    message: string;
-    title: string;
-    type: "confirm" | "alert";
-    onConfirm?: () => void;
-  }) => void;
-}
-
-export const useBills = ({ setModalConfig }: useBillsProps) => {
+export const useBills = () => {
   const { month, year } = useFilter();
   const queryClient = useQueryClient();
 
@@ -128,18 +118,7 @@ export const useBills = ({ setModalConfig }: useBillsProps) => {
       bill: bill.bill,
       totalValue: bill.totalValue,
     });
-    setIsFormModalOpen(true);
-  };
-
-  const deleteRequest = (id: number) => {
-    setBillId(id);
-    setModalConfig({
-      isOpen: true,
-      title: "Confirmação",
-      message: "Tem certeza que deseja excluir esta conta?",
-      type: "confirm",
-      onConfirm: () => handleDelete(id),
-    });
+    setIsFormModalOpen(true)
   };
 
   const handleDelete = async (id: number) => {
@@ -157,10 +136,11 @@ export const useBills = ({ setModalConfig }: useBillsProps) => {
     bills,
     formData,
     billId,
+    setBillId,
     handleChange,
     handleEdit,
     handleSubmit,
-    deleteRequest,
+    handleDelete,
     resetForm,
   };
 };

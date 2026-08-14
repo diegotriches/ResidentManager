@@ -5,7 +5,6 @@ import { UtilityBillsView } from "../components/monthly-bills/UtilityBillsView";
 import { WaterBillModal } from "../components/monthly-bills/WaterBillModal";
 import { GasBillModal } from "../components/monthly-bills/GasBillModal";
 import { BillsRecordsTable } from "../components/monthly-bills/BillsRecordTable";
-import { Modal } from "../components/ui/Modal";
 // Hooks
 import { useBills } from "../hooks/useBills";
 import { useUtilityBills } from "../hooks/useUtilityBills";
@@ -18,41 +17,29 @@ import { FaDroplet, FaFireFlameCurved } from "react-icons/fa6";
 // UI
 import * as Dropdown from "@radix-ui/react-dropdown-menu";
 
-export interface ModalConfig {
-  isOpen: boolean;
-  title: string;
-  message: string;
-  type: "confirm" | "alert";
-  onConfirm?: () => void;
-}
-
 export const MonthlyBills = () => {
   const [activeTab, setActiveTab] = useState<"condo" | "utilities">("condo");
-  const [modalConfig, setModalConfig] = useState<ModalConfig>({
-    isOpen: false,
-    title: "",
-    message: "",
-    type: "alert",
-  });
 
   const {
     loading,
     bills,
     billId,
+    setBillId,
     isFormModalOpen,
     setIsFormModalOpen,
     formData,
     handleChange,
     handleEdit,
     handleSubmit,
-    deleteRequest,
+    handleDelete,
     resetForm,
-  } = useBills({ setModalConfig });
+  } = useBills();
 
   const {
     utilityBills,
     loading: loadingUtility,
     utilityBillId,
+    setUtilityBillId,
     isFormModalOpen: isUtilityModalOpen,
     setIsFormModalOpen: setIsUtilityModalOpen,
     formData: utilityFormData,
@@ -60,11 +47,11 @@ export const MonthlyBills = () => {
     handleChange: handleUtilityChange,
     handleEdit: handleUtilityEdit,
     handleSubmit: handleUtilitySubmit,
-    deleteRequest: deleteUtilityRequest,
+    handleDelete: handleDeleteUtility,
     resetForm: resetUtilityForm,
-  } = useUtilityBills({ setModalConfig });
+  } = useUtilityBills();
 
-  const { totalApartments } = useApartments({ setModalConfig });
+  const { totalApartments } = useApartments();
 
   // --- CÁLCULOS DE RESUMO (Baseados no array correto: bills) ---
   const sumTotalValue = bills.reduce(
@@ -160,7 +147,6 @@ export const MonthlyBills = () => {
                 if (success) setIsFormModalOpen(false);
               }}
               editingBillId={billId}
-              setModalConfig={setModalConfig}
             />
           </div>
         </div>
@@ -253,8 +239,10 @@ export const MonthlyBills = () => {
 
                   <BillsRecordsTable
                     bills={bills}
-                    handleOpenEdit={handleEdit}
-                    deleteRequest={deleteRequest}
+                    handleEdit={handleEdit}
+                    handleDelete={handleDelete}
+                    billId={billId}
+                    setBillId={setBillId}
                   />
                 </>
               ) : (
@@ -267,22 +255,14 @@ export const MonthlyBills = () => {
           ) : (
             <UtilityBillsView
               bills={utilityBills}
-              handleOpenEdit={handleUtilityEdit}
-              deleteRequest={deleteUtilityRequest}
+              utilityBillId={utilityBillId}
+              setUtilityBillId={setUtilityBillId}
+              handleEdit={handleUtilityEdit}
+              handleDelete={handleDeleteUtility}
             />
           )}
         </div>
       </div>
-
-      {/* Modal do Sistema (Sucesso, Erro, Confirmação de Deleção) */}
-      <Modal
-        isOpen={modalConfig.isOpen}
-        title={modalConfig.title}
-        message={modalConfig.message}
-        type={modalConfig.type}
-        onClose={() => setModalConfig({ ...modalConfig, isOpen: false })}
-        onConfirm={modalConfig.onConfirm}
-      />
     </>
   );
 };

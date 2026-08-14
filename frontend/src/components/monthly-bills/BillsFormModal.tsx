@@ -151,7 +151,7 @@ export const BillsFormModal = ({
               </>
             ) : (
               <>
-                <FaPencilAlt /> Editar
+                <FaPencilAlt /> Salvar
               </>
             )}
           </Button>

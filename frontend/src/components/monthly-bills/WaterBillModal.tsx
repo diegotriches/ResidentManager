@@ -18,7 +18,6 @@ export const WaterBillModal = ({
   editingUtilityBillId,
 }: UtilityBillModalProps) => {
   const handleSave = () => {
-    // A lógica de cálculo é validada aqui antes de enviar ao backend
     onSave({ ...formData });
   };
 

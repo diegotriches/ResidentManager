@@ -14,17 +14,7 @@ import { queryKeys } from "../keys/queryKeys";
 import { useQueryClient, useQuery, useMutation } from "@tanstack/react-query";
 import { toast } from "sonner";
 
-interface useUtilityBillsProps {
-  setModalConfig: (config: {
-    isOpen: boolean;
-    message: string;
-    title: string;
-    type: "confirm" | "alert";
-    onConfirm?: () => void;
-  }) => void;
-}
-
-export const useUtilityBills = ({ setModalConfig }: useUtilityBillsProps) => {
+export const useUtilityBills = () => {
   const { month, year } = useFilter();
   const queryClient = useQueryClient();
 
@@ -157,17 +147,6 @@ export const useUtilityBills = ({ setModalConfig }: useUtilityBillsProps) => {
     setIsFormModalOpen(true);
   };
 
-  const deleteRequest = (id: number) => {
-    setUtilityBillId(id);
-    setModalConfig({
-      isOpen: true,
-      title: "Confirmação",
-      message: "Tem certeza que deseja excluir esta conta?",
-      type: "confirm",
-      onConfirm: () => handleDelete(id),
-    });
-  };
-
   const handleDelete = async (id: number) => {
     await deleteMutation.mutateAsync(id);
   };
@@ -184,10 +163,11 @@ export const useUtilityBills = ({ setModalConfig }: useUtilityBillsProps) => {
     formData,
     setFormData,
     utilityBillId,
+    setUtilityBillId,
     handleChange,
     handleEdit,
     handleSubmit,
-    deleteRequest,
+    handleDelete,
     resetForm,
   };
 };
