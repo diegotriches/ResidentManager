@@ -12,16 +12,7 @@ import type { MeterFormData } from "../types/meters";
 import { queryKeys } from "../keys/queryKeys";
 import { toast } from "sonner";
 
-interface useMetersProps {
-  setModalConfig: (config: {
-    isOpen: boolean;
-    message: string;
-    title: string;
-    type: "confirm" | "alert";
-  }) => void;
-}
-
-export const useMeters = ({ setModalConfig }: useMetersProps) => {
+export const useMeters = () => {
   const { month, year } = useFilter();
   const queryClient = useQueryClient();
 
@@ -148,22 +139,11 @@ export const useMeters = ({ setModalConfig }: useMetersProps) => {
       water: meter.water,
       gas: meter.gas,
     });
+    setIsFormModalOpen(true);
   };
 
-  const deleteRequest = (id: number) => {
-    setIdToDelete(id);
-    setModalConfig({
-      isOpen: true,
-      title: "Confirmação",
-      message: "Tem certeza que deseja excluir esta medição?",
-      type: "confirm",
-    });
-  };
-
-  const handleDelete = async () => {
-    if (idToDelete !== null) {
-      await deleteMutation.mutateAsync(idToDelete);
-    }
+  const handleDelete = async (id: number) => {
+      await deleteMutation.mutateAsync(id);
   };
 
   const loading =
@@ -184,10 +164,11 @@ export const useMeters = ({ setModalConfig }: useMetersProps) => {
     setIsFormModalOpen,
     editingMeterId,
     setEditingMeterId,
+    idToDelete,
+    setIdToDelete,
     handleChange,
     handleEdit,
     handleSubmit,
-    deleteRequest,
     handleDelete,
   };
 };

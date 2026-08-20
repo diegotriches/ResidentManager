@@ -3,9 +3,11 @@ import { MetersRepository } from "../repositories/meters.ts";
 import {
   createMeterSchema,
   meterSchema,
+  meterConsumptionSchema,
   meterQuerySchema,
-  meterIdParamSchema
+  meterIdParamSchema,
 } from "../../packages/shared/schemas/meter.schema.ts";
+import { z } from "zod";
 
 export const MetersController = {
   async read(req: Request, res: Response) {
@@ -23,7 +25,19 @@ export const MetersController = {
 
       const meters = await MetersRepository.read(month, year);
 
-      return res.json(meters);
+      const parsedMeters = z.array(meterSchema).safeParse(meters);
+
+      if (!parsedMeters.success) {
+        console.error(
+          "Erro na validação do schema de medidores:",
+          parsedMeters.error,
+        );
+        return res.status(500).json({
+          error: "Dados retornados do banco estão em formato inválido.",
+        });
+      }
+
+      return res.json(parsedMeters.data);
     } catch (error) {
       console.error("Erro ao listar medições:", error);
       return res.status(500).json({ error: "Erro ao buscar dados no banco." });
@@ -45,7 +59,19 @@ export const MetersController = {
 
       const meters = await MetersRepository.readConsumption(month, year);
 
-      return res.json(meters);
+      const parsedMeters = z.array(meterConsumptionSchema).safeParse(meters);
+
+      if (!parsedMeters.success) {
+        console.error(
+          "Erro na validação do schema de medidores:",
+          parsedMeters.error,
+        );
+        return res.status(500).json({
+          error: "Dados retornados do banco estão em formato inválido.",
+        });
+      }
+
+      return res.json(parsedMeters.data);
     } catch (error) {
       console.error("Erro ao ler consumo:", error);
       return res.status(500).json({
@@ -88,7 +114,7 @@ export const MetersController = {
 
   async update(req: Request, res: Response) {
     try {
-      const paramValidation = meterSchema.safeParse(req.params);
+      const paramValidation = meterIdParamSchema.safeParse(req.params);
 
       if (!paramValidation.success) {
         return res.status(400).json({
@@ -97,7 +123,7 @@ export const MetersController = {
         });
       }
 
-      const validation = meterSchema.safeParse(req.body);
+      const validation = createMeterSchema.safeParse(req.body);
 
       if (!validation.success) {
         return res.status(400).json({

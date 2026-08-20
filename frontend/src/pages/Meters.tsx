@@ -1,29 +1,31 @@
 import { useState } from "react";
 import { MetersForm } from "../components/meters/MetersForm";
 import { MeterTable } from "../components/meters/MeterTable";
-import { Modal } from "../components/ui/Modal";
 import { useMeters } from "../hooks/useMeters";
 import type { MetersType } from "../types/meters";
 import { FaPlusCircle, FaTachometerAlt } from "react-icons/fa";
 import { MeterRecordsTable } from "../components/meters/MeterRecordsTable";
-
-interface ModalConfig {
-  isOpen: boolean;
-  title: string;
-  message: string;
-  type: "confirm" | "alert";
-}
+import {
+  AlertDialog,
+  AlertDialogAction,
+  AlertDialogCancel,
+  AlertDialogContent,
+  AlertDialogDescription,
+  AlertDialogFooter,
+  AlertDialogHeader,
+  AlertDialogTitle,
+} from "@/components/ui/alert-dialog";
+import {
+  Dialog,
+  DialogContent,
+  DialogHeader,
+  DialogTitle,
+} from "@/components/ui/dialog";
 
 export const Meters = () => {
   const [activeTab, setActiveTab] = useState<"register" | "history">(
     "register",
   );
-  const [modalConfig, setModalConfig] = useState<ModalConfig>({
-    isOpen: false,
-    title: "",
-    message: "",
-    type: "alert",
-  });
 
   const {
     initialForm,
@@ -36,12 +38,13 @@ export const Meters = () => {
     setIsFormModalOpen,
     editingMeterId,
     setEditingMeterId,
+    idToDelete,
+    setIdToDelete,
     handleChange,
     handleEdit,
     handleSubmit,
-    deleteRequest,
     handleDelete,
-  } = useMeters({ setModalConfig });
+  } = useMeters();
 
   // Função para abrir para NOVA medição
   const handleOpenCreate = () => {
@@ -56,46 +59,40 @@ export const Meters = () => {
     setIsFormModalOpen(true);
   };
 
+  const [isDeleteDialogOpen, setIsDeleteDialogOpen] = useState(false);
+
   return (
     <>
-      {/* Modal de Alerta/Confirmação (Exclusão) */}
-      <Modal
-        isOpen={modalConfig.isOpen}
-        title={modalConfig.title}
-        message={modalConfig.message}
-        type={modalConfig.type}
-        onClose={() => setModalConfig({ ...modalConfig, isOpen: false })}
-        onConfirm={handleDelete}
-      />
+      <Dialog
+        open={isFormModalOpen}
+        onOpenChange={(open) => {
+          setIsFormModalOpen(open);
 
-      {/* MODAL DO FORMULÁRIO (Acionado por Nova Medição ou Editar) */}
-      {isFormModalOpen && (
-        <div className="modal-overlay">
-          <div className="modal-content form-modal">
-            <h2 className="modal-title">
+          if (!open) {
+            setEditingMeterId(null);
+          }
+        }}
+      >
+        <DialogContent>
+          <DialogHeader>
+            <DialogTitle>
               {editingMeterId ? "Editar Medição" : "Nova Medição"}
-            </h2>
-            <button
-              className="close-x"
-              onClick={() => setIsFormModalOpen(false)}
-            >
-              &times;
-            </button>
+            </DialogTitle>
+          </DialogHeader>
 
-            <MetersForm
-              formData={formData}
-              handleChange={handleChange}
-              editingMeterId={editingMeterId}
-              onSave={async () => {
-                const success = await handleSubmit();
-                if (success) {
-                  setIsFormModalOpen(false);
-                }
-              }}
-            />
-          </div>
-        </div>
-      )}
+          <MetersForm
+            formData={formData}
+            handleChange={handleChange}
+            editingMeterId={editingMeterId}
+            onSave={async () => {
+              const success = await handleSubmit();
+              if (success) {
+                setIsFormModalOpen(false);
+              }
+            }}
+          />
+        </DialogContent>
+      </Dialog>
 
       <div className="main-container">
         <header className="pages-header">
@@ -128,7 +125,10 @@ export const Meters = () => {
               <MeterRecordsTable
                 meters={meters}
                 onEdit={handleOpenEdit}
-                onDelete={deleteRequest}
+                onDelete={(id) => {
+                  setIdToDelete(id);
+                  setIsDeleteDialogOpen(true);
+                }}
                 loading={loading}
               />
             </section>
@@ -141,6 +141,39 @@ export const Meters = () => {
           )}
         </div>
       </div>
+
+      <AlertDialog
+        open={isDeleteDialogOpen}
+        onOpenChange={setIsDeleteDialogOpen}
+      >
+        <AlertDialogContent>
+          <AlertDialogHeader>
+            <AlertDialogTitle>Excluir categoria?</AlertDialogTitle>
+
+            <AlertDialogDescription>
+              Tem certeza que deseja excluir esta medição? Esta ação não poderá
+              ser desfeita.
+            </AlertDialogDescription>
+          </AlertDialogHeader>
+
+          <AlertDialogFooter>
+            <AlertDialogCancel>Cancelar</AlertDialogCancel>
+
+            <AlertDialogAction
+              onClick={() => {
+                if (idToDelete !== null) {
+                  handleDelete(idToDelete);
+                }
+
+                setIsDeleteDialogOpen(false);
+                setIdToDelete(null);
+              }}
+            >
+              Excluir
+            </AlertDialogAction>
+          </AlertDialogFooter>
+        </AlertDialogContent>
+      </AlertDialog>
     </>
   );
 };

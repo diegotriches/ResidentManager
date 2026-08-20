@@ -16,7 +16,9 @@ export const MeterRecordsTable: React.FC<MeterRecordsTableProps> = ({
 }) => {
   if (loading) return <h4>Carregando consumos...</h4>;
   if (!loading && meters.length === 0) {
-    return <p>Nenhum registro encontrado. Crie registros no botão Nova Medição.</p>;
+    return (
+      <p>Nenhum registro encontrado. Crie registros no botão Nova Medição.</p>
+    );
   }
 
   return (
@@ -51,18 +53,10 @@ export const MeterRecordsTable: React.FC<MeterRecordsTableProps> = ({
                   : "---"}
               </td>
               <td>
-                <button
-                  className="btn-edit"
-                  onClick={() => onEdit(m)}
-                  title="Editar medição"
-                >
+                <button className="btn-edit" onClick={() => onEdit(m)}>
                   <FaPencilAlt />
                 </button>
-                <button
-                  className="btn-delete"
-                  onClick={() => onDelete(m.id)}
-                  title="Excluir medição"
-                >
+                <button className="btn-delete" onClick={() => onDelete(m.id)}>
                   <FaTrashAlt />
                 </button>
               </td>

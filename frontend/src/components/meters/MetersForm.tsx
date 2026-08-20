@@ -2,6 +2,8 @@ import { FaPencilAlt, FaPlusCircle } from "react-icons/fa";
 import { useApartments } from "../../hooks/useApartments";
 import type { MeterFormData } from "../../types/meters";
 import { months } from "../../utils/constants";
+import { Input } from "@/components/ui/input";
+import { Button } from "@/components/ui/button";
 
 interface MetersFormProps {
   formData: MeterFormData;
@@ -22,15 +24,15 @@ export const MetersForm: React.FC<MetersFormProps> = ({
     onSave({ ...formData });
   };
 
-  const { apartments, loading } = useApartments({ setModalConfig: () => {} });
+  const { apartments, loading } = useApartments();
 
   return (
     <div className="form-wrapper">
       <div className="form-field">
         <label>Data da medição:</label>
         <span>
-          {months.find((m) => m.value === formData.month)?.label}
-          /{formData.year}
+          {months.find((m) => m.value === formData.month)?.label}/
+          {formData.year}
         </span>
       </div>
 
@@ -57,7 +59,8 @@ export const MetersForm: React.FC<MetersFormProps> = ({
       <div className="form-grid">
         <div className="form-field">
           <label>Medição de Água</label>
-          <input
+          <Input
+            id="water"
             type="number"
             name="water"
             value={formData.water}
@@ -68,7 +71,8 @@ export const MetersForm: React.FC<MetersFormProps> = ({
 
         <div className="form-field">
           <label>Medição de Gás</label>
-          <input
+          <Input
+            id="gas"
             type="number"
             name="gas"
             value={formData.gas}
@@ -79,17 +83,17 @@ export const MetersForm: React.FC<MetersFormProps> = ({
       </div>
 
       <div className="modal-btns">
-        <button onClick={handleSave} className="btn-save">
+        <Button onClick={handleSave} className="btn-save">
           {!editingMeterId ? (
             <>
               <FaPlusCircle /> Cadastrar
             </>
           ) : (
             <>
-              <FaPencilAlt /> Editar
+              <FaPencilAlt /> Salvar
             </>
           )}
-        </button>
+        </Button>
       </div>
     </div>
   );

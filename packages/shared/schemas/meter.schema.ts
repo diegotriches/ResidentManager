@@ -9,31 +9,29 @@ export const createMeterSchema = z.object({
 });
 
 export const meterSchema = createMeterSchema.extend({
-  id: z
-    .number({ error: "O ID deve ser um número." })
-    .positive("O ID deve ser um número positivo."),
-
+  id: z.number().positive(),
+  apartment: z.string(),
   createdAt: z.string(),
   updatedAt: z.string(),
 });
 
+export const meterConsumptionSchema = z.object({
+  apartment: z.string(),
+  waterCurrent: z.number(),
+  gasCurrent: z.number(),
+  waterPrevious: z.number(),
+  gasPrevious: z.number(),
+  waterConsumption: z.number(),
+  gasConsumption: z.number(),
+});
+
 export const meterIdParamSchema = z.object({
-  id: z.coerce
-    .number({ error: "O ID deve ser um número." })
-    .positive("O ID deve ser positivo."),
+  id: z.coerce.number().positive(),
 });
 
 export const meterQuerySchema = z.object({
-  month: z.coerce
-    .number({ error: "O mês é obrigatório." })
-    .min(1, "O mês não pode ficar em branco")
-    .max(12, "O valor informado não é válido como um mês."),
-
-  year: z.coerce
-    .number({ error: "O ano é obrigatório." })
-    .min(1900, "O ano não pode ficar em branco.")
-    .max(2100, "O valor informado não é válido como um ano."),
+  month: z.coerce.number().min(1).max(12),
+  year: z.coerce.number().min(1900).max(2100),
 });
 
 export type CreateBillDTO = z.infer<typeof createMeterSchema>;
-export type Bill = z.infer<typeof meterSchema>;
